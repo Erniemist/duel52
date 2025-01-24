@@ -10,10 +10,10 @@ class Card:
         if self.host == game.cursor:
             return False
 
-        return game.active_player.team == self.host.team
+        return game.active_player().team == self.host.team and game.active_player().actions > 0
 
     def on_select(self, game):
-        self.move_to(game.cursor)
+        game.cursor.card = self
         game.cursor.set_offset(game.focused_object)
 
     def move_to(self, new_host):

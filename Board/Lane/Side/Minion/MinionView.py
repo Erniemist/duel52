@@ -13,6 +13,7 @@ class MinionView(ViewObject):
     highlight = (255, 255, 0)
     targeted = (255, 0, 0)
     normal = (0, 0, 0)
+    exahusted_colour = (200, 200, 200)
 
     def __init__(self, minion, position, rotation):
         super().__init__(minion, *position, self.w, self.h)
@@ -36,17 +37,13 @@ class MinionView(ViewObject):
         font = pygame.font.SysFont('arial', self.font_size)
         pygame.draw.rect(
             screen,
-            self.get_border(),
+            self.border_colour(),
             (0, 0, self.w, self.h),
             border_radius=self.weight
         )
-        if self.minion.face_down:
-            colour = CardView.back_colour
-        else:
-            colour = CardView.front_colour
         pygame.draw.rect(
             screen,
-            colour,
+            self.main_colour(),
             (self.weight, self.weight, self.w - self.weight * 2, self.h - self.weight * 2),
             border_radius=self.weight
         )
@@ -59,7 +56,17 @@ class MinionView(ViewObject):
             ))
         return screen
 
-    def get_border(self):
+    def main_colour(self):
+        if self.minion.face_down:
+            colour = CardView.back_colour
+        else:
+            if self.minion.attacks_left > 0:
+                colour = CardView.front_colour
+            else:
+                colour = self.exahusted_colour
+        return colour
+
+    def border_colour(self):
         source = self.minion.game.cursor.target_source
         if source and source is not self.real and self.focused:
             return self.targeted

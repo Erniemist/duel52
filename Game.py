@@ -14,17 +14,24 @@ class Game:
     def __init__(self, screen):
         self.screen = screen
         self.view_objects = []
-        self.players = [Player(team, self) for team in Player.TEAMS]
-        self.active_player = self.players[0]
         self.graveyard = Graveyard(self)
+        self.players = [Player(team, self) for team in Player.TEAMS]
         self.board = Board(self)
         self.cursor = Cursor(self)
+        self.active_player_index = 0
+        self.active_player().start_turn(actions=2)
         self.displayables = [*self.players, self.board, self.cursor]
         self.focused_object = None
         self.running = True
         self.tick = 0
+        self.turns = 0
+
+    def active_player(self):
+        return self.players[self.active_player_index]
 
     def loop(self):
+        if self.active_player().actions == 0:
+            self.new_turn()
         self.cursor.position = pygame.mouse.get_pos()
         self.generate_view_objects()
         self.handle_events()
@@ -33,6 +40,11 @@ class Game:
             view_object.draw_all(self.screen)
         self.tick += 1
         pygame.display.flip()
+
+    def new_turn(self):
+        self.turns += 1
+        self.active_player_index = (self.active_player_index + 1) % 2
+        self.active_player().start_turn()
 
     def generate_view_objects(self):
         self.view_objects = []
@@ -72,7 +84,7 @@ class Game:
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == RIGHT:
-                self.cursor.cancel_target()
+                self.cursor.cancel()
                 return
             if event.button != LEFT:
                 return

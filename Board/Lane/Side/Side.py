@@ -2,17 +2,19 @@ from Board.Lane.Side.Minion.Minion import Minion
 
 
 class Side:
-    def __init__(self, game, lane, team):
-        self.lane = lane
+    def __init__(self, game, lane, player):
         self.game = game
-        self.team = team
+        self.lane = lane
+        self.player = player
+        self.team = player.team
         self.cards = []
 
     def can_place(self, game, card):
-        return self.team == game.active_player.team
+        return self.team == game.active_player().team and self.player.actions > 0
 
     def on_place(self, game, card):
-        card.move_to(self)
+        game.cursor.card = None
+        game.active_player().play_card(self, card)
 
     def add_card(self, card):
         card.minion = Minion(card, self, self.game)

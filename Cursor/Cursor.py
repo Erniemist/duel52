@@ -43,6 +43,13 @@ class Cursor:
     def set_target_source(self, minion):
         self.target_source = minion
 
+    def cancel(self):
+        match self.mode():
+            case 'target':
+                self.target_source = None
+            case 'place':
+                self.card = None
+
     def cancel_target(self):
         self.target_source = None
 

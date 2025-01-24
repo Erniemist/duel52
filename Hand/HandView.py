@@ -10,16 +10,17 @@ class HandView(ViewObject):
     card_w = CardView.w * 0.8
 
     def __init__(self, hand, x, y, flipped):
-        w = self.card_w * len(hand.cards)
+        self.cards_to_show = [card for card in hand.cards if card is not hand.game.cursor.card]
+        w = self.card_w * len(self.cards_to_show)
         super().__init__(hand, x - w / 2, y - CardView.h / 2, w, CardView.h)
         self.flipped = flipped
         self.hand = self.real
-        self.cards = self.generate_cards()
-        self.set_children(self.cards)
+        self.card_views = self.generate_cards()
+        self.set_children(self.card_views)
 
     def generate_cards(self):
         cards = []
-        for i, card in enumerate(self.hand.cards):
+        for i, card in enumerate(self.cards_to_show):
             rotation = self.card_rotation(i)
             y = self.card_y(rotation)
             if self.flipped:
@@ -31,7 +32,7 @@ class HandView(ViewObject):
                 i,
                 (self.card_x(i), y),
                 rotation=rotation,
-                facedown=self.flipped,
+                face_down=self.flipped,
             ))
         return cards
 
@@ -39,18 +40,22 @@ class HandView(ViewObject):
         return i * self.card_w
 
     def card_y(self, rotation):
-        if len(self.hand.cards) == 1:
+        if len(self.cards_to_show) == 1:
             return 0
         return self.h * 0.255 - math.sin((90 - rotation * 2) / 180 * math.pi) * self.h / 2
 
     def card_rotation(self, i):
-        if len(self.hand.cards) == 1:
+        if len(self.cards_to_show) == 1:
             return 0
         spread = 60
-        return spread / 2 - spread / (len(self.hand.cards) - 1) * i
+        return spread / 2 - spread / (len(self.cards_to_show) - 1) * i
 
     def focus_card(self, card: HandCardView):
-        focused = FocusedHandCardView(card.card, (self.card_x(card.i), -CardView.h * 0.5))
+        focused = FocusedHandCardView(
+            card.card,
+            (self.card_x(card.i), -CardView.h * 0.5 * (-1 if self.flipped else 1)),
+            face_down=card.face_down,
+        )
         focused.parent = self
-        self.cards[card.i] = focused
+        self.card_views[card.i] = focused
         return focused

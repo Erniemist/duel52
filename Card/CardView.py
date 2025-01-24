@@ -12,11 +12,11 @@ class CardView(ViewObject):
     back_colour = (230, 100, 100)
     front_colour = (230, 230, 230)
 
-    def __init__(self, card, pos, rotation=0, facedown=False):
+    def __init__(self, card, pos, rotation=0, face_down=False):
         super().__init__(card, *pos, 125, 175)
         self.card = self.real
         self.rotation = rotation
-        self.facedown = facedown
+        self.face_down = face_down
 
     def draw(self, screen: pygame.Surface):
         card = self.draw_surface()
@@ -43,7 +43,8 @@ class CardView(ViewObject):
             (0, 0, self.w, self.h),
             border_radius=self.weight
         )
-        if self.facedown:
+
+        if self.face_down:
             pygame.draw.rect(
                 screen,
                 self.back_colour,
