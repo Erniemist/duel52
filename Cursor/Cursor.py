@@ -21,20 +21,14 @@ class Cursor:
     def start_pos(self):
         return self.target_source.view_object.get_centre()
 
-    def add_card(self, card):
-        if self.card:
-            raise Exception('Cursor has card')
+    def select(self, card):
         self.card = card
+        self.set_offset(self.game.game_view.focused_object)
 
     def set_offset(self, card_view):
         x, y = self.position
         c_x, c_y = card_view.position()
         self.offset = (c_x - x, c_y - y)
-
-    def remove_card(self, card):
-        if not self.card:
-            raise Exception('No card to put down')
-        self.card = None
 
     def card_position(self):
         o_x, o_y = self.offset

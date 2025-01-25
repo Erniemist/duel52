@@ -1,6 +1,7 @@
 from Board.BoardView import BoardView
 from Player.PlayerView import PlayerView
 from ViewObject import ViewObject
+from functions import can_call
 
 
 class GameView(ViewObject):
@@ -12,3 +13,17 @@ class GameView(ViewObject):
             BoardView(game.board(), game, w, h),
             game.cursor.view(game)
         ])
+        self.focused_object = self.get_focused_object()
+
+    def get_focused_object(self):
+        touched_object = self.check_focus(self.game.cursor.position)
+        if touched_object is None:
+            return
+
+        if can_call(touched_object, 'on_focus'):
+            touched_object = touched_object.on_focus()
+        touched_object.focused = True
+        return touched_object
+
+    def draw(self, screen):
+        screen.fill((64, 180, 64))

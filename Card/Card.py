@@ -13,8 +13,7 @@ class Card:
         return game.active_player().team == self.host.team and game.active_player().actions > 0
 
     def on_select(self, game):
-        game.cursor.card = self
-        game.cursor.set_offset(game.focused_object)
+        game.cursor.select(self)
 
     def move_to(self, new_host):
         self.host.remove_card(self)

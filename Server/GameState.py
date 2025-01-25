@@ -14,6 +14,10 @@ class GameState:
         self.active_player().start_turn(actions=2)
         self.turns = 0
 
+    def update(self):
+        if self.active_player().actions == 0:
+            self.new_turn()
+
     def active_player(self):
         return self.players[self.active_player_index]
 
