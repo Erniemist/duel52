@@ -17,8 +17,7 @@ class Cursor:
             return TargetView(self.game, self.start_pos(), self.position)
 
     def start_pos(self):
-        x, y = self.target_source.view_object.position()
-        return x + self.target_source.view_object.w / 2, y + self.target_source.view_object.h / 2
+        return self.target_source.view_object.get_centre()
 
     def add_card(self, card):
         if self.card:

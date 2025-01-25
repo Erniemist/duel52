@@ -22,6 +22,7 @@ class Game:
         self.active_player().start_turn(actions=2)
         self.displayables = [*self.players, self.board, self.cursor]
         self.focused_object = None
+        self.last_focused = None
         self.running = True
         self.tick = 0
         self.turns = 0
@@ -43,11 +44,13 @@ class Game:
 
     def new_turn(self):
         self.turns += 1
+        self.active_player().end_turn()
         self.active_player_index = (self.active_player_index + 1) % 2
         self.active_player().start_turn()
 
     def generate_view_objects(self):
         self.view_objects = []
+        self.last_focused = self.focused_object
         self.focused_object = None
         for displayable in self.displayables:
             view = displayable.view()

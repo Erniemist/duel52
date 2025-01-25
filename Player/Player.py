@@ -20,8 +20,10 @@ class Player:
     def start_turn(self, actions=3):
         self.actions = actions
         self.deck.draw_from_top()
+
+    def end_turn(self):
         for minion in self.minions():
-            minion.start_turn()
+            minion.end_turn()
 
     def view(self):
         return PlayerView(self)
@@ -45,12 +47,25 @@ class Player:
         self.action()
         minion.face_down = False
 
+    def pair_cards(self, minion, second_minion):
+        if minion.team != self.team or second_minion.team != self.team:
+            raise Exception("Tried to pair minion from the other team")
+        if minion.value != second_minion.value:
+            raise Exception("Can't pair non-matching minions")
+        if minion.pair or second_minion.pair:
+            raise Exception("Can't pair already paired minions")
+        if minion.face_down or second_minion.face_down:
+            raise Exception("Can't pair facedown minions")
+        self.action()
+        minion.pair = second_minion
+        second_minion.pair = minion
+
     def attack(self, friendly_minion, enemy_minion):
         if friendly_minion.team != self.team:
             raise Exception("Tried to attack from an enemy minion")
         if enemy_minion.team == self.team:
             raise Exception("Tried to attack a friendly minion")
-        if friendly_minion.attacks_left < 1:
+        if friendly_minion.attacks_left() < 1:
             raise Exception("Tried to attack with an exhausted minion")
         self.action()
         friendly_minion.attack(enemy_minion)

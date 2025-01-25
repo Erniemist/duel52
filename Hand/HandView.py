@@ -26,14 +26,21 @@ class HandView(ViewObject):
             if self.flipped:
                 rotation *= -1
                 y *= -1
-            cards.append(HandCardView(
-                card,
-                self,
-                i,
-                (self.card_x(i), y),
-                rotation=rotation,
-                face_down=self.flipped,
-            ))
+            if self.hand.game.last_focused and card is self.hand.game.last_focused.real:
+                cards.append(FocusedHandCardView(
+                    card,
+                    (self.card_x(i), -CardView.h * 0.5 * (-1 if self.flipped else 1)),
+                    face_down=self.flipped,
+                ))
+            else:
+                cards.append(HandCardView(
+                    card,
+                    self,
+                    i,
+                    (self.card_x(i), y),
+                    rotation=rotation,
+                    face_down=self.flipped,
+                ))
         return cards
 
     def card_x(self, i):
@@ -49,13 +56,3 @@ class HandView(ViewObject):
             return 0
         spread = 60
         return spread / 2 - spread / (len(self.cards_to_show) - 1) * i
-
-    def focus_card(self, card: HandCardView):
-        focused = FocusedHandCardView(
-            card.card,
-            (self.card_x(card.i), -CardView.h * 0.5 * (-1 if self.flipped else 1)),
-            face_down=card.face_down,
-        )
-        focused.parent = self
-        self.card_views[card.i] = focused
-        return focused

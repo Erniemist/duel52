@@ -23,17 +23,25 @@ class SideView(ViewObject):
 
     def generate_minion_views(self):
         row_max = 4
-        num_minions = len(self.side.cards)
+        pairs = []
+        minions = []
+        for card in self.side.cards:
+            if card.minion.pair:
+                if card.minion.pair not in pairs:
+                    pairs.append(card.minion)
+            else:
+                minions.append([card.minion])
+        minions = minions + [[minion, minion.pair] for minion in pairs]
+        num_minions = len(minions)
         num_rows = math.ceil(num_minions / row_max)
 
         return [
-            card.minion.view(
-                self.minion_position(i, num_minions, num_rows)
-            )
-            for i, card in enumerate(self.side.cards)
+            MinionView(minion, self.minion_position(i, j, num_minions, num_rows))
+            for i, minion_group in enumerate(minions)
+            for j, minion in enumerate(minion_group)
         ]
 
-    def minion_position(self, i, num_minions, num_rows):
+    def minion_position(self, i, j, num_minions, num_rows):
         minions_per_row = math.ceil(num_minions / num_rows)
         row = i // minions_per_row
         col = i % minions_per_row
@@ -43,6 +51,6 @@ class SideView(ViewObject):
         x_start = self.w / 2 - row_width / 2
         y_start = self.h / 2 - total_height / 2
         return (
-            x_start + col * (MinionView.w + self.margin),
-            y_start + row * (MinionView.h + self.margin),
+            x_start + col * (MinionView.w + self.margin) + j * MinionView.w / 5,
+            y_start + row * (MinionView.h + self.margin) + j * MinionView.h / 5,
         )

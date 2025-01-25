@@ -1,6 +1,6 @@
 import pygame
 
-import rectangle
+from Board.Lane.Side.Minion.Minion import Minion
 from Card.CardView import CardView
 from ViewObject import ViewObject
 
@@ -12,15 +12,20 @@ class MinionView(ViewObject):
     font_size = 30
     highlight = (255, 255, 0)
     targeted = (255, 0, 0)
+    pairing = (100, 100, 255)
     normal = (0, 0, 0)
     exahusted_colour = (200, 200, 200)
 
-    def __init__(self, minion, position, rotation):
+    def __init__(self, minion, position):
         super().__init__(minion, *position, self.w, self.h)
         self.minion = self.real
-        self.rotation = rotation
+        self.minion.view_object = self
+        self.border_colour = self.normal
+        damage = minion.max_hp - minion.hp
+        self.rotation = -90 / minion.max_hp * damage
 
     def draw(self, screen: pygame.Surface):
+        self.border_colour = self.get_border()
         minion = self.draw_surface()
         x, y = self.position()
         x += self.w / 2
@@ -37,7 +42,7 @@ class MinionView(ViewObject):
         font = pygame.font.SysFont('arial', self.font_size)
         pygame.draw.rect(
             screen,
-            self.border_colour(),
+            self.border_colour,
             (0, 0, self.w, self.h),
             border_radius=self.weight
         )
@@ -56,20 +61,66 @@ class MinionView(ViewObject):
             ))
         return screen
 
+    def get_centre(self):
+        if self.minion.pair:
+            return self.get_centre_pair()
+        return self.get_centre_alone()
+
+    def get_centre_pair(self):
+        x1, y1 = self.get_centre_alone()
+        x2, y2 = self.minion.pair.view_object.get_centre_alone()
+        return (x1 + x2) / 2, (y1 + y2) / 2
+
+    def get_centre_alone(self):
+        x, y = self.position()
+        return x + self.w / 2, y + self.h / 2
+
     def main_colour(self):
         if self.minion.face_down:
             colour = CardView.back_colour
         else:
-            if self.minion.attacks_left > 0:
+            if self.minion.attacks_left() > 0:
                 colour = CardView.front_colour
             else:
                 colour = self.exahusted_colour
         return colour
 
-    def border_colour(self):
+    def on_focus(self):
+        self.focused = True
+        self.border_colour = self.get_border()
+        return self
+
+    def get_border(self):
+        if not self.minion.pair or not self.minion.pair.view_object:
+            return self.determine_border_from_focus()
+
+        paired_view = self.minion.pair.view_object
+        if paired_view.border_colour != self.normal:
+            return paired_view.border_colour
+        border_colour = self.determine_border_from_focus()
+        paired_view.border_colour = border_colour
+        return border_colour
+
+    def determine_border_from_focus(self):
         source = self.minion.game.cursor.target_source
-        if source and source is not self.real and self.focused:
-            return self.targeted
-        if source is self.real or self.focused:
+        if source and source is not self.minion and self.focused:
+            if source.team != self.minion.team:
+                return self.targeted
+            return self.pairing
+        if source is self.minion:
+            if self.source_of_pairing():
+                return self.pairing
+            return self.highlight
+        if self.focused:
             return self.highlight
         return self.normal
+
+    def source_of_pairing(self):
+        other_pair = self.minion.game.last_focused
+        if not other_pair:
+            return False
+        if not isinstance(other_pair.real, Minion):
+            return False
+        if other_pair.minion is self.minion:
+            return False
+        return other_pair.minion.team == self.minion.team

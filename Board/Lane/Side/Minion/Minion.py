@@ -1,12 +1,10 @@
-from Board.Lane.Side.Minion.MinionView import MinionView
-
-
 class Minion:
     max_hp = 2
     max_attacks = 1
 
     def __init__(self, card, side, game):
         self.card = card
+        self.value = card.value
         self.side = side
         self.player = side.player
         self.team = self.player.team
@@ -15,13 +13,19 @@ class Minion:
         self.face_down = True
         self.view_object = None
         self.pair = None
-        self.attacks_left = self.max_attacks
+        self.attacks_made = 0
+        self.focused = False
 
-    def start_turn(self):
-        self.attacks_left = self.max_attacks
+    def end_turn(self):
+        self.attacks_made = 0
+
+    def attacks_left(self):
+        return self.max_attacks - (self.attacks_made + (self.pair.attacks_made if self.pair else 0))
 
     def can_select(self, game):
-        return self.team == game.active_player().team and self.player.actions > 0 and self.attacks_left > 0
+        if self.team != game.active_player().team or self.player.actions < 1:
+            return False
+        return not self.pair or self.attacks_left() > 0
 
     def on_select(self, game):
         if self.face_down:
@@ -29,32 +33,40 @@ class Minion:
         else:
             game.cursor.set_target_source(self)
 
+    def on_focus(self):
+        if self.pair:
+            self.pair.focused = True
+
     def can_target(self, game, target_source):
-        if target_source.side.lane is not self.side.lane:
+        if game.active_player().team != self.team:
+            return self.can_be_attacked(target_source)
+        return self.can_pair(target_source)
+
+    def can_be_attacked(self, target_source):
+        return target_source.side.lane == self.side.lane
+
+    def can_pair(self, target_source):
+        if self.face_down:
             return False
-        if target_source.side.team == self.side.team:
+        if self.pair or target_source.pair:
             return False
-        return True
+        return self.value == target_source.value
 
     def on_target(self, game, target_source):
         game.cursor.cancel_target()
-        if target_source.side.lane is not self.side.lane:
-            return
-        if target_source.side is self.side:
-            return
-        game.active_player().attack(target_source, self)
-
-    def view(self, position):
-        damage = self.max_hp - self.hp
-        self.view_object = MinionView(self, position, -90 / self.max_hp * damage)
-        return self.view_object
+        if game.active_player().team != self.team:
+            game.active_player().attack(target_source, self)
+        else:
+            game.active_player().pair_cards(target_source, self)
 
     def attack(self, enemy):
-        self.attacks_left -= 1
+        self.attacks_made += 1
         damage = 2 if self.pair else 1
         enemy.hp -= damage
         if enemy.hp <= 0:
             enemy.die()
 
     def die(self):
+        if self.pair:
+            self.pair.pair = None
         self.card.move_to(self.game.graveyard)
