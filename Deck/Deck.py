@@ -10,8 +10,7 @@ class Deck:
         self.game = game
         self.deck = [
             Card(value, self)
-            # for value in ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'] * 4
-            for value in ['A', 'B'] * 40
+            for value in ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'] * 4
         ]
         random.shuffle(self.deck)
 
