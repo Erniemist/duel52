@@ -33,10 +33,6 @@ class Minion:
         else:
             game.cursor.set_target_source(self)
 
-    def on_focus(self):
-        if self.pair:
-            self.pair.focused = True
-
     def can_target(self, game, target_source):
         if game.active_player().team != self.team:
             return self.can_be_attacked(target_source)

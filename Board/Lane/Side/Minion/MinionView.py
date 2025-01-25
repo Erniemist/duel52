@@ -20,7 +20,7 @@ class MinionView(ViewObject):
         super().__init__(minion, *position, self.w, self.h)
         self.minion = self.real
         self.minion.view_object = self
-        self.border_colour = self.normal
+        self.border_colour = None
         damage = minion.max_hp - minion.hp
         self.rotation = -90 / minion.max_hp * damage
 
@@ -85,32 +85,21 @@ class MinionView(ViewObject):
                 colour = self.exahusted_colour
         return colour
 
-    def on_focus(self):
-        self.focused = True
-        self.border_colour = self.get_border()
-        return self
-
     def get_border(self):
-        if not self.minion.pair or not self.minion.pair.view_object:
-            return self.determine_border_from_focus()
-
-        paired_view = self.minion.pair.view_object
-        if paired_view.border_colour != self.normal:
-            return paired_view.border_colour
-        border_colour = self.determine_border_from_focus()
-        paired_view.border_colour = border_colour
-        return border_colour
-
-    def determine_border_from_focus(self):
         source = self.minion.game.cursor.target_source
         if source and source is not self.minion and self.focused:
             if source.team != self.minion.team:
                 return self.targeted
             return self.pairing
-        if source is self.minion:
-            if self.source_of_pairing():
-                return self.pairing
-            return self.highlight
+        if self.minion.pair:
+            if source is self.minion or source is self.minion.pair:
+                return self.highlight
+        else:
+            if source is self.minion:
+                if self.source_of_pairing():
+                    return self.pairing
+                else:
+                    return self.highlight
         if self.focused:
             return self.highlight
         return self.normal
@@ -119,7 +108,7 @@ class MinionView(ViewObject):
         other_pair = self.minion.game.last_focused
         if not other_pair:
             return False
-        if not isinstance(other_pair.real, Minion):
+        if not isinstance(other_pair, MinionView):
             return False
         if other_pair.minion is self.minion:
             return False
