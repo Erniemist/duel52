@@ -1,5 +1,6 @@
 from Cursor.CursorCardView import CursorCardView
 from Cursor.TargetView import TargetView
+from ViewObject import ViewObject
 
 
 class Cursor:
@@ -10,11 +11,12 @@ class Cursor:
         self.card = None
         self.target_source = None
 
-    def view(self):
+    def view(self, game):
         if self.card:
-            return CursorCardView(self.card, self.card_position())
+            return CursorCardView(self.card, game, self.card_position())
         if self.target_source:
-            return TargetView(self.game, self.start_pos(), self.position)
+            return TargetView(self, game, self.start_pos(), self.position)
+        return ViewObject(self, game, 0, 0)
 
     def start_pos(self):
         return self.target_source.view_object.get_centre()

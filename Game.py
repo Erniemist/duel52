@@ -1,9 +1,12 @@
 import pygame
 
 from Board.Board import Board
+from Board.BoardView import BoardView
 from Cursor.Cursor import Cursor
 from Graveyard.Graveyard import Graveyard
 from Player.Player import Player
+from Player.PlayerView import PlayerView
+from Server.GameState import GameState
 from functions import can_call
 
 LEFT = 1
@@ -14,25 +17,29 @@ class Game:
     def __init__(self, screen):
         self.screen = screen
         self.view_objects = []
-        self.graveyard = Graveyard(self)
-        self.players = [Player(team, self) for team in Player.TEAMS]
-        self.board = Board(self)
+        self.game_state = GameState()
         self.cursor = Cursor(self)
-        self.active_player_index = 0
-        self.active_player().start_turn(actions=2)
-        self.displayables = [*self.players, self.board, self.cursor]
         self.focused_object = None
         self.last_focused = None
         self.running = True
         self.tick = 0
         self.turns = 0
 
+    def graveyard(self):
+        return self.game_state.graveyard
+
+    def players(self):
+        return self.game_state.players
+
+    def board(self):
+        return self.game_state.board
+
     def active_player(self):
-        return self.players[self.active_player_index]
+        return self.game_state.active_player()
 
     def loop(self):
         if self.active_player().actions == 0:
-            self.new_turn()
+            self.game_state.new_turn()
         self.cursor.position = pygame.mouse.get_pos()
         self.generate_view_objects()
         self.handle_events()
@@ -49,19 +56,19 @@ class Game:
         self.active_player().start_turn()
 
     def generate_view_objects(self):
-        self.view_objects = []
         self.last_focused = self.focused_object
         self.focused_object = None
-        for displayable in self.displayables:
-            view = displayable.view()
-            if view:
-                self.view_objects.append(view)
-
+        w, h = self.screen.get_width(), self.screen.get_height()
+        self.view_objects = [
+            *(PlayerView(player, self, w, h) for player in self.players()),
+            BoardView(self.board(), self, w, h),
+            self.cursor.view(self)
+        ]
         self.focused_object = self.get_focused_object()
 
     def get_focused_object(self):
         for view_object in self.view_objects[::-1]:
-            touched_object = view_object.check_focus(self, self.cursor.position)
+            touched_object = view_object.check_focus(self.cursor.position)
             if touched_object is None:
                 continue
 

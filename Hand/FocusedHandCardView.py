@@ -6,9 +6,9 @@ from Card.CardView import CardView
 class FocusedHandCardView(CardView):
     zoom = 1.1
 
-    def __init__(self, card, pos, face_down=False):
+    def __init__(self, card, game, pos, face_down=False):
         self.focused = True
-        super().__init__(card, pos, face_down=face_down)
+        super().__init__(card, game, pos, face_down=face_down)
 
     def touching_mouse(self, mouse):
         m_x, m_y = mouse

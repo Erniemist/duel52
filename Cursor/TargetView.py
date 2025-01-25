@@ -8,9 +8,8 @@ class TargetView(ViewObject):
     length = 20
     gap = 10
 
-    def __init__(self, game, start, end):
-        super().__init__(game.cursor, *start)
-        self.game = game
+    def __init__(self, cursor, game, start, end):
+        super().__init__(cursor, game, *start)
         self.start = start
         self.end = end
 

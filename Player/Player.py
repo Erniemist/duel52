@@ -25,9 +25,6 @@ class Player:
         for minion in self.minions():
             minion.end_turn()
 
-    def view(self):
-        return PlayerView(self)
-
     def minions(self):
         return [card.minion for side in self.sides() for card in side.cards]
 

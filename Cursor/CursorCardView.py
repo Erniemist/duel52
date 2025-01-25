@@ -8,8 +8,8 @@ class CursorCardView(CardView):
     shadow_offset = (20, 20)
     perspective_scale = 1.1
 
-    def __init__(self, card, pos):
-        super().__init__(card, pos, 0)
+    def __init__(self, card, game, pos):
+        super().__init__(card, game, pos)
 
     def draw_surface(self):
         x, y = self.shadow_offset

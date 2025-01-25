@@ -8,8 +8,8 @@ class DeckView(ViewObject):
     w = 125
     h = 175
 
-    def __init__(self, deck, x, y):
-        super().__init__(deck, x, y - self.h / 2, self.w, self.h)
+    def __init__(self, deck, game, x, y):
+        super().__init__(deck, game, x, y - self.h / 2, self.w, self.h)
         self.deck = self.real
 
     def draw(self, screen: pygame.Surface):

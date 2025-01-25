@@ -1,6 +1,5 @@
 import pygame
 
-from Board.Lane.Side.Minion.Minion import Minion
 from Card.CardView import CardView
 from ViewObject import ViewObject
 
@@ -16,8 +15,8 @@ class MinionView(ViewObject):
     normal = (0, 0, 0)
     exahusted_colour = (200, 200, 200)
 
-    def __init__(self, minion, position):
-        super().__init__(minion, *position, self.w, self.h)
+    def __init__(self, minion, game, position):
+        super().__init__(minion, game, *position, self.w, self.h)
         self.minion = self.real
         self.minion.view_object = self
         self.border_colour = None
@@ -86,7 +85,7 @@ class MinionView(ViewObject):
         return colour
 
     def get_border(self):
-        source = self.minion.game.cursor.target_source
+        source = self.game.cursor.target_source
         if source and source is not self.minion and self.focused:
             if source.team != self.minion.team:
                 return self.targeted
@@ -105,7 +104,7 @@ class MinionView(ViewObject):
         return self.normal
 
     def source_of_pairing(self):
-        other_pair = self.minion.game.last_focused
+        other_pair = self.game.last_focused
         if not other_pair:
             return False
         if not isinstance(other_pair, MinionView):

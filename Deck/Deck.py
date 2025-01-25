@@ -1,7 +1,6 @@
 import random
 
 from Card.Card import Card
-from Deck.DeckView import DeckView
 
 
 class Deck:
