@@ -1,5 +1,6 @@
 import pygame
 
+import rectangle
 from Card.CardView import CardView
 
 
@@ -8,10 +9,7 @@ class FocusedHandCardView(CardView):
 
     def __init__(self, card, game, pos, face_down=False):
         self.focused = True
-        super().__init__(card, game, pos, face_down=face_down)
+        super().__init__(card, game, pos, face_down=face_down, w=CardView.w * self.zoom, h=CardView.h * self.zoom)
 
-    def touching_mouse(self, mouse):
-        m_x, m_y = mouse
-        x, y = self.position()
-        w, h = self.w * self.zoom, self.h * self.zoom * 2
-        return x <= m_x <= x + w and y <= m_y <= y + h
+    def touching_mouse(self):
+        return rectangle.point_inside(self.game.cursor.position, (*self.position(), self.w, self.h * 2))

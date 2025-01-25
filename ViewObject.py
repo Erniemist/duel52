@@ -21,27 +21,27 @@ class ViewObject:
         for child in self.children:
             child.parent = self
 
-    def check_focus(self, mouse):
+    def check_focus(self):
         for child in self.children[::-1]:
-            child_focus = child.check_focus(mouse)
+            child_focus = child.check_focus()
             if child_focus is not None:
                 return child_focus
-        return self.base_check_focus(mouse)
+        return self.base_check_focus()
 
-    def base_check_focus(self, mouse):
+    def base_check_focus(self):
         cursor = self.game.cursor
         if not can_call(self.real, cursor.click_method_name()):
             return None
         if can_call(self.real, cursor.validation_method_name()) and not cursor.validation_method()(self.real):
             return None
-        return self if self.touching_mouse(mouse) else None
+        return self if self.touching_mouse() else None
 
     def rect(self):
         x, y = self.position()
         return x, y, self.w, self.h
 
-    def touching_mouse(self, mouse):
-        return rectangle.point_inside(mouse, self.rect())
+    def touching_mouse(self):
+        return rectangle.point_inside(self.game.cursor.position, self.rect())
 
     def draw_all(self, screen):
         self.draw(screen)

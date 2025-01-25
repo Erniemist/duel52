@@ -8,18 +8,18 @@ class Player:
     THEM = 1
     TEAMS = [US, THEM]
 
-    def __init__(self, team, game):
+    def __init__(self, team, game, deck):
         self.team = team
         self.game = game
         self.hand = Hand(self, game)
-        self.deck = Deck(self, game)
+        self.deck = deck
         self.actions = 0
         for i in range(5):
-            self.deck.draw_from_top()
+            self.deck.draw_from_top(self.hand)
 
     def start_turn(self, actions=3):
         self.actions = actions
-        self.deck.draw_from_top()
+        self.deck.draw_from_top(self.hand)
 
     def end_turn(self):
         for minion in self.minions():

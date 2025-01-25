@@ -13,6 +13,7 @@ class Card:
         return game.active_player().team == self.host.team and game.active_player().actions > 0
 
     def on_select(self, game):
+        print('selecting', self)
         game.cursor.select(self)
 
     def move_to(self, new_host):

@@ -1,5 +1,5 @@
 from Board.Board import Board
-from Cursor.Cursor import Cursor
+from Deck.Deck import Deck
 from Graveyard.Graveyard import Graveyard
 from Player.Player import Player
 
@@ -7,12 +7,21 @@ from Player.Player import Player
 class GameState:
     def __init__(self):
         self.graveyard = Graveyard(self)
-        self.players = [Player(team, self) for team in Player.TEAMS]
+        self.players = self.make_players()
         self.board = Board(self)
-        self.cursor = Cursor(self)
         self.active_player_index = 0
         self.active_player().start_turn(actions=2)
         self.turns = 0
+
+    def make_players(self):
+        main_deck = Deck(self)
+        players = []
+        for team in Player.TEAMS:
+            deck = Deck(self, [])
+            for i in range(20):
+                main_deck.draw_from_top(deck)
+            players.append(Player(team, self, deck))
+        return players
 
     def update(self):
         if self.active_player().actions == 0:

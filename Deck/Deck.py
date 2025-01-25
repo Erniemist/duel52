@@ -4,17 +4,21 @@ from Card.Card import Card
 
 
 class Deck:
-    def __init__(self, player, game):
-        self.player = player
+    def __init__(self, game, values=None):
+        self.player = None
         self.game = game
-        self.deck = [
+        values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'] * 4 if values is None else values
+        self.cards = [
             Card(value, self)
-            for value in ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'] * 4
+            for value in values
         ]
-        random.shuffle(self.deck)
+        random.shuffle(self.cards)
 
-    def draw_from_top(self):
-        self.deck[0].move_to(self.player.hand)
+    def draw_from_top(self, zone):
+        self.cards[0].move_to(zone)
 
     def remove_card(self, card):
-        self.deck = [c for c in self.deck if c is not card]
+        self.cards = [c for c in self.cards if c is not card]
+
+    def add_card(self, card):
+        self.cards.append(card)

@@ -16,7 +16,7 @@ class GameView(ViewObject):
         self.focused_object = self.get_focused_object()
 
     def get_focused_object(self):
-        touched_object = self.check_focus(self.game.cursor.position)
+        touched_object = self.check_focus()
         if touched_object is None:
             return
 

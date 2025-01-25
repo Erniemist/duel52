@@ -12,8 +12,8 @@ class CardView(ViewObject):
     back_colour = (230, 100, 100)
     front_colour = (230, 230, 230)
 
-    def __init__(self, card, game, pos, rotation=0, face_down=False):
-        super().__init__(card, game, *pos, 125, 175)
+    def __init__(self, card, game, pos, rotation=0, face_down=False, w=None, h=None):
+        super().__init__(card, game, *pos, 125 if w is None else w, 175 if h is None else h)
         self.card = self.real
         self.rotation = rotation
         self.face_down = face_down
@@ -35,7 +35,6 @@ class CardView(ViewObject):
         return self.draw_card(screen, highlight=True)
 
     def draw_card(self, screen: pygame.Surface, highlight=False):
-        font = pygame.font.SysFont('arial', self.font_size)
         border_colour = (255, 255, 0) if highlight else (0, 0, 0)
         pygame.draw.rect(
             screen,
@@ -58,6 +57,7 @@ class CardView(ViewObject):
             (self.weight, self.weight, self.w - self.weight * 2, self.h - self.weight * 2),
             border_radius=self.weight
         )
+        font = pygame.font.SysFont('arial', self.font_size)
         numeral = font.render(self.card.value, True, (0, 0, 0))
 
         screen.blit(numeral, (

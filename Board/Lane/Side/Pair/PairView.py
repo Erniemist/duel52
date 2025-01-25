@@ -11,9 +11,9 @@ class PairView(ViewObject):
         self.second_view = MinionView(second, game, (offset, offset))
         self.set_children([self.first_view, self.second_view])
 
-    def check_focus(self, mouse):
-        second_focus = self.second_view.check_focus(mouse)
-        first_focus = self.first_view.check_focus(mouse)
+    def check_focus(self):
+        second_focus = self.second_view.check_focus()
+        first_focus = self.first_view.check_focus()
         if self.game.cursor.mode() == 'target' and self.game.cursor.target_source.team != self.team:
             return second_focus if second_focus is not None else first_focus
         return self if (second_focus is not None or first_focus is not None) else None

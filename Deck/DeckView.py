@@ -7,6 +7,7 @@ from ViewObject import ViewObject
 class DeckView(ViewObject):
     w = 125
     h = 175
+    font_size = 30
 
     def __init__(self, deck, game, x, y):
         super().__init__(deck, game, x, y - self.h / 2, self.w, self.h)
@@ -23,4 +24,12 @@ class DeckView(ViewObject):
             (x + margin, y + margin, self.w - margin * 2, self.h - margin * 2),
             border_radius=margin
         )
+        if self.touching_mouse():
+            font = pygame.font.SysFont('arial', self.font_size)
+            numeral = font.render(str(len(self.deck.cards)), True, (255, 255, 255))
+
+            screen.blit(numeral, (
+                x + self.w / 2 - numeral.get_width() / 2,
+                y + self.h / 2 - numeral.get_height() / 2,
+            ))
 
