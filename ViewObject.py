@@ -54,5 +54,11 @@ class ViewObject:
         x, y = self.parent.position()
         return self._x + x, self._y + y
 
+    def call_recursive(self, method_name, callback):
+        for child in self.children:
+            child.call_recursive(method_name, callback)
+        if can_call(self, method_name):
+            callback(self)
+
     def draw(self, screen):
         pass

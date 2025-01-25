@@ -13,5 +13,5 @@ class FocusedHandCardView(CardView):
     def touching_mouse(self, mouse):
         m_x, m_y = mouse
         x, y = self.position()
-        w, h = self.w * self.zoom, self.h * self.zoom
+        w, h = self.w * self.zoom, self.h * self.zoom * 2
         return x <= m_x <= x + w and y <= m_y <= y + h

@@ -31,5 +31,5 @@ class CursorCardView(CardView):
         )
         return pygame.transform.scale(shadow, (self.w * self.shadow_scale, self.h * self.shadow_scale))
 
-    def on_mouse_move(self, game):
-        self.card.x, self.card.y = game.cursor.position
+    def on_mouse_move(self):
+        self.card.x, self.card.y = self.game.cursor.position
