@@ -1,8 +1,11 @@
+import asyncio
+
 import pygame
+import websockets
 
 from Cursor.Cursor import Cursor
 from GameView import GameView
-from Server.GameState import GameState
+from GameState import GameState
 
 LEFT = 1
 RIGHT = 3
@@ -11,12 +14,19 @@ RIGHT = 3
 class Game:
     def __init__(self, screen):
         self.screen = screen
-        self.game_state = GameState()
+        self.game_state = GameState(self)
         self.cursor = Cursor(self)
         self.last_focused = None
         self.game_view = GameView(self)
         self.running = True
         self.tick = 0
+
+    def send_message(self, message):
+        asyncio.run(self.async_send_message(message))
+
+    async def async_send_message(self, message):
+        async with websockets.connect('ws://localhost:8001') as websocket:
+            await websocket.send(message)
 
     def players(self):
         return self.game_state.players

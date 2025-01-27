@@ -5,7 +5,8 @@ from Player.Player import Player
 
 
 class GameState:
-    def __init__(self):
+    def __init__(self, game):
+        self.game = game
         self.graveyard = Graveyard(self)
         self.players = self.make_players()
         self.board = Board(self)
@@ -23,6 +24,9 @@ class GameState:
             players.append(Player(team, self, deck))
         return players
 
+    def send_message(self, message):
+        self.game.send_message(message)
+
     def update(self):
         if self.active_player().actions == 0:
             self.new_turn()
@@ -31,6 +35,7 @@ class GameState:
         return self.players[self.active_player_index]
 
     def new_turn(self):
+        self.game.send_message('New turn')
         self.turns += 1
         self.active_player().end_turn()
         self.active_player_index = (self.active_player_index + 1) % 2

@@ -24,7 +24,6 @@ class Cursor:
     def select(self, card):
         self.card = card
         self.set_offset(self.game.game_view.focused_object)
-        print('set card to', self.card)
 
     def set_offset(self, card_view):
         x, y = self.position

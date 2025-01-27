@@ -39,6 +39,8 @@ class Minion:
         return self.can_pair(target_source)
 
     def can_be_attacked(self, target_source):
+        if target_source.attacks_left() < 1:
+            return False
         return target_source.side.lane == self.side.lane
 
     def can_pair(self, target_source):
