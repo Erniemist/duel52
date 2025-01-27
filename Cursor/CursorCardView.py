@@ -8,8 +8,8 @@ class CursorCardView(CardView):
     shadow_offset = (20, 20)
     perspective_scale = 1.1
 
-    def __init__(self, card, game, pos):
-        super().__init__(card, game, pos)
+    def __init__(self, card, app, pos):
+        super().__init__(card, app, pos)
 
     def draw_surface(self):
         x, y = self.shadow_offset
@@ -32,4 +32,4 @@ class CursorCardView(CardView):
         return pygame.transform.scale(shadow, (self.w * self.shadow_scale, self.h * self.shadow_scale))
 
     def on_mouse_move(self):
-        self.card.x, self.card.y = self.game.cursor.position
+        self.card.x, self.card.y = self.app.cursor.position

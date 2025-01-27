@@ -1,18 +1,24 @@
-import pygame
-import time
+import asyncio
+import json
 
-from Game import Game
+import pygame
+
+from App import App
+from GameState import GameState
 
 FPS = 30
 
 
 def main():
     pygame.init()
-    screen = pygame.display.set_mode([0, 0], pygame.FULLSCREEN)
+    screen = pygame.display.set_mode([1920, 1000])
 
-    game = Game(screen)
-    while game.running:
-        game.loop()
+    app = App(screen, "ws://localhost:8001")
+    response = json.loads(app.send_message('init'))
+    app.game_state = GameState.from_json(response['game'])
+    app.team = response['team']
+    while app.running:
+        app.loop()
 
     pygame.quit()
 

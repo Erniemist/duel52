@@ -5,15 +5,15 @@ from ViewObject import ViewObject
 
 
 class BoardView(ViewObject):
-    def __init__(self, board, game, w, h):
-        super().__init__(board, game, 0, 0, w, h)
+    def __init__(self, board, app, w, h):
+        super().__init__(board, app, 0, 0, w, h)
         lane_w = int(math.ceil((self.w + LaneView.weight) / 3))
         lane_h = self.h * 0.65
         self.board = self.real
         self.lane_views = [
             LaneView(
                 lane,
-                self.game,
+                self.app,
                 i * lane_w - LaneView.weight / 2,
                 (self.h - lane_h) / 2,
                 lane_w,

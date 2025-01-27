@@ -1,13 +1,12 @@
-import pygame.draw
-
 import rectangle
 from functions import can_call
 
 
 class ViewObject:
-    def __init__(self, real, game, x, y, w=0, h=0):
+    def __init__(self, real, app, x, y, w=0, h=0):
         self.real = real
-        self.game = game
+        self.app = app
+        self.cursor = app.cursor
         self.parent = None
         self._x = x
         self._y = y
@@ -29,10 +28,9 @@ class ViewObject:
         return self.base_check_focus()
 
     def base_check_focus(self):
-        cursor = self.game.cursor
-        if not can_call(self.real, cursor.click_method_name()):
+        if not can_call(self.real, self.cursor.click_method_name()):
             return None
-        if can_call(self.real, cursor.validation_method_name()) and not cursor.validation_method()(self.real):
+        if can_call(self.real, self.cursor.validation_method_name()) and not self.cursor.validation_method()(self.real):
             return None
         return self if self.touching_mouse() else None
 
@@ -41,7 +39,7 @@ class ViewObject:
         return x, y, self.w, self.h
 
     def touching_mouse(self):
-        return rectangle.point_inside(self.game.cursor.position, self.rect())
+        return rectangle.point_inside(self.cursor.position, self.rect())
 
     def draw_all(self, screen):
         self.draw(screen)

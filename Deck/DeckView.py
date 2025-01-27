@@ -9,8 +9,8 @@ class DeckView(ViewObject):
     h = 175
     font_size = 30
 
-    def __init__(self, deck, game, x, y):
-        super().__init__(deck, game, x, y - self.h / 2, self.w, self.h)
+    def __init__(self, deck,app, x, y):
+        super().__init__(deck,app, x, y - self.h / 2, self.w, self.h)
         self.deck = self.real
 
     def draw(self, screen: pygame.Surface):

@@ -1,10 +1,13 @@
+import json
+
+from Board.Lane.Side.Minion.Minion import Minion
+
+
 class Card:
     def __init__(self, value: str, host):
         self.value = value
         self.host = host
         self.minion = None
-        self.focused = False
-        self.previous_host = None
 
     def can_select(self, game):
         if self.host == game.cursor:
@@ -17,6 +20,20 @@ class Card:
 
     def move_to(self, new_host):
         self.host.remove_card(self)
-        self.previous_host = self.host
         self.host = new_host
         new_host.add_card(self)
+
+    def to_json(self):
+        data = {
+            'value': self.value
+        }
+        if self.minion:
+            data['minion'] = self.minion.to_json()
+        return data
+
+    @staticmethod
+    def from_json(host, game, data):
+        card = Card(data['value'], host)
+        if 'minion' in data.keys():
+            card.minion = Minion.from_json(card=card, side=host, game=game, data=data['minion'])
+        return card

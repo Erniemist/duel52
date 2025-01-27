@@ -1,4 +1,5 @@
 import asyncio
+import json
 
 import pygame
 import websockets
@@ -11,22 +12,38 @@ LEFT = 1
 RIGHT = 3
 
 
-class Game:
-    def __init__(self, screen):
+class App:
+    def __init__(self, screen, websocket_uri):
+        self.websocket_uri = websocket_uri
         self.screen = screen
-        self.game_state = GameState(self)
+        self.team = None
+        self.game_state = None
         self.cursor = Cursor(self)
         self.last_focused = None
-        self.game_view = GameView(self)
+        self.game_view = None
         self.running = True
         self.tick = 0
 
     def send_message(self, message):
-        asyncio.run(self.async_send_message(message))
+        return asyncio.run(self.async_send_message(message))
 
     async def async_send_message(self, message):
-        async with websockets.connect('ws://localhost:8001') as websocket:
+        async with websockets.connect(self.websocket_uri) as websocket:
             await websocket.send(message)
+            return await websocket.recv()
+
+    def receive_message(self):
+        return asyncio.run(self.async_receive_message())
+
+    async def async_receive_message(self):
+        async with websockets.connect(self.websocket_uri) as websocket:
+            return await websocket.recv()
+
+    async def handle(self, message):
+        response = json.loads(message)
+        self.game_state = GameState.from_json(response['game'])
+        if self.team is None:
+            self.team = response['team']
 
     def players(self):
         return self.game_state.players
@@ -38,9 +55,12 @@ class Game:
         return self.game_state.active_player()
 
     def loop(self):
-        self.game_state.update()
+        message = self.game_state.update()
+        if message:
+            data_string = self.send_message(message + '//' + json.dumps(self.game_state.to_json()))
+            self.game_state = GameState.from_json(json.loads(data_string))
         self.cursor.position = pygame.mouse.get_pos()
-        self.last_focused = self.game_view.focused_object
+        self.last_focused = self.game_view.focused_object if self.game_view else None
         self.game_view = GameView(self)
         self.handle_events()
         self.game_view.draw_all(self.screen)

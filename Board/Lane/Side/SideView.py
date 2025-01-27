@@ -11,8 +11,8 @@ class SideView(ViewObject):
     margin = 10
     weight = 6
 
-    def __init__(self, side, game, x, y, w, h):
-        super().__init__(side, game, x + 1, y, w, h)
+    def __init__(self, side, app, x, y, w, h):
+        super().__init__(side, app, x + 1, y, w, h)
         self.side = self.real
         self.minion_views = self.generate_minion_views()
         self.set_children(self.minion_views)
@@ -36,9 +36,9 @@ class SideView(ViewObject):
 
         return [
             (
-                MinionView(minion, self.game, self.minion_position(i, num_minions, num_rows))
+                MinionView(minion, self.app, self.minion_position(i, num_minions, num_rows))
                 if not minion.pair
-                else PairView(minion, minion.pair, self.game, self.minion_position(i, num_minions, num_rows))
+                else PairView(minion, minion.pair, self.app, self.minion_position(i, num_minions, num_rows))
             )
             for i, minion in enumerate(minions + pairs)
         ]

@@ -1,3 +1,6 @@
+import json
+
+
 class Minion:
     max_hp = 2
     max_attacks = 1
@@ -14,7 +17,6 @@ class Minion:
         self.view_object = None
         self.pair = None
         self.attacks_made = 0
-        self.focused = False
 
     def end_turn(self):
         self.attacks_made = 0
@@ -68,3 +70,21 @@ class Minion:
         if self.pair:
             self.pair.pair = None
         self.card.move_to(self.game.graveyard)
+
+    def to_json(self):
+        data = {
+            'hp': self.hp,
+            'face_down': self.face_down,
+            'attacks_made': self.attacks_made,
+        }
+        if self.pair:
+            data['pair'] = self.side.index_card(self.pair.card)
+        return data
+
+    @staticmethod
+    def from_json(card, side, game, data):
+        minion = Minion(card=card, side=side, game=game)
+        minion.hp = data['hp']
+        minion.face_down = data['face_down']
+        minion.attacks_made = data['attacks_made']
+        return minion

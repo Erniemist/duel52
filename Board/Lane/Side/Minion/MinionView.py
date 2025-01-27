@@ -15,8 +15,8 @@ class MinionView(ViewObject):
     normal = (0, 0, 0)
     exahusted_colour = (200, 200, 200)
 
-    def __init__(self, minion, game, position):
-        super().__init__(minion, game, *position, self.w, self.h)
+    def __init__(self, minion, app, position):
+        super().__init__(minion, app, *position, self.w, self.h)
         self.minion = self.real
         self.minion.view_object = self
         self.border_colour = None
@@ -61,16 +61,6 @@ class MinionView(ViewObject):
         return screen
 
     def get_centre(self):
-        if self.minion.pair:
-            return self.get_centre_pair()
-        return self.get_centre_alone()
-
-    def get_centre_pair(self):
-        x1, y1 = self.get_centre_alone()
-        x2, y2 = self.minion.pair.view_object.get_centre_alone()
-        return (x1 + x2) / 2, (y1 + y2) / 2
-
-    def get_centre_alone(self):
         x, y = self.position()
         return x + self.w / 2, y + self.h / 2
 
@@ -85,7 +75,7 @@ class MinionView(ViewObject):
         return colour
 
     def get_border(self):
-        source = self.game.cursor.target_source
+        source = self.app.cursor.target_source
         if source and source is not self.minion and self.focused:
             if source.team != self.minion.team:
                 return self.targeted
@@ -104,7 +94,7 @@ class MinionView(ViewObject):
         return self.normal
 
     def source_of_pairing(self):
-        other_pair = self.game.last_focused
+        other_pair = self.app.last_focused
         if not other_pair:
             return False
         if not isinstance(other_pair, MinionView):

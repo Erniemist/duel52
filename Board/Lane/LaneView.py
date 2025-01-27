@@ -10,8 +10,8 @@ from ViewObject import ViewObject
 class LaneView(ViewObject):
     weight = 6
 
-    def __init__(self, lane, game, x, y, w, h):
-        super().__init__(lane, game, x + self.weight / 2, y, w - self.weight, h)
+    def __init__(self, lane, app, x, y, w, h):
+        super().__init__(lane, app, x + self.weight / 2, y, w - self.weight, h)
         self.lane = self.real
         self.side_views = self.generate_side_views()
         self.set_children(self.side_views)
@@ -20,9 +20,9 @@ class LaneView(ViewObject):
         side_h = self.h / 2
         return [SideView(
             side,
-            self.game,
+            self.app,
             0,
-            side_h * (1 if side.team == Player.US else 0),
+            side_h * (1 if side.team == self.app.team else 0),
             self.w,
             side_h,
         ) for side in self.lane.sides]

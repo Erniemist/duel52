@@ -9,10 +9,10 @@ from ViewObject import ViewObject
 class HandView(ViewObject):
     card_w = CardView.w * 0.8
 
-    def __init__(self, hand, game, x, y, flipped):
-        self.cards_to_show = [card for card in hand.cards if card is not game.cursor.card]
+    def __init__(self, hand, app, x, y, flipped):
+        self.cards_to_show = [card for card in hand.cards if card is not app.cursor.card]
         w = self.card_w * len(self.cards_to_show)
-        super().__init__(hand, game, x - w / 2, y - CardView.h / 2, w, CardView.h)
+        super().__init__(hand, app, x - w / 2, y - CardView.h / 2, w, CardView.h)
         self.flipped = flipped
         self.hand = self.real
         self.card_views = self.generate_cards()
@@ -26,17 +26,17 @@ class HandView(ViewObject):
             if self.flipped:
                 rotation *= -1
                 y *= -1
-            if self.game.last_focused and card is self.game.last_focused.real:
+            if self.app.last_focused and card is self.app.last_focused.real:
                 cards.append(FocusedHandCardView(
                     card,
-                    self.game,
+                    self.app,
                     (self.card_x(i), -CardView.h * 0.5 * (-1 if self.flipped else 1)),
                     face_down=self.flipped,
                 ))
             else:
                 cards.append(HandCardView(
                     card,
-                    self.game,
+                    self.app,
                     self,
                     i,
                     (self.card_x(i), y),
