@@ -57,8 +57,13 @@ class App:
     def loop(self):
         message = self.game_state.update()
         if message:
-            data_string = self.send_message(message + '//' + json.dumps(self.game_state.to_json()))
-            self.game_state = GameState.from_json(json.loads(data_string))
+            message = json.dumps({'event': message, 'game_state': self.game_state.to_json()})
+        else:
+            message = json.dumps({'event': 'ping'})
+
+        data_string = self.send_message(message)
+        self.game_state = GameState.from_json(json.loads(data_string))
+
         self.cursor.position = pygame.mouse.get_pos()
         self.last_focused = self.game_view.focused_object if self.game_view else None
         self.game_view = GameView(self)

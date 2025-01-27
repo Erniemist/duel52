@@ -20,19 +20,23 @@ async def join(websocket):
 
 
 async def handler(websocket):
+    global game
     async for message in websocket:
-        if message == 'init':
+        data = json.loads(message)
+        event = data['event']
+        if event == 'init':
             if game is None:
                 print('got init, starting game')
                 await start(websocket)
-                print('heard back')
             else:
                 print('got init, joining game')
                 await join(websocket)
+        elif event == 'ping':
+            await websocket.send(json.dumps(game.to_json()))
         else:
-            event, separator, game_state = message.partition('//')
             print(event)
-            await websocket.send(game_state)
+            game = GameState.from_json(data['game_state'])
+            await websocket.send(json.dumps(data['game_state']))
 
 
 async def main():

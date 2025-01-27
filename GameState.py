@@ -1,5 +1,3 @@
-import json
-
 from Board.Board import Board
 from Deck.Deck import Deck
 from Graveyard.Graveyard import Graveyard
