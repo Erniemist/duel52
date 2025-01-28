@@ -41,12 +41,12 @@ class Player:
 
     def play_card(self, side, card):
         self.action()
-        self.game.send_message(f'Played card {card.__hash__()} to side {side.__hash__()}')
+        self.game.send_message(f'Played card {card.card_id} to side {side.side_id}')
         card.move_to(side)
 
     def flip_card(self, minion):
         self.action()
-        self.game.send_message(f'Minion {minion.__hash__()} turned faceup')
+        self.game.send_message(f'Minion {minion.card.card_id} turned faceup')
         minion.face_down = False
 
     def pair_cards(self, minion, second_minion):
@@ -59,7 +59,7 @@ class Player:
         if minion.face_down or second_minion.face_down:
             raise Exception("Can't pair facedown minions")
         self.action()
-        self.game.send_message(f'Paired minion {minion.__hash__()} with second_minion {second_minion.__hash__()}')
+        self.game.send_message(f'Paired minion {minion.card.card_id} with second_minion {second_minion.card.card_id}')
         minion.pair = second_minion
         second_minion.pair = minion
 
@@ -71,7 +71,7 @@ class Player:
         if friendly_minion.attacks_left() < 1:
             raise Exception("Tried to attack with an exhausted minion")
         self.action()
-        self.game.send_message(f'Minion {friendly_minion.__hash__()} attacked {enemy_minion.__hash__()}')
+        self.game.send_message(f'Minion {friendly_minion.card.card_id} attacked {enemy_minion.card.card_id}')
         friendly_minion.attack(enemy_minion)
 
     def to_json(self):

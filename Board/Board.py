@@ -8,7 +8,7 @@ class Board:
 
     def __init__(self, game):
         self.game = game
-        self.lanes = [Lane(game) for i in range(self.num_lanes)]
+        self.lanes = [Lane(game, lane_id=i) for i in range(self.num_lanes)]
 
     def to_json(self):
         return {
@@ -18,5 +18,8 @@ class Board:
     @staticmethod
     def from_json(game, data):
         board = Board(game=game)
-        board.lanes = [Lane.from_json(game=game, data=lane_data) for lane_data in data['lanes']]
+        board.lanes = [
+            Lane.from_json(game=game, lane_id=i, data=lane_data)
+            for i, lane_data in enumerate(data['lanes'])
+        ]
         return board

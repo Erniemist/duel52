@@ -5,9 +5,10 @@ from Card.Card import Card
 
 
 class Side:
-    def __init__(self, game, lane, player):
+    def __init__(self, game, lane, side_id, player):
         self.game = game
         self.lane = lane
+        self.side_id = side_id
         self.player = player
         self.team = player.team
         self.cards = []
@@ -39,8 +40,8 @@ class Side:
         }
 
     @staticmethod
-    def from_json(lane, player, game, data):
-        side = Side(game=game, lane=lane, player=player)
+    def from_json(lane, player, side_id, game, data):
+        side = Side(game=game, lane=lane, side_id=side_id, player=player)
         side.cards = [Card.from_json(host=side, game=game, data=card_data) for card_data in data['cards']]
         for card, card_data in zip(side.cards, data['cards']):
             if 'pair' in card_data['minion'].keys() and not card.minion.pair:
