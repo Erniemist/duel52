@@ -27,8 +27,11 @@ class Side:
         card.minion = None
         self.cards = [c for c in self.cards if c is not card]
 
-    def index_card(self, card):
-        return self.cards.index(card)
+    def find_card(self, card_id):
+        for card in self.cards:
+            if card.card_id == card_id:
+                return card
+        return None
 
     def to_json(self):
         return {
@@ -41,7 +44,7 @@ class Side:
         side.cards = [Card.from_json(host=side, game=game, data=card_data) for card_data in data['cards']]
         for card, card_data in zip(side.cards, data['cards']):
             if 'pair' in card_data['minion'].keys() and not card.minion.pair:
-                paired = side.cards[card_data['minion']['pair']].minion
+                paired = side.find_card(card_data['minion']['pair']).minion
                 paired.pair = card.minion
                 card.minion.pair = paired
 

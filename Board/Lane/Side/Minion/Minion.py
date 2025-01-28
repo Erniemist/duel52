@@ -78,7 +78,7 @@ class Minion:
             'attacks_made': self.attacks_made,
         }
         if self.pair:
-            data['pair'] = self.side.index_card(self.pair.card)
+            data['pair'] = self.pair.card.card_id
         return data
 
     @staticmethod

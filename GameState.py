@@ -70,9 +70,9 @@ class GameState:
     def get_card_from_board(self, card_id):
         for lane in self.board.lanes:
             for side in lane.sides:
-                for card in side.cards:
-                    if card.card_id == card_id:
-                        return card
+                card = side.find_card(card_id)
+                if card:
+                    return card
         return None
 
     def new_turn(self):
