@@ -55,6 +55,13 @@ class Minion:
         else:
             self.game.pair_event(target_source, self)
 
+    def pair_with(self, other):
+        self.pair = other
+        other.pair = self
+
+    def flip_up(self):
+        self.face_down = False
+
     def attack(self, enemy):
         self.attacks_made += 1
         damage = 2 if self.pair else 1

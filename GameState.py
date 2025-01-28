@@ -16,6 +16,7 @@ class GameState:
         self.board = None
         self.active_player_index = 0
         self.turns = 0
+        self.winner = None
 
     def start_game(self):
         self.graveyard = Graveyard(self)
@@ -50,6 +51,25 @@ class GameState:
         if len(self.event_data) > 0:
             return self.event_data.pop(0)
         return None
+
+    def check_victory(self):
+        self.winner = self.determine_winner()
+
+    def determine_winner(self):
+        if not self.all_cards_played():
+            return None
+        lanes_won = {player.team: 0 for player in self.players}
+        for lane in self.board.lanes:
+            winner = lane.player_winning_lane()
+            if winner is not None:
+                lanes_won[winner] += 1
+        for player in self.players:
+            if lanes_won[player.team] > 1:
+                return player.team
+        return None
+
+    def all_cards_played(self):
+        return all(len(player.deck.cards) + len(player.hand.cards) == 0 for player in self.players)
 
     def play_event(self, card, side):
         self.event('play', {'card': card.card_id, 'side': side.side_id})
@@ -104,6 +124,7 @@ class GameState:
             'players': [player.to_json() for player in self.players],
             'board': self.board.to_json(),
             'turns': self.turns,
+            'winner': self.winner,
         }
 
     @staticmethod
@@ -111,6 +132,7 @@ class GameState:
         game = GameState()
         game.active_player_index = data['active_player_index']
         game.turns = data['turns']
+        game.winner = data['winner']
         game.graveyard = Graveyard.from_json(game=game, data=data['graveyard'])
         game.players = [Player.from_json(game=game, data=player_data) for player_data in data['players']]
         game.board = Board.from_json(game=game, data=data['board'])

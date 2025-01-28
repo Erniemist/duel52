@@ -34,33 +34,42 @@ class Player:
     def sides(self):
         return [side for lane in self.game.board.lanes for side in lane.sides if side.team == self.team]
 
-    def action(self):
+    def start_action(self):
         if self.actions < 1:
             raise Exception("Tried to take action with actions left")
+
+    def finish_action(self):
         self.actions -= 1
-        if self.actions == 0:
+        self.game.check_victory()
+        if self.actions == 0 or self.no_possible_actions():
             self.game.new_turn()
 
+    def no_possible_actions(self):
+        return (
+            len(self.hand.cards)
+            + len([
+                minion
+                for minion in self.minions()
+                if (
+                    minion.attacks_left() > 0
+                    or minion.face_down
+                    or (
+                        minion.pair is None
+                        and minion.value in [
+                            other.value
+                            for other in minion.side.cards
+                            if other.minion is not minion and other.minion.pair is None
+                        ]
+                    )
+                )
+            ])
+        ) == 0
+
     def play_card(self, side, card):
-        self.action()
-        card.move_to(side)
+        self.take_action(lambda: card.move_to(side))
 
     def flip_minion(self, minion):
-        self.action()
-        minion.face_down = False
-
-    def pair_minions(self, minion, second_minion):
-        if minion.team != self.team or second_minion.team != self.team:
-            raise Exception("Tried to pair minion from the other team")
-        if minion.value != second_minion.value:
-            raise Exception("Can't pair non-matching minions")
-        if minion.pair or second_minion.pair:
-            raise Exception("Can't pair already paired minions")
-        if minion.face_down or second_minion.face_down:
-            raise Exception("Can't pair facedown minions")
-        self.action()
-        minion.pair = second_minion
-        second_minion.pair = minion
+        self.take_action(lambda: minion.flip_up())
 
     def attack(self, friendly_minion, enemy_minion):
         if friendly_minion.team != self.team:
@@ -69,8 +78,24 @@ class Player:
             raise Exception("Tried to attack a friendly minion")
         if friendly_minion.attacks_left() < 1:
             raise Exception("Tried to attack with an exhausted minion")
-        self.action()
-        friendly_minion.attack(enemy_minion)
+        self.take_action(lambda: friendly_minion.attack(enemy_minion))
+
+    def pair_minions(self, minion, second_minion):
+        self.start_action()
+        if minion.team != self.team or second_minion.team != self.team:
+            raise Exception("Tried to pair minion from the other team")
+        if minion.value != second_minion.value:
+            raise Exception("Can't pair non-matching minions")
+        if minion.pair or second_minion.pair:
+            raise Exception("Can't pair already paired minions")
+        if minion.face_down or second_minion.face_down:
+            raise Exception("Can't pair facedown minions")
+        self.take_action(lambda: minion.pair_with(second_minion))
+
+    def take_action(self, action):
+        self.start_action()
+        action()
+        self.finish_action()
 
     def to_json(self):
         return {

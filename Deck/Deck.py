@@ -7,6 +7,8 @@ class Deck:
         self.cards = []
 
     def draw_from_top(self, zone):
+        if len(self.cards) == 0:
+            return
         self.cards[0].move_to(zone)
 
     def remove_card(self, card):
