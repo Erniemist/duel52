@@ -38,7 +38,6 @@ class MinionView(ViewObject):
         return pygame.transform.rotate(minion, self.rotation)
 
     def draw_minion(self, screen: pygame.Surface):
-        font = pygame.font.SysFont('arial', self.font_size)
         pygame.draw.rect(
             screen,
             self.border_colour,
@@ -52,6 +51,7 @@ class MinionView(ViewObject):
             border_radius=self.weight
         )
         if not self.minion.face_down:
+            font = pygame.font.SysFont('arial', self.font_size)
             numeral = font.render(self.minion.card.value, True, (0, 0, 0))
 
             screen.blit(numeral, (

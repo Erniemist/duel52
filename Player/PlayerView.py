@@ -1,5 +1,6 @@
 from Deck.DeckView import DeckView
 from Hand.HandView import HandView
+from Player.ActionView import ActionView
 from ViewObject import ViewObject
 
 
@@ -13,13 +14,8 @@ class PlayerView(ViewObject):
             flipped = True
         super().__init__(player, app, w / 4, y)
         self.player = self.real
-        hand_view = HandView(
-            player.hand,
-            app,
-            w / 4,
-            0,
-            flipped=flipped,
-        )
-        deck_view = DeckView(player.deck, app, 0, 0)
-        self.set_children([hand_view, deck_view])
-
+        self.set_children([
+            HandView(player.hand, app, w / 4, 0, flipped=flipped),
+            DeckView(player.deck, app, 0, 0),
+            ActionView(app, player, w * 0.65, 50 * (1 if flipped else -1)),
+        ])
