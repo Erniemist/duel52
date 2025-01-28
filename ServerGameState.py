@@ -5,29 +5,28 @@ from Card.Card import Card
 from Deck.Deck import Deck
 from GameState import GameState
 from Graveyard.Graveyard import Graveyard
-from Player.Player import Player
+from Player.ServerPlayer import ServerPlayer
 
 
 class ServerGameState(GameState):
     def __init__(self):
-        super().__init__()
-
-    def start_game(self):
+        self.active_player_index = random.randint(0, 1)
+        self.winner = None
         self.graveyard = Graveyard(self)
         deck = self.make_deck()
         self.players = self.make_players(deck)
         self.board = Board(self)
-        for player in self.players:
-            player.start_game()
         self.active_player().start_turn(actions=2)
 
     def make_players(self, main_deck):
         players = []
-        for team in Player.TEAMS:
-            deck = Deck(self)
+        for team in ['A', 'B']:
+            player = ServerPlayer(team, self)
             for i in range(20):
-                main_deck.draw_from_top(deck)
-            players.append(Player(team, self, deck))
+                main_deck.draw_from_top(player.deck)
+            for i in range(5):
+                player.deck.draw_from_top(player.hand)
+            players.append(ServerPlayer(team, self))
         return players
 
     def make_deck(self):

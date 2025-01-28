@@ -11,7 +11,6 @@ game = None
 async def start(websocket):
     global game
     game = ServerGameState()
-    game.start_game()
     await websocket.send(json.dumps({'game': game.to_json(), 'team': 0}))
 
 

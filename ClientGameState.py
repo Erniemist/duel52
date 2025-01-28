@@ -1,13 +1,17 @@
 from Board.Board import Board
 from GameState import GameState
 from Graveyard.Graveyard import Graveyard
-from Player.Player import Player
+from Player.ClientPlayer import ClientPlayer
 
 
 class ClientGameState(GameState):
-    def __init__(self):
+    def __init__(self, active_player_index, winner, graveyard, players, board):
+        self.active_player_index = active_player_index
+        self.winner = winner
+        self.graveyard = Graveyard.from_json(game=self, data=graveyard)
+        self.players = [ClientPlayer.from_json(game=self, data=player_data) for player_data in players]
+        self.board = Board.from_json(game=self, data=board)
         self.event_data = []
-        super().__init__()
 
     def update(self):
         if len(self.event_data) > 0:
@@ -31,10 +35,10 @@ class ClientGameState(GameState):
 
     @staticmethod
     def from_json(data):
-        game = ClientGameState()
-        game.active_player_index = data['active_player_index']
-        game.winner = data['winner']
-        game.graveyard = Graveyard.from_json(game=game, data=data['graveyard'])
-        game.players = [Player.from_json(game=game, data=player_data) for player_data in data['players']]
-        game.board = Board.from_json(game=game, data=data['board'])
-        return game
+        return ClientGameState(
+            active_player_index=data['active_player_index'],
+            winner=data['winner'],
+            graveyard=data['graveyard'],
+            players=data['players'],
+            board=data['board'],
+        )

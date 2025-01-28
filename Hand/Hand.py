@@ -2,10 +2,8 @@ from Card.Card import Card
 
 
 class Hand:
-    def __init__(self, player, game):
-        self.player = player
+    def __init__(self, game):
         self.game = game
-        self.team = player.team
         self.cards = []
 
     def add_card(self, card):
@@ -20,7 +18,7 @@ class Hand:
         }
 
     @staticmethod
-    def from_json(player, game, data):
-        hand = Hand(player=player, game=game)
+    def from_json(game, data):
+        hand = Hand(game=game)
         hand.cards = [Card.from_json(host=hand, game=game, data=card_data) for card_data in data['cards']]
         return hand

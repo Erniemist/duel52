@@ -1,11 +1,4 @@
 class GameState:
-    def __init__(self):
-        self.graveyard = None
-        self.players = []
-        self.board = None
-        self.active_player_index = 0
-        self.winner = None
-
     def active_player(self):
         return self.players[self.active_player_index]
 

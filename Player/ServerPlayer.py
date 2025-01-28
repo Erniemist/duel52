@@ -2,21 +2,13 @@ from Deck.Deck import Deck
 from Hand.Hand import Hand
 
 
-class Player:
-    US = 0
-    THEM = 1
-    TEAMS = [US, THEM]
-
-    def __init__(self, team, game, deck):
+class ServerPlayer:
+    def __init__(self, team, game):
         self.team = team
         self.game = game
-        self.hand = Hand(self, game)
-        self.deck = deck
+        self.hand = Hand(game)
+        self.deck = Deck(game)
         self.actions = 0
-
-    def start_game(self):
-        for i in range(5):
-            self.deck.draw_from_top(self.hand)
 
     def start_turn(self, actions=3):
         self.actions = actions
@@ -102,10 +94,3 @@ class Player:
             'actions': self.actions,
             'team': self.team,
         }
-
-    @staticmethod
-    def from_json(game, data):
-        player = Player(team=data['team'], game=game, deck=Deck.from_json(game=game, data=data['deck']))
-        player.hand = Hand.from_json(player, game=game, data=data['hand'])
-        player.actions = data['actions']
-        return player
