@@ -1,9 +1,6 @@
 import pygame
 
-import rectangle
 from Board.Lane.Side.SideView import SideView
-from Card.CardView import CardView
-from Player.Player import Player
 from ViewObject import ViewObject
 
 

@@ -1,5 +1,3 @@
-import pygame
-
 import rectangle
 from Card.CardView import CardView
 

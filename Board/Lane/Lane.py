@@ -1,5 +1,3 @@
-import json
-
 from Board.Lane.Side.Side import Side
 
 

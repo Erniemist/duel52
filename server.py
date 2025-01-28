@@ -3,22 +3,23 @@ import json
 
 from websockets.asyncio.server import serve
 
-from GameState import GameState
+from ServerGameState import ServerGameState
+
 game = None
 
 
 async def start(websocket):
     global game
-    game = GameState()
+    game = ServerGameState()
     game.start_game()
     await websocket.send(json.dumps({'game': game.to_json(), 'team': 0}))
 
 
-async def join(websocket, game: GameState):
+async def join(websocket, game: ServerGameState):
     await websocket.send(json.dumps({'game': game.to_json(), 'team': 1}))
 
 
-async def handle_event(websocket, data, game: GameState):
+async def handle_event(websocket, data, game: ServerGameState):
     player = game.active_player()
     if player.team != data['team']:
         raise Exception(f'Non-active player attempted to take action: {data}')
@@ -45,7 +46,7 @@ async def handle_event(websocket, data, game: GameState):
         case _:
             raise Exception(f"Didn't recognise event: {data}")
 
-    await websocket.send(json.dumps(game.to_json()))
+    await websocket.send(json.dumps({'game': game.to_json()}))
 
 
 async def handler(websocket):
@@ -61,7 +62,7 @@ async def handler(websocket):
                 print('got init, joining game')
                 await join(websocket, game)
         elif event == 'ping':
-            await websocket.send(json.dumps(game.to_json()))
+            await websocket.send(json.dumps({'game': game.to_json()}))
         else:
             await handle_event(websocket, data, game)
 

@@ -1,5 +1,3 @@
-import json
-
 from Board.Lane.Lane import Lane
 
 

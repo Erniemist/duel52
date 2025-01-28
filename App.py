@@ -4,9 +4,9 @@ import json
 import pygame
 import websockets
 
+from ClientGameState import ClientGameState
 from Cursor.Cursor import Cursor
 from GameView import GameView
-from GameState import GameState
 
 LEFT = 1
 RIGHT = 3
@@ -23,20 +23,18 @@ class App:
         self.game_view = None
         self.running = True
         self.tick = 0
+        self.update({'event': 'init'})
 
-    def send_message(self, message):
-        return json.loads(asyncio.run(self.async_send_message(json.dumps(message))))
+    def update(self, event_data):
+        response = json.loads(asyncio.run(self.async_send_message(json.dumps(event_data))))
+        self.game_state = ClientGameState.from_json(response['game'])
+        if 'team' in response.keys():
+            self.team = response['team']
 
     async def async_send_message(self, message):
         async with websockets.connect(self.websocket_uri) as websocket:
             await websocket.send(message)
             return await websocket.recv()
-
-    async def handle(self, message):
-        response = json.loads(message)
-        self.game_state = GameState.from_json(response['game'])
-        if self.team is None:
-            self.team = response['team']
 
     def players(self):
         return self.game_state.players
@@ -62,8 +60,7 @@ class App:
             event_data = {'event': 'ping'}
         event_data['team'] = self.team
 
-        game_data = self.send_message(event_data)
-        self.game_state = GameState.from_json(game_data)
+        self.update(event_data)
 
         self.cursor.position = pygame.mouse.get_pos()
         self.last_focused = self.game_view.focused_object if self.game_view else None

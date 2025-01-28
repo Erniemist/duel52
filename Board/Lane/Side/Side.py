@@ -1,5 +1,3 @@
-import json
-
 from Board.Lane.Side.Minion.Minion import Minion
 from Card.Card import Card
 

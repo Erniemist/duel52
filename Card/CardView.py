@@ -1,6 +1,5 @@
 import pygame
 
-import rectangle
 from ViewObject import ViewObject
 
 
