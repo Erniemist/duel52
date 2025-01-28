@@ -14,9 +14,29 @@ async def start(websocket):
     await websocket.send(json.dumps({'game': game.to_json(), 'team': 0}))
 
 
-async def join(websocket):
-    global game
+async def join(websocket, game: GameState):
     await websocket.send(json.dumps({'game': game.to_json(), 'team': 1}))
+
+
+async def handle_event(websocket, data, game: GameState):
+    player = game.active_player()
+    match data['event']:
+        case 'play':
+            side = game.find_side(data['side'])
+            card = game.find_card_from_hand(data['card'])
+            player.play_card(card=card, side=side)
+        case 'flip':
+            minion = game.find_card_from_board(data['card']).minion
+            player.flip_minion(minion)
+        case 'pair':
+            minion_1 = game.find_card_from_board(data['card_1']).minion
+            minion_2 = game.find_card_from_board(data['card_2']).minion
+            player.pair_minions(minion_1, minion_2)
+        case 'attack':
+            minion_1 = game.find_card_from_board(data['card_1']).minion
+            minion_2 = game.find_card_from_board(data['card_2']).minion
+            player.attack(minion_1, minion_2)
+    await websocket.send(json.dumps(game.to_json()))
 
 
 async def handler(websocket):
@@ -30,13 +50,11 @@ async def handler(websocket):
                 await start(websocket)
             else:
                 print('got init, joining game')
-                await join(websocket)
+                await join(websocket, game)
         elif event == 'ping':
             await websocket.send(json.dumps(game.to_json()))
         else:
-            print(event)
-            game = GameState.from_json(data['game_state'])
-            await websocket.send(json.dumps(data['game_state']))
+            await handle_event(websocket, data, game)
 
 
 async def main():

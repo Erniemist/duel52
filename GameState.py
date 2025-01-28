@@ -45,14 +45,7 @@ class GameState:
         main_deck.cards = cards
         return main_deck
 
-    def send_message(self, message):
-        if self.message:
-            pass
-        self.message = message
-
     def update(self):
-        if self.active_player().actions == 0:
-            self.new_turn()
         message = self.message
         self.message = None
         return message
@@ -60,14 +53,14 @@ class GameState:
     def active_player(self):
         return self.players[self.active_player_index]
 
-    def get_card_from_hand(self, card_id):
+    def find_card_from_hand(self, card_id):
         for player in self.players:
             for card in player.hand.cards:
                 if card.card_id == card_id:
                     return card
         return None
 
-    def get_card_from_board(self, card_id):
+    def find_card_from_board(self, card_id):
         for lane in self.board.lanes:
             for side in lane.sides:
                 card = side.find_card(card_id)
@@ -75,8 +68,14 @@ class GameState:
                     return card
         return None
 
+    def find_side(self, side_id):
+        for lane in self.board.lanes:
+            for side in lane.sides:
+                if side.side_id == side_id:
+                    return side
+        return None
+
     def new_turn(self):
-        self.send_message('New turn')
         self.turns += 1
         self.active_player().end_turn()
         self.active_player_index = (self.active_player_index + 1) % 2

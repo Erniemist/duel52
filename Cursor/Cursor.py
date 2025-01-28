@@ -16,12 +16,12 @@ class Cursor:
     def card(self) -> Card | None:
         if self.card_id is None:
             return None
-        return self.app.get_card_from_hand(self.card_id)
+        return self.app.find_card_from_hand(self.card_id)
 
     def target_source(self) -> Minion | None:
         if self.target_source_id is None:
             return None
-        return self.app.get_card_from_board(self.target_source_id).minion
+        return self.app.find_card_from_board(self.target_source_id).minion
 
     def view(self):
         if self.card():

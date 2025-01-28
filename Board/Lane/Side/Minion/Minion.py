@@ -31,7 +31,7 @@ class Minion:
 
     def on_select(self, game):
         if self.face_down:
-            game.active_player().flip_card(self)
+            self.game.message = json.dumps({'event': 'flip', 'card': self.card.card_id})
         else:
             game.cursor.set_target_source(self)
 
@@ -55,9 +55,17 @@ class Minion:
     def on_target(self, game, target_source):
         game.cursor.cancel_target()
         if game.active_player().team != self.team:
-            game.active_player().attack(target_source, self)
+            self.game.message = json.dumps({
+                'event': 'attack',
+                'card_1': target_source.card.card_id,
+                'card_2': self.card.card_id,
+            })
         else:
-            game.active_player().pair_cards(target_source, self)
+            self.game.message = json.dumps({
+                'event': 'pair',
+                'card_1': target_source.card.card_id,
+                'card_2': self.card.card_id,
+            })
 
     def attack(self, enemy):
         self.attacks_made += 1

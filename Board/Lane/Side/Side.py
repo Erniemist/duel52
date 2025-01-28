@@ -18,7 +18,9 @@ class Side:
 
     def on_place(self, game, card):
         game.cursor.card_id = None
-        game.active_player().play_card(self, card)
+        self.game.message = json.dumps({
+            'event': 'play', 'card': card.card_id, 'side': self.side_id
+        })
 
     def add_card(self, card):
         card.minion = Minion(card, self, self.game)

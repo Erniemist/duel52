@@ -47,17 +47,15 @@ class App:
     def active_player(self):
         return self.game_state.active_player()
 
-    def get_card_from_hand(self, card_id):
-        return self.game_state.get_card_from_hand(card_id)
+    def find_card_from_hand(self, card_id):
+        return self.game_state.find_card_from_hand(card_id)
 
-    def get_card_from_board(self, card_id):
-        return self.game_state.get_card_from_board(card_id)
+    def find_card_from_board(self, card_id):
+        return self.game_state.find_card_from_board(card_id)
 
     def loop(self):
         message = self.game_state.update()
-        if message:
-            message = json.dumps({'event': message, 'game_state': self.game_state.to_json()})
-        else:
+        if not message:
             message = json.dumps({'event': 'ping'})
 
         data_string = self.send_message(message)
