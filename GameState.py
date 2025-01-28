@@ -1,3 +1,4 @@
+import json
 import random
 
 from Board.Board import Board
@@ -9,7 +10,7 @@ from Player.Player import Player
 
 class GameState:
     def __init__(self):
-        self.message = None
+        self.event_data = []
         self.graveyard = None
         self.players = []
         self.board = None
@@ -38,7 +39,7 @@ class GameState:
         main_deck = Deck(self)
         values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'] * 4
         cards = [
-            Card(value=value, host=main_deck, card_id=card_id)
+            Card(value=value, host=main_deck, card_id=card_id, game=self)
             for card_id, value in enumerate(values)
         ]
         random.shuffle(cards)
@@ -46,9 +47,24 @@ class GameState:
         return main_deck
 
     def update(self):
-        message = self.message
-        self.message = None
-        return message
+        if len(self.event_data) > 0:
+            return self.event_data.pop(0)
+        return None
+
+    def play_event(self, card, side):
+        self.event('play', {'card': card.card_id, 'side': side.side_id})
+
+    def flip_event(self, minion):
+        self.event('flip', {'card': minion.card.card_id})
+
+    def attack_event(self, minion_1, minion_2):
+        self.event('attack', {'card_1': minion_1.card.card_id, 'card_2': minion_2.card.card_id})
+
+    def pair_event(self, minion_1, minion_2):
+        self.event('pair', {'card_1': minion_1.card.card_id, 'card_2': minion_2.card.card_id})
+
+    def event(self, event, data):
+        self.event_data.append({'event': event, 'data': data})
 
     def active_player(self):
         return self.players[self.active_player_index]

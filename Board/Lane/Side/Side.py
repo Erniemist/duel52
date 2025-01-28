@@ -13,14 +13,11 @@ class Side:
         self.team = player.team
         self.cards = []
 
-    def can_place(self, game, card):
-        return self.team == game.active_player().team and self.player.actions > 0
+    def can_place(self, card, my_turn):
+        return my_turn and self.team == self.game.active_player().team and self.player.actions > 0
 
-    def on_place(self, game, card):
-        game.cursor.card_id = None
-        self.game.message = json.dumps({
-            'event': 'play', 'card': card.card_id, 'side': self.side_id
-        })
+    def on_place(self, card):
+        self.game.play_event(card, self)
 
     def add_card(self, card):
         card.minion = Minion(card, self, self.game)

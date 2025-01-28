@@ -4,20 +4,18 @@ from Board.Lane.Side.Minion.Minion import Minion
 
 
 class Card:
-    def __init__(self, value: str, host, card_id):
+    def __init__(self, value: str, host, card_id, game):
         self.card_id = card_id
         self.value = value
         self.host = host
+        self.game = game
         self.minion = None
 
-    def can_select(self, game):
-        if self.host == game.cursor:
-            return False
+    def can_select(self, my_turn):
+        return my_turn and self.game.active_player().team == self.host.team and self.game.active_player().actions > 0
 
-        return game.active_player().team == self.host.team and game.active_player().actions > 0
-
-    def on_select(self, game):
-        game.cursor.select(self)
+    def on_select(self, cursor):
+        cursor.pick_up(self)
 
     def move_to(self, new_host):
         self.host.remove_card(self)
@@ -35,7 +33,7 @@ class Card:
 
     @staticmethod
     def from_json(host, game, data):
-        card = Card(data['value'], host, data['card_id'])
+        card = Card(data['value'], host, data['card_id'], game)
         if 'minion' in data.keys():
             card.minion = Minion.from_json(card=card, side=host, game=game, data=data['minion'])
         return card

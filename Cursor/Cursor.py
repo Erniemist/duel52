@@ -35,10 +35,6 @@ class Cursor:
             return self.target_source().view_object.parent.get_centre()
         return self.target_source().view_object.get_centre()
 
-    def select(self, card):
-        self.card_id = card.card_id
-        self.set_offset(self.app.game_view.focused_object)
-
     def set_offset(self, card_view):
         x, y = self.position
         c_x, c_y = card_view.position()
@@ -79,17 +75,29 @@ class Cursor:
     def click_method(self):
         mode = self.mode()
         if mode == 'place':
-            return lambda x: x.on_place(self.app, self.card())
+            return lambda x: self.place(x)
         if mode == 'target':
-            return lambda x: x.on_target(self.app, self.target_source())
+            return lambda x: self.target(x)
         else:
-            return lambda x: x.on_select(self.app)
+            return lambda x: x.on_select(self)
+
+    def pick_up(self, card):
+        self.card_id = card.card_id
+        self.set_offset(self.app.game_view.focused_object)
+
+    def place(self, game_object):
+        game_object.on_place(self.card())
+        self.card_id = None
+
+    def target(self, game_object):
+        game_object.on_target(self.target_source())
+        self.cancel_target()
 
     def validation_method(self):
         mode = self.mode()
         if mode == 'place':
-            return lambda x: x.can_place(self.app, self.card())
+            return lambda x: x.can_place(self.card(), self.app.is_my_turn())
         if mode == 'target':
-            return lambda x: x.can_target(self.app, self.target_source())
+            return lambda x: x.can_target(self.target_source(), self.app.is_my_turn())
         else:
-            return lambda x: x.can_select(self.app)
+            return lambda x: x.can_select(self.app.is_my_turn())

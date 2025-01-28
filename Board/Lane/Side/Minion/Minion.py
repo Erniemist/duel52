@@ -1,6 +1,3 @@
-import json
-
-
 class Minion:
     max_hp = 2
     max_attacks = 1
@@ -24,21 +21,21 @@ class Minion:
     def attacks_left(self):
         return self.max_attacks - (self.attacks_made + (self.pair.attacks_made if self.pair else 0))
 
-    def can_select(self, game):
-        if self.team != game.active_player().team or self.player.actions < 1:
+    def can_select(self, my_turn):
+        if not my_turn or self.team != self.game.active_player().team or self.player.actions < 1:
             return False
         return not self.pair or self.attacks_left() > 0
 
-    def on_select(self, game):
+    def on_select(self, cursor):
         if self.face_down:
-            self.game.message = json.dumps({'event': 'flip', 'card': self.card.card_id})
+            self.game.flip_event(self)
         else:
-            game.cursor.set_target_source(self)
+            cursor.set_target_source(self)
 
-    def can_target(self, game, target_source):
-        if game.active_player().team != self.team:
+    def can_target(self, target_source, my_turn):
+        if self.game.active_player().team != self.team:
             return self.can_be_attacked(target_source)
-        return self.can_pair(target_source)
+        return my_turn and self.can_pair(target_source)
 
     def can_be_attacked(self, target_source):
         if target_source.attacks_left() < 1:
@@ -52,20 +49,11 @@ class Minion:
             return False
         return self.value == target_source.value
 
-    def on_target(self, game, target_source):
-        game.cursor.cancel_target()
-        if game.active_player().team != self.team:
-            self.game.message = json.dumps({
-                'event': 'attack',
-                'card_1': target_source.card.card_id,
-                'card_2': self.card.card_id,
-            })
+    def on_target(self, target_source):
+        if self.game.active_player().team != self.team:
+            self.game.attack_event(target_source, self)
         else:
-            self.game.message = json.dumps({
-                'event': 'pair',
-                'card_1': target_source.card.card_id,
-                'card_2': self.card.card_id,
-            })
+            self.game.pair_event(target_source, self)
 
     def attack(self, enemy):
         self.attacks_made += 1

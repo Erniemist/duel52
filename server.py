@@ -20,22 +20,31 @@ async def join(websocket, game: GameState):
 
 async def handle_event(websocket, data, game: GameState):
     player = game.active_player()
-    match data['event']:
-        case 'play':
-            side = game.find_side(data['side'])
-            card = game.find_card_from_hand(data['card'])
+    if player.team != data['team']:
+        raise Exception(f'Non-active player attempted to take action: {data}')
+    match data:
+        case {'event': 'play', 'data': {'side': side, 'card': card}}:
+            side = game.find_side(side)
+            card = game.find_card_from_hand(card)
             player.play_card(card=card, side=side)
-        case 'flip':
-            minion = game.find_card_from_board(data['card']).minion
+
+        case {'event': 'flip', 'data': {'card': card}}:
+            minion = game.find_card_from_board(card).minion
             player.flip_minion(minion)
-        case 'pair':
-            minion_1 = game.find_card_from_board(data['card_1']).minion
-            minion_2 = game.find_card_from_board(data['card_2']).minion
+
+        case {'event': 'pair', 'data': {'card_1': card_1, 'card_2': card_2}}:
+            minion_1 = game.find_card_from_board(card_1).minion
+            minion_2 = game.find_card_from_board(card_2).minion
             player.pair_minions(minion_1, minion_2)
-        case 'attack':
-            minion_1 = game.find_card_from_board(data['card_1']).minion
-            minion_2 = game.find_card_from_board(data['card_2']).minion
+
+        case {'event': 'attack', 'data': {'card_1': card_1, 'card_2': card_2}}:
+            minion_1 = game.find_card_from_board(card_1).minion
+            minion_2 = game.find_card_from_board(card_2).minion
             player.attack(minion_1, minion_2)
+
+        case _:
+            raise Exception(f"Didn't recognise event: {data}")
+
     await websocket.send(json.dumps(game.to_json()))
 
 

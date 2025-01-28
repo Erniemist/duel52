@@ -25,7 +25,7 @@ class App:
         self.tick = 0
 
     def send_message(self, message):
-        return asyncio.run(self.async_send_message(message))
+        return json.loads(asyncio.run(self.async_send_message(json.dumps(message))))
 
     async def async_send_message(self, message):
         async with websockets.connect(self.websocket_uri) as websocket:
@@ -47,6 +47,9 @@ class App:
     def active_player(self):
         return self.game_state.active_player()
 
+    def is_my_turn(self):
+        return self.game_state.active_player().team == self.team
+
     def find_card_from_hand(self, card_id):
         return self.game_state.find_card_from_hand(card_id)
 
@@ -54,12 +57,13 @@ class App:
         return self.game_state.find_card_from_board(card_id)
 
     def loop(self):
-        message = self.game_state.update()
-        if not message:
-            message = json.dumps({'event': 'ping'})
+        event_data = self.game_state.update()
+        if not event_data:
+            event_data = {'event': 'ping'}
+        event_data['team'] = self.team
 
-        data_string = self.send_message(message)
-        self.game_state = GameState.from_json(json.loads(data_string))
+        game_data = self.send_message(event_data)
+        self.game_state = GameState.from_json(game_data)
 
         self.cursor.position = pygame.mouse.get_pos()
         self.last_focused = self.game_view.focused_object if self.game_view else None

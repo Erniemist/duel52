@@ -14,7 +14,7 @@ def main():
     screen = pygame.display.set_mode([1920, 1000])
 
     app = App(screen, "ws://localhost:8001")
-    response = json.loads(app.send_message(json.dumps({'event': 'init'})))
+    response = app.send_message({'event': 'init'})
     app.game_state = GameState.from_json(response['game'])
     app.team = response['team']
     while app.running:
