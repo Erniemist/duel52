@@ -32,13 +32,6 @@ class App:
             await websocket.send(message)
             return await websocket.recv()
 
-    def receive_message(self):
-        return asyncio.run(self.async_receive_message())
-
-    async def async_receive_message(self):
-        async with websockets.connect(self.websocket_uri) as websocket:
-            return await websocket.recv()
-
     async def handle(self, message):
         response = json.loads(message)
         self.game_state = GameState.from_json(response['game'])
@@ -53,6 +46,12 @@ class App:
 
     def active_player(self):
         return self.game_state.active_player()
+
+    def get_card_from_hand(self, card_id):
+        return self.game_state.get_card_from_hand(card_id)
+
+    def get_card_from_board(self, card_id):
+        return self.game_state.get_card_from_board(card_id)
 
     def loop(self):
         message = self.game_state.update()

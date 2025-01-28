@@ -16,7 +16,7 @@ class Side:
         return self.team == game.active_player().team and self.player.actions > 0
 
     def on_place(self, game, card):
-        game.cursor.card = None
+        game.cursor.card_id = None
         game.active_player().play_card(self, card)
 
     def add_card(self, card):

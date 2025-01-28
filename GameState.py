@@ -1,4 +1,7 @@
+import random
+
 from Board.Board import Board
+from Card.Card import Card
 from Deck.Deck import Deck
 from Graveyard.Graveyard import Graveyard
 from Player.Player import Player
@@ -15,21 +18,32 @@ class GameState:
 
     def start_game(self):
         self.graveyard = Graveyard(self)
-        self.players = self.make_players()
+        deck = self.make_deck()
+        self.players = self.make_players(deck)
         self.board = Board(self)
         for player in self.players:
             player.start_game()
         self.active_player().start_turn(actions=2)
 
-    def make_players(self):
-        main_deck = Deck(self)
+    def make_players(self, main_deck):
         players = []
         for team in Player.TEAMS:
-            deck = Deck(self, [])
+            deck = Deck(self)
             for i in range(20):
                 main_deck.draw_from_top(deck)
             players.append(Player(team, self, deck))
         return players
+
+    def make_deck(self):
+        main_deck = Deck(self)
+        values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'] * 4
+        cards = [
+            Card(value=value, host=main_deck, card_id=card_id)
+            for card_id, value in enumerate(values)
+        ]
+        random.shuffle(cards)
+        main_deck.cards = cards
+        return main_deck
 
     def send_message(self, message):
         if self.message:
@@ -45,6 +59,21 @@ class GameState:
 
     def active_player(self):
         return self.players[self.active_player_index]
+
+    def get_card_from_hand(self, card_id):
+        for player in self.players:
+            for card in player.hand.cards:
+                if card.card_id == card_id:
+                    return card
+        return None
+
+    def get_card_from_board(self, card_id):
+        for lane in self.board.lanes:
+            for side in lane.sides:
+                for card in side.cards:
+                    if card.card_id == card_id:
+                        return card
+        return None
 
     def new_turn(self):
         self.send_message('New turn')

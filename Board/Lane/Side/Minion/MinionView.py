@@ -75,7 +75,7 @@ class MinionView(ViewObject):
         return colour
 
     def get_border(self):
-        source = self.app.cursor.target_source
+        source = self.app.cursor.target_source()
         if source and source is not self.minion and self.focused:
             if source.team != self.minion.team:
                 return self.targeted

@@ -1,3 +1,5 @@
+from Board.Lane.Side.Minion.Minion import Minion
+from Card.Card import Card
 from Cursor.CursorCardView import CursorCardView
 from Cursor.TargetView import TargetView
 from ViewObject import ViewObject
@@ -8,23 +10,33 @@ class Cursor:
         self.app = app
         self.position = (0, 0)
         self.offset = (0, 0)
-        self.card = None
-        self.target_source = None
+        self.card_id = None
+        self.target_source_id = None
+
+    def card(self) -> Card | None:
+        if self.card_id is None:
+            return None
+        return self.app.get_card_from_hand(self.card_id)
+
+    def target_source(self) -> Minion | None:
+        if self.target_source_id is None:
+            return None
+        return self.app.get_card_from_board(self.target_source_id).minion
 
     def view(self):
-        if self.card:
-            return CursorCardView(self.card, self.app, self.card_position())
-        if self.target_source:
+        if self.card():
+            return CursorCardView(self.card(), self.app, self.card_position())
+        if self.target_source():
             return TargetView(self, self.app, self.start_pos(), self.position)
         return ViewObject(self, self.app, 0, 0)
 
     def start_pos(self):
-        if self.target_source.pair:
-            return self.target_source.view_object.parent.get_centre()
-        return self.target_source.view_object.get_centre()
+        if self.target_source().pair:
+            return self.target_source().view_object.parent.get_centre()
+        return self.target_source().view_object.get_centre()
 
     def select(self, card):
-        self.card = card
+        self.card_id = card.card_id
         self.set_offset(self.app.game_view.focused_object)
 
     def set_offset(self, card_view):
@@ -38,22 +50,22 @@ class Cursor:
         return x + o_x, y + o_y
 
     def set_target_source(self, minion):
-        self.target_source = minion
+        self.target_source_id = minion.card.card_id
 
     def cancel(self):
         match self.mode():
             case 'target':
-                self.target_source = None
+                self.target_source_id = None
             case 'place':
-                self.card = None
+                self.card_id = None
 
     def cancel_target(self):
-        self.target_source = None
+        self.target_source_id = None
 
     def mode(self):
-        if self.card:
+        if self.card():
             return 'place'
-        elif self.target_source:
+        elif self.target_source():
             return 'target'
         else:
             return 'select'
@@ -67,17 +79,17 @@ class Cursor:
     def click_method(self):
         mode = self.mode()
         if mode == 'place':
-            return lambda x: x.on_place(self.app, self.card)
+            return lambda x: x.on_place(self.app, self.card())
         if mode == 'target':
-            return lambda x: x.on_target(self.app, self.target_source)
+            return lambda x: x.on_target(self.app, self.target_source())
         else:
             return lambda x: x.on_select(self.app)
 
     def validation_method(self):
         mode = self.mode()
         if mode == 'place':
-            return lambda x: x.can_place(self.app, self.card)
+            return lambda x: x.can_place(self.app, self.card())
         if mode == 'target':
-            return lambda x: x.can_target(self.app, self.target_source)
+            return lambda x: x.can_target(self.app, self.target_source())
         else:
             return lambda x: x.can_select(self.app)

@@ -1,18 +1,10 @@
-import json
-import random
-
 from Card.Card import Card
 
 
 class Deck:
-    def __init__(self, game, values=None):
+    def __init__(self, game):
         self.game = game
-        values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'] * 4 if values is None else values
-        self.cards = [
-            Card(value, self)
-            for value in values
-        ]
-        random.shuffle(self.cards)
+        self.cards = []
 
     def draw_from_top(self, zone):
         self.cards[0].move_to(zone)

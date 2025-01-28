@@ -14,7 +14,7 @@ class PairView(ViewObject):
     def check_focus(self):
         second_focus = self.second_view.check_focus()
         first_focus = self.first_view.check_focus()
-        if self.app.cursor.mode() == 'target' and self.app.cursor.target_source.team != self.team:
+        if self.app.cursor.mode() == 'target' and self.app.cursor.target_source().team != self.team:
             return second_focus if second_focus is not None else first_focus
         return self if (second_focus is not None or first_focus is not None) else None
 

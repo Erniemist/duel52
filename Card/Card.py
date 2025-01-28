@@ -4,7 +4,8 @@ from Board.Lane.Side.Minion.Minion import Minion
 
 
 class Card:
-    def __init__(self, value: str, host):
+    def __init__(self, value: str, host, card_id):
+        self.card_id = card_id
         self.value = value
         self.host = host
         self.minion = None
@@ -25,7 +26,8 @@ class Card:
 
     def to_json(self):
         data = {
-            'value': self.value
+            'card_id': self.card_id,
+            'value': self.value,
         }
         if self.minion:
             data['minion'] = self.minion.to_json()
@@ -33,7 +35,7 @@ class Card:
 
     @staticmethod
     def from_json(host, game, data):
-        card = Card(data['value'], host)
+        card = Card(data['value'], host, data['card_id'])
         if 'minion' in data.keys():
             card.minion = Minion.from_json(card=card, side=host, game=game, data=data['minion'])
         return card

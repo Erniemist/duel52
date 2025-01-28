@@ -10,7 +10,7 @@ class HandView(ViewObject):
     card_w = CardView.w * 0.8
 
     def __init__(self, hand, app, x, y, flipped):
-        self.cards_to_show = [card for card in hand.cards if card is not app.cursor.card]
+        self.cards_to_show = [card for card in hand.cards if card is not app.cursor.card()]
         w = self.card_w * len(self.cards_to_show)
         super().__init__(hand, app, x - w / 2, y - CardView.h / 2, w, CardView.h)
         self.flipped = flipped
