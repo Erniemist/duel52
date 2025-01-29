@@ -12,9 +12,9 @@ from ServerApp import ServerApp
 apps = {}
 
 
-async def start(websocket):
+async def create(websocket, name):
     global apps
-    app = ServerApp(ServerGameState())
+    app = ServerApp(ServerGameState(), name)
     apps[app.game_id] = app
     team = ServerPlayer.TEAMS[0]
     app.add_connection(websocket, team)
@@ -65,9 +65,9 @@ async def handler(websocket):
         async for message in websocket:
             match json.loads(message):
                 case {'event': 'list'}:
-                    await websocket.send(json.dumps({game_id: len(app.teams) for game_id, app in apps.items()}))
-                case {'event': 'start'}:
-                    await start(websocket)
+                    await list_games(websocket)
+                case {'event': 'create', 'name': name}:
+                    await create(websocket, name)
                 case {'event': 'join', 'game_id': game_id}:
                     await join(websocket, game_id)
                 case {'event': 'ping'}:
@@ -78,6 +78,17 @@ async def handler(websocket):
                     await handle_event(websocket, data)
     finally:
         apps.pop(websocket.app.game_id)
+
+
+async def list_games(websocket):
+    await websocket.send(json.dumps([
+        {
+            'game_id': app.game_id,
+            'name': app.name,
+        }
+        for app in apps
+        if len(app.teams) < 2
+    ]))
 
 
 async def main():
