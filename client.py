@@ -9,7 +9,7 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode([1920, 1000])
 
-    app = App(screen, "ws://localhost:8001")
+    app = App(screen, "wss://duel52.herokuapp.com")
     while app.running:
         app.loop()
 
