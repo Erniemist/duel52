@@ -11,7 +11,7 @@ class ClientGameState(ServerGameState):
         self.event_data = []
         self.players = [ClientPlayer.from_json(game=self, data=player_data) for player_data in players]
         self.board = Board.from_json(game=self, data=board)
-        self.active_player_index=active_player_index
+        self.active_player_index = active_player_index
 
     def update(self):
         if len(self.event_data) > 0:

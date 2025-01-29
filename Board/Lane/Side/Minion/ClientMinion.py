@@ -16,10 +16,10 @@ class ClientMinion(ServerMinion):
         self.view_object = None
         if pair_id is None:
             return
-        other = self.game.find_card_from_board(pair_id)
+        other = next((card for card in self.side.cards if card.card_id == pair_id), None)
         if other is None:
             return
-        self.pair_with(other)
+        self.pair_with(other.minion)
 
     def can_select(self, my_turn):
         if not my_turn or self.team != self.game.active_player().team or self.player.actions < 1:
