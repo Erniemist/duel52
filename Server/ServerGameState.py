@@ -1,21 +1,20 @@
 import random
 
 from Board.Board import Board
-from Card.Card import Card
+from Server.ServerCard import ServerCard
 from Deck.Deck import Deck
 from GameState import GameState
 from Graveyard.Graveyard import Graveyard
-from Player.ServerPlayer import ServerPlayer
+from Server.ServerPlayer import ServerPlayer
 
 
 class ServerGameState(GameState):
     def __init__(self):
-        self.active_player_index = random.randint(0, 1)
         self.winner = None
         self.graveyard = Graveyard(self)
-        deck = self.make_deck()
-        self.players = self.make_players(deck)
+        self.players = self.make_players(self.make_deck())
         self.board = Board(self)
+        super().__init__(active_player_index=random.randint(0, 1))
         self.active_player().start_turn(actions=2)
 
     def make_players(self, main_deck):
@@ -26,14 +25,14 @@ class ServerGameState(GameState):
                 main_deck.draw_from_top(player.deck)
             for i in range(5):
                 player.deck.draw_from_top(player.hand)
-            players.append(ServerPlayer(team, self))
+            players.append(player)
         return players
 
     def make_deck(self):
-        main_deck = Deck(self)
+        main_deck = Deck(self, None)
         values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'] * 4
         cards = [
-            Card(value=value, host=main_deck, card_id=card_id, game=self)
+            ServerCard(value=value, host=main_deck, card_id=card_id, game=self)
             for card_id, value in enumerate(values)
         ]
         random.shuffle(cards)
@@ -71,12 +70,13 @@ class ServerGameState(GameState):
         self.active_player_index = (self.active_player_index + 1) % 2
         self.active_player().start_turn()
 
-    def to_json(self):
+    def to_json(self, team):
+        player = self.player_by_team(team)
         return {
             'active_player_index': self.active_player_index,
-            'graveyard': self.graveyard.to_json(),
-            'players': [player.to_json() for player in self.players],
-            'board': self.board.to_json(),
+            'graveyard': self.graveyard.to_json(player),
+            'players': [player.to_json(player) for player in self.players],
+            'board': self.board.to_json(player),
             'winner': self.winner,
         }
 

@@ -1,5 +1,5 @@
 from Board.Lane.Side.Minion.Minion import Minion
-from Card.Card import Card
+from Card.ClientCard import ClientCard
 from Cursor.CursorCardView import CursorCardView
 from Cursor.TargetView import TargetView
 from ViewObject import ViewObject
@@ -13,7 +13,7 @@ class Cursor:
         self.card_id = None
         self.target_source_id = None
 
-    def card(self) -> Card | None:
+    def card(self) -> ClientCard | None:
         if self.card_id is None:
             return None
         return self.app.find_card_from_hand(self.card_id)

@@ -1,9 +1,10 @@
-from Card.Card import Card
+from Card.ClientCard import ClientCard
 
 
 class Deck:
-    def __init__(self, game):
+    def __init__(self, game, player):
         self.game = game
+        self.player = player
         self.cards = []
 
     def draw_from_top(self, zone):
@@ -17,13 +18,11 @@ class Deck:
     def add_card(self, card):
         self.cards.append(card)
 
-    def to_json(self):
-        return {
-            'cards': [card.to_json() for card in self.cards]
-        }
+    def to_json(self, player):
+        return {'cards': [card.to_json(player) for card in self.cards]}
 
     @staticmethod
-    def from_json(game, data):
-        deck = Deck(game=game)
-        deck.cards = [Card.from_json(host=deck, game=game, data=card_data) for card_data in data['cards']]
+    def from_json(game, player, data):
+        deck = Deck(game=game, player=player)
+        deck.cards = [ClientCard.from_json(host=deck, game=game, data=card_data) for card_data in data['cards']]
         return deck

@@ -1,5 +1,6 @@
 from Board.Lane.Side.Minion.Minion import Minion
-from Card.Card import Card
+from Card.ClientCard import ClientCard
+from Server.ServerMinion import ServerMinion
 
 
 class Side:
@@ -18,7 +19,7 @@ class Side:
         self.game.play_event(card, self)
 
     def add_card(self, card):
-        card.minion = Minion(card, self, self.game)
+        card.minion = ServerMinion(card, self, self.game)
         self.cards.append(card)
 
     def remove_card(self, card):
@@ -31,19 +32,11 @@ class Side:
                 return card
         return None
 
-    def to_json(self):
-        return {
-            'cards': [card.to_json() for card in self.cards]
-        }
+    def to_json(self, player):
+        return {'cards': [card.to_json(player) for card in self.cards]}
 
     @staticmethod
     def from_json(lane, player, side_id, game, data):
         side = Side(game=game, lane=lane, side_id=side_id, player=player)
-        side.cards = [Card.from_json(host=side, game=game, data=card_data) for card_data in data['cards']]
-        for card, card_data in zip(side.cards, data['cards']):
-            if 'pair' in card_data['minion'].keys() and not card.minion.pair:
-                paired = side.find_card(card_data['minion']['pair']).minion
-                paired.pair = card.minion
-                card.minion.pair = paired
-
+        side.cards = [ClientCard.from_json(host=side, game=game, data=card_data) for card_data in data['cards']]
         return side

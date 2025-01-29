@@ -3,17 +3,19 @@ from Hand.Hand import Hand
 
 
 class ServerPlayer:
+    TEAMS = ['A', 'B']
+
     def __init__(self, team, game):
         self.team = team
         self.game = game
-        self.hand = Hand(game)
-        self.deck = Deck(game)
+        self.hand = Hand(game, self)
+        self.deck = Deck(game, self)
         self.actions = 0
+        self.known_cards = []
 
     def start_turn(self, actions=3):
         self.actions = actions
         self.deck.draw_from_top(self.hand)
-
     def end_turn(self):
         for minion in self.minions():
             minion.end_turn()
@@ -87,10 +89,22 @@ class ServerPlayer:
         action()
         self.finish_action()
 
-    def to_json(self):
+    def other_team(self):
+        return next(team for team in self.TEAMS if team is not self.team)
+
+    def other_player(self):
+        return self.game.player_by_team(self.other_team())
+
+    def learn(self, card):
+        self.known_cards.append(card)
+
+    def knows(self, card):
+        return card in self.known_cards
+
+    def to_json(self, player):
         return {
-            'hand': self.hand.to_json(),
-            'deck': self.deck.to_json(),
+            'hand': self.hand.to_json(player),
+            'deck': self.deck.to_json(player),
             'actions': self.actions,
             'team': self.team,
         }

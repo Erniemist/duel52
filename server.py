@@ -3,7 +3,8 @@ import json
 
 from websockets.asyncio.server import serve
 
-from ServerGameState import ServerGameState
+from Server.ServerGameState import ServerGameState
+from Server.ServerPlayer import ServerPlayer
 
 game = None
 
@@ -11,11 +12,13 @@ game = None
 async def start(websocket):
     global game
     game = ServerGameState()
-    await websocket.send(json.dumps({'game': game.to_json(), 'team': 0}))
+    team = ServerPlayer.TEAMS[0]
+    await websocket.send(json.dumps({'game': game.to_json(team), 'team': team}))
 
 
 async def join(websocket, game: ServerGameState):
-    await websocket.send(json.dumps({'game': game.to_json(), 'team': 1}))
+    team = ServerPlayer.TEAMS[1]
+    await websocket.send(json.dumps({'game': game.to_json(team), 'team': team}))
 
 
 async def handle_event(websocket, data, game: ServerGameState):
@@ -45,7 +48,7 @@ async def handle_event(websocket, data, game: ServerGameState):
         case _:
             raise Exception(f"Didn't recognise event: {data}")
 
-    await websocket.send(json.dumps({'game': game.to_json()}))
+    await websocket.send(json.dumps({'game': game.to_json(data['team'])}))
 
 
 async def handler(websocket):
@@ -61,7 +64,7 @@ async def handler(websocket):
                 print('got init, joining game')
                 await join(websocket, game)
         elif event == 'ping':
-            await websocket.send(json.dumps({'game': game.to_json()}))
+            await websocket.send(json.dumps({'game': game.to_json(data['team'])}))
         else:
             await handle_event(websocket, data, game)
 

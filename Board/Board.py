@@ -8,10 +8,8 @@ class Board:
         self.game = game
         self.lanes = [Lane(game, lane_id=i) for i in range(self.num_lanes)]
 
-    def to_json(self):
-        return {
-            'lanes': [lane.to_json() for lane in self.lanes]
-        }
+    def to_json(self, player):
+        return {'lanes': [lane.to_json(player) for lane in self.lanes]}
 
     @staticmethod
     def from_json(game, data):

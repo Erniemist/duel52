@@ -1,4 +1,4 @@
-from Card.Card import Card
+from Card.ClientCard import ClientCard
 
 
 class Graveyard:
@@ -9,13 +9,11 @@ class Graveyard:
     def add_card(self, card):
         self.cards.append(card)
 
-    def to_json(self):
-        return {
-            'cards': [card.to_json() for card in self.cards]
-        }
+    def to_json(self, player):
+        return {'cards': [card.to_json(player) for card in self.cards]}
 
     @staticmethod
     def from_json(game, data):
         graveyard = Graveyard(game=game)
-        graveyard.cards = [Card.from_json(host=graveyard, game=game, data=card_data) for card_data in data['cards']]
+        graveyard.cards = [ClientCard.from_json(host=graveyard, game=game, data=card_data) for card_data in data['cards']]
         return graveyard

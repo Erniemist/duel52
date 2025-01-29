@@ -6,8 +6,8 @@ class ClientPlayer:
     def __init__(self, team, game, deck, hand, actions):
         self.team = team
         self.game = game
-        self.hand = Hand.from_json(game=game, data=hand)
-        self.deck = Deck.from_json(game=game, data=deck)
+        self.hand = Hand.from_json(game=game, player=self, data=hand)
+        self.deck = Deck.from_json(game=game, player=self, data=deck)
         self.actions = actions
 
     @staticmethod

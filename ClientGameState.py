@@ -6,12 +6,12 @@ from Player.ClientPlayer import ClientPlayer
 
 class ClientGameState(GameState):
     def __init__(self, active_player_index, winner, graveyard, players, board):
-        self.active_player_index = active_player_index
         self.winner = winner
         self.graveyard = Graveyard.from_json(game=self, data=graveyard)
+        self.event_data = []
         self.players = [ClientPlayer.from_json(game=self, data=player_data) for player_data in players]
         self.board = Board.from_json(game=self, data=board)
-        self.event_data = []
+        super().__init__(active_player_index=active_player_index)
 
     def update(self):
         if len(self.event_data) > 0:

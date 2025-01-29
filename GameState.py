@@ -1,6 +1,12 @@
 class GameState:
+    def __init__(self, active_player_index):
+        self.active_player_index = active_player_index
+
     def active_player(self):
         return self.players[self.active_player_index]
+
+    def player_by_team(self, team):
+        return next(player for player in self.players if player.team == team)
 
     def find_card_from_hand(self, card_id):
         for player in self.players:

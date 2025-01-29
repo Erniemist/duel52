@@ -14,10 +14,8 @@ class Lane:
             return self.sides[1].team
         return None
 
-    def to_json(self):
-        return {
-            'sides': [side.to_json() for side in self.sides]
-        }
+    def to_json(self, player):
+        return {'sides': [side.to_json(player) for side in self.sides]}
 
     @staticmethod
     def from_json(game, lane_id, data):
