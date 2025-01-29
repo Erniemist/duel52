@@ -1,7 +1,8 @@
 from Board.Lane.Side.Minion.ClientMinion import ClientMinion
+from Server.ServerCard import ServerCard
 
 
-class ClientCard:
+class ClientCard(ServerCard):
     def __init__(self, value: str, host, card_id, game, minion=None):
         self.card_id = card_id
         self.value = value

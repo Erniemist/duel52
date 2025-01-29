@@ -1,9 +1,18 @@
-from Board.Lane.Side.Minion.Minion import Minion
+from Server.ServerMinion import ServerMinion
 
 
-class ClientMinion(Minion):
+class ClientMinion(ServerMinion):
     def __init__(self, card, side, game, hp, face_down, attacks_made, pair_id):
-        super().__init__(card, side, game, hp, face_down, attacks_made)
+        self.card = card
+        self.value = card.value
+        self.side = side
+        self.player = side.player
+        self.team = self.player.team
+        self.game = game
+        self.hp = hp
+        self.face_down = face_down
+        self.attacks_made = attacks_made
+        self.pair = None
         self.view_object = None
         if pair_id is None:
             return

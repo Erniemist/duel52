@@ -1,8 +1,9 @@
 from Deck.Deck import Deck
 from Hand.Hand import Hand
+from Server.ServerPlayer import ServerPlayer
 
 
-class ClientPlayer:
+class ClientPlayer(ServerPlayer):
     def __init__(self, team, game, deck, hand, actions):
         self.team = team
         self.game = game

@@ -1,4 +1,3 @@
-from Board.Lane.Side.Minion.Minion import Minion
 from Card.ClientCard import ClientCard
 from Server.ServerMinion import ServerMinion
 

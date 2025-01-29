@@ -56,6 +56,14 @@ class App:
     def find_card_from_board(self, card_id):
         return self.game_state.find_card_from_board(card_id)
 
+    def run(self):
+        try:
+            while self.running:
+                self.loop()
+        finally:
+            self.close()
+            pygame.quit()
+
     def loop(self):
         event_data = self.game_state.update()
         if event_data:
@@ -79,7 +87,7 @@ class App:
 
     def handle_event(self, event):
         if event.type == pygame.QUIT:
-            self.close()
+            self.running = False
             return
 
         if event.type == pygame.MOUSEMOTION:

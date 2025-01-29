@@ -10,10 +10,7 @@ def main():
     screen = pygame.display.set_mode([1920, 1000])
 
     app = App(screen, "wss://duel52-8b7c8276f3dd.herokuapp.com")
-    while app.running:
-        app.loop()
-
-    pygame.quit()
+    app.run()
 
 
 if __name__ == '__main__':
