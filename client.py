@@ -1,18 +1,18 @@
 import asyncio
+import json
 
 import pygame
 import websockets
 
 from App import App
 
-FPS = 30
-
 app = None
+URI = "wss://duel52-8b7c8276f3dd.herokuapp.com"
 
 
 async def main():
     global app
-    async with websockets.connect("wss://duel52-8b7c8276f3dd.herokuapp.com") as websocket:
+    async with websockets.connect(URI) as websocket:
         if app is None:
             pygame.init()
             screen = pygame.display.set_mode([1920, 1000])
@@ -24,5 +24,15 @@ async def main():
         )
 
 
+async def list_games():
+    async with websockets.connect(URI) as websocket:
+        await websocket.send(json.dumps({'event': 'list'}))
+        return await websocket.recv()
+
+
 if __name__ == '__main__':
+    games = asyncio.run(list_games())
+    for game in games:
+        print(game)
+    exit()
     asyncio.run(main())
