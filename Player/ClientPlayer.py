@@ -10,6 +10,7 @@ class ClientPlayer(ServerPlayer):
         self.hand = Hand.from_json(game=game, player=self, data=hand)
         self.deck = Deck.from_json(game=game, player=self, data=deck)
         self.actions = actions
+        self.known_cards = []
 
     @staticmethod
     def from_json(game, data):

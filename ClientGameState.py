@@ -32,9 +32,10 @@ class ClientGameState(ServerGameState):
 
     def pair_event(self, minion_1, minion_2):
         self.event('pair', {'card_1': minion_1.card.card_id, 'card_2': minion_2.card.card_id})
-        self.active_player().pair(minion=minion_1, second_minion=minion_2)
+        self.active_player().pair_minions(minion=minion_1, second_minion=minion_2)
 
     def event(self, event, data):
+        print(event)
         self.event_data.append({'event': event, 'data': data})
 
     @staticmethod

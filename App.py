@@ -67,7 +67,9 @@ class App:
     def loop(self):
         event_data = self.game_state.update()
         if event_data:
+            print(event_data)
             self.update(event_data)
+            print('heard back')
         elif self.tick % 30 == 0 and self.team is not self.active_player().team:
             print('ping')
             event_data = {'event': 'ping'}
@@ -77,6 +79,7 @@ class App:
         self.last_focused = self.game_view.focused_object if self.game_view else None
         self.game_view = GameView(self)
         self.handle_events()
+        self.game_view = GameView(self)
         self.game_view.draw_all(self.screen)
         pygame.display.flip()
         self.tick += 1
