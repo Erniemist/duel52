@@ -13,8 +13,8 @@ RIGHT = 3
 
 
 class App:
-    def __init__(self, screen, websocket_uri):
-        self.websocket_uri = websocket_uri
+    def __init__(self, screen, websocket):
+        self.websocket = websocket
         self.screen = screen
         self.team = None
         self.game_state = None
@@ -23,20 +23,21 @@ class App:
         self.game_view = None
         self.running = True
         self.tick = 0
-        self.update({'event': 'init'})
 
-    def update(self, event_data):
+    async def start(self):
+        await self.update({'event': 'init'})
+
+    async def update(self, event_data):
         if self.team:
             event_data['team'] = self.team
-        response = json.loads(asyncio.run(self.async_send_message(json.dumps(event_data))))
-        self.game_state = ClientGameState.from_json(response['game'])
-        if not self.team:
-            self.team = response['team']
+        await self.websocket.send(json.dumps(event_data))
 
-    async def async_send_message(self, message):
-        async with websockets.connect(self.websocket_uri) as websocket:
-            await websocket.send(message)
-            return await websocket.recv()
+    async def handle_incoming(self):
+        async for message in self.websocket:
+            response = json.loads(message)
+            self.game_state = ClientGameState.from_json(response['game'])
+            if not self.team:
+                self.team = response['team']
 
     def players(self):
         return self.game_state.players
@@ -56,24 +57,23 @@ class App:
     def find_card_from_board(self, card_id):
         return self.game_state.find_card_from_board(card_id)
 
-    def run(self):
+    async def run(self):
         try:
             while self.running:
-                self.loop()
+                if self.game_state:
+                    await self.loop()
+                await asyncio.sleep(0)
         finally:
-            self.close()
+            await self.close()
             pygame.quit()
 
-    def loop(self):
+    async def loop(self):
         event_data = self.game_state.update()
         if event_data:
-            print(event_data)
-            self.update(event_data)
-            print('heard back')
+            await self.update(event_data)
         elif self.tick % 30 == 0 and self.team is not self.active_player().team:
-            print('ping')
             event_data = {'event': 'ping'}
-            self.update(event_data)
+            await self.update(event_data)
 
         self.cursor.position = pygame.mouse.get_pos()
         self.last_focused = self.game_view.focused_object if self.game_view else None
@@ -108,6 +108,6 @@ class App:
                 return
             self.cursor.click_method()(self.game_view.focused_object.real)
 
-    def close(self):
+    async def close(self):
         self.running = False
-        self.update({'event': 'close'})
+        await self.update({'event': 'close'})
