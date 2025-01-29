@@ -68,7 +68,9 @@ async def handler(websocket):
         elif event == 'ping':
             await websocket.send(json.dumps({'game': game.to_json(data['team'])}))
         elif event == 'close':
+            data = game.to_json(data['team'])
             game = None
+            await websocket.send(json.dumps({'game': data}))
         else:
             await handle_event(websocket, data, game)
 

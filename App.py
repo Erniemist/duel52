@@ -60,7 +60,8 @@ class App:
         event_data = self.game_state.update()
         if event_data:
             self.update(event_data)
-        elif self.tick % 30 == 0:
+        elif self.tick % 30 == 0 and self.team is not self.active_player().team:
+            print('ping')
             event_data = {'event': 'ping'}
             self.update(event_data)
 
@@ -78,7 +79,7 @@ class App:
 
     def handle_event(self, event):
         if event.type == pygame.QUIT:
-            self.running = False
+            self.close()
             return
 
         if event.type == pygame.MOUSEMOTION:
@@ -95,3 +96,7 @@ class App:
                 self.cursor.cancel_target()
                 return
             self.cursor.click_method()(self.game_view.focused_object.real)
+
+    def close(self):
+        self.running = False
+        self.update({'event': 'close'})

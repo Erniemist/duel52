@@ -14,7 +14,6 @@ def main():
         app.loop()
 
     pygame.quit()
-    app.update({'event': 'close'})
 
 
 if __name__ == '__main__':
