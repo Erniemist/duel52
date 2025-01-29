@@ -67,12 +67,13 @@ async def handler(websocket):
                 await join(websocket, game)
         elif event == 'ping':
             await websocket.send(json.dumps({'game': game.to_json(data['team'])}))
+        elif event == 'close':
+            game = None
         else:
             await handle_event(websocket, data, game)
 
 
 async def main():
-    # Set the stop condition when receiving SIGTERM.
     loop = asyncio.get_running_loop()
     stop = loop.create_future()
     loop.add_signal_handler(signal.SIGTERM, stop.set_result, None)

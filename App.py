@@ -26,9 +26,11 @@ class App:
         self.update({'event': 'init'})
 
     def update(self, event_data):
+        if self.team:
+            event_data['team'] = self.team
         response = json.loads(asyncio.run(self.async_send_message(json.dumps(event_data))))
         self.game_state = ClientGameState.from_json(response['game'])
-        if 'team' in response.keys():
+        if not self.team:
             self.team = response['team']
 
     async def async_send_message(self, message):
@@ -56,11 +58,11 @@ class App:
 
     def loop(self):
         event_data = self.game_state.update()
-        if not event_data:
+        if event_data:
+            self.update(event_data)
+        elif self.tick % 30 == 0:
             event_data = {'event': 'ping'}
-        event_data['team'] = self.team
-
-        self.update(event_data)
+            self.update(event_data)
 
         self.cursor.position = pygame.mouse.get_pos()
         self.last_focused = self.game_view.focused_object if self.game_view else None
