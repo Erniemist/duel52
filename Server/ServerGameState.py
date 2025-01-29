@@ -3,19 +3,39 @@ import random
 from Board.Board import Board
 from Server.ServerCard import ServerCard
 from Deck.Deck import Deck
-from GameState import GameState
 from Graveyard.Graveyard import Graveyard
 from Server.ServerPlayer import ServerPlayer
 
 
-class ServerGameState(GameState):
+class ServerGameState:
     def __init__(self):
         self.winner = None
         self.graveyard = Graveyard(self)
         self.players = self.make_players(self.make_deck())
         self.board = Board(self)
-        super().__init__(active_player_index=random.randint(0, 1))
+        self.active_player_index = random.randint(0, 1)
         self.active_player().start_turn(actions=2)
+
+    def active_player(self):
+        return self.players[self.active_player_index]
+
+    def player_by_team(self, team):
+        return next(player for player in self.players if player.team == team)
+
+    def find_card_from_hand(self, card_id):
+        for player in self.players:
+            for card in player.hand.cards:
+                if card.card_id == card_id:
+                    return card
+        return None
+
+    def find_card_from_board(self, card_id):
+        for lane in self.board.lanes:
+            for side in lane.sides:
+                card = side.find_card(card_id)
+                if card:
+                    return card
+        return None
 
     def make_players(self, main_deck):
         players = []
