@@ -2,10 +2,10 @@ import asyncio
 import json
 
 import pygame
-import websockets
 
 from ClientGameState import ClientGameState
 from Cursor.Cursor import Cursor
+from Event import Event
 from GameView import GameView
 
 LEFT = 1
@@ -22,20 +22,23 @@ class App:
         self.last_focused = None
         self.game_view = None
         self.running = True
+        self.events = []
         self.tick = 0
 
-    async def start(self):
-        await self.update({'event': 'init'})
+    async def update(self, event):
+        print(event.name)
+        event.sent = True
+        await self.websocket.send(event.json())
 
-    async def update(self, event_data):
-        if self.team:
-            event_data['team'] = self.team
-        await self.websocket.send(json.dumps(event_data))
+    def next_event(self):
+        return next((event for event in self.events if not event.resolved), None)
 
     async def handle_incoming(self):
         async for message in self.websocket:
             response = json.loads(message)
-            self.game_state = ClientGameState.from_json(response['game'])
+            if 'event_id' in response.keys():
+                self.events[response['event_id']].resolved = True
+            self.game_state = ClientGameState.from_json(response['game'], self)
             if not self.team:
                 self.team = response['team']
 
@@ -68,13 +71,9 @@ class App:
             pygame.quit()
 
     async def loop(self):
-        event_data = self.game_state.update()
-        if event_data:
-            await self.update(event_data)
-        elif self.tick % 30 == 0 and self.team is not self.active_player().team:
-            event_data = {'event': 'ping'}
-            await self.update(event_data)
-
+        event = self.next_event()
+        if event and not event.sent:
+            await self.update(event)
         self.cursor.position = pygame.mouse.get_pos()
         self.last_focused = self.game_view.focused_object if self.game_view else None
         self.game_view = GameView(self)
@@ -110,4 +109,8 @@ class App:
 
     async def close(self):
         self.running = False
-        await self.update({'event': 'close'})
+        await self.websocket.send(json.dumps({'event': 'close'}))
+        await self.websocket.close()
+
+    def event(self, name, data):
+        self.events.append(Event(event_id=len(self.events), name=name, data=data))

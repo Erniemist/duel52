@@ -1,13 +1,14 @@
 import asyncio
 import json
-
+from dotenv import dotenv_values
 import pygame
 import websockets
 
 from App import App
 
+URI = dotenv_values(".env.local").get('WEBSOCKET_URI', "wss://duel52-8b7c8276f3dd.herokuapp.com")
+
 app = None
-URI = "wss://duel52-8b7c8276f3dd.herokuapp.com"
 
 
 async def main():

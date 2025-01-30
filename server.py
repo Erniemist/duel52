@@ -18,14 +18,14 @@ async def create(websocket, name):
     apps[app.game_id] = app
     team = ServerPlayer.TEAMS[0]
     app.add_connection(websocket, team)
-    await websocket.send(json.dumps({'game': app.to_json(websocket), 'team': team}))
+    await app.send(websocket)
 
 
 async def join(websocket, game_id):
     team = ServerPlayer.TEAMS[1]
     app = apps[game_id]
     app.add_connection(websocket, team)
-    await websocket.send(json.dumps({'game': app.to_json(websocket), 'team': team}))
+    await app.send(websocket)
 
 
 async def handle_event(websocket, data):
@@ -56,7 +56,18 @@ async def handle_event(websocket, data):
         case _:
             raise Exception(f"Didn't recognise event: {data}")
 
-    await websocket.send(json.dumps({'game': app.to_json(websocket)}))
+    await app.send(websocket, data['event_id'])
+
+
+async def list_games(websocket):
+    await websocket.send(json.dumps([
+        {
+            'game_id': game_id,
+            'name': app.name,
+        }
+        for game_id, app in apps.items()
+        if len(app.teams) < 2
+    ]))
 
 
 async def handler(websocket):
@@ -70,26 +81,18 @@ async def handler(websocket):
                     await create(websocket, name)
                 case {'event': 'join', 'game_id': game_id}:
                     await join(websocket, game_id)
-                case {'event': 'ping'}:
-                    await websocket.send(json.dumps({'game': websocket.app.to_json(websocket)}))
                 case {'event': 'close'}:
-                    apps.pop(websocket.app.game_id)
+                    break
                 case data:
                     await handle_event(websocket, data)
     finally:
         if hasattr(websocket, 'app'):
-            apps.pop(websocket.app.game_id)
-
-
-async def list_games(websocket):
-    await websocket.send(json.dumps([
-        {
-            'game_id': game_id,
-            'name': app.name,
-        }
-        for game_id, app in apps.items()
-        if len(app.teams) < 2
-    ]))
+            for connection in websocket.app.teams.keys():
+                await connection.close()
+            if websocket.app.game_id in apps.keys():
+                apps.pop(websocket.app.game_id)
+        else:
+            await websocket.close()
 
 
 async def main():

@@ -37,5 +37,6 @@ class Side:
     @staticmethod
     def from_json(lane, player, side_id, game, data):
         side = Side(game=game, lane=lane, side_id=side_id, player=player)
-        side.cards = [ClientCard.from_json(host=side, game=game, data=card_data) for card_data in data['cards']]
+        for card_data in data['cards']:
+            side.cards.append(ClientCard.from_json(host=side, game=game, data=card_data))
         return side
