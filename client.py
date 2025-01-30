@@ -33,7 +33,7 @@ async def choose_game(websocket, games):
     print('listing games')
     print('0) Create a new game')
     for i, game in enumerate(games):
-        print(f'{i + 1}) {game.name}')
+        print(f'{i + 1}) {game['name']}')
     choice = input('>>> ')
     try:
         choice = int(choice)
