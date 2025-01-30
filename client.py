@@ -39,12 +39,14 @@ async def choose_game(websocket, games):
     choice = input('>>> ')
     try:
         choice = int(choice)
+        if choice > len(games):
+            return await choose_game(websocket, games)
     except ValueError:
-        return choose_game(websocket, games)
+        return await choose_game(websocket, games)
     if choice == 0:
         name = input('Enter game name: ')
         if name in [game.name for game in games]:
-            return choose_game(websocket, games)
+            return await choose_game(websocket, games)
         await websocket.send(json.dumps({'event': 'create', 'name': name}))
         return
     await websocket.send(json.dumps({'event': 'join', 'game_id': games[choice - 1]['game_id']}))
