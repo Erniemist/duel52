@@ -4,7 +4,7 @@ import uuid
 class ServerApp:
     def __init__(self, game, name):
         self.name = name
-        self.game_id = uuid.uuid4()
+        self.game_id = str(uuid.uuid4().int)
         self.game = game
         self.teams = {}
 
