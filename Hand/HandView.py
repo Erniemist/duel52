@@ -7,12 +7,20 @@ from ViewObject import ViewObject
 
 
 class HandView(ViewObject):
-    card_w = CardView.w * 0.8
+    squish = 0.75
+    card_w = CardView.w * squish
 
     def __init__(self, hand, app, x, y, flipped):
         self.cards_to_show = [card for card in hand.cards if card is not app.cursor.card()]
         w = self.card_w * len(self.cards_to_show)
-        super().__init__(hand, app, x - w / 2, y - CardView.h / 2, w, CardView.h)
+        super().__init__(
+            hand,
+            app,
+            x - w / 2,
+            y - CardView.h / 2,
+            w,
+            CardView.h,
+        )
         self.flipped = flipped
         self.hand = self.real
         self.card_views = self.generate_cards()
@@ -30,7 +38,7 @@ class HandView(ViewObject):
                 cards.append(FocusedHandCardView(
                     card,
                     self.app,
-                    (self.card_x(i), -CardView.h * 0.5 * (-1 if self.flipped else 1)),
+                    (self.card_x(i) - CardView.w * (1 - self.squish) / 4, -CardView.h * 0.5 * (-1 if self.flipped else 1)),
                     face_down=self.flipped,
                 ))
             else:
@@ -46,7 +54,7 @@ class HandView(ViewObject):
         return cards
 
     def card_x(self, i):
-        return i * self.card_w
+        return i * self.card_w - CardView.w * (1 - self.squish) / 2
 
     def card_y(self, rotation):
         if len(self.cards_to_show) == 1:

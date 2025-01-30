@@ -8,13 +8,12 @@ class ActionView(ViewObject):
     weight = 5
 
     def __init__(self, app, player, x, y):
-        super().__init__(player, app, x, y, 100, 100)
+        w = 100
+        super().__init__(player, app, x - w / 2, y - w / 2, w=w, h=w)
         self.player = self.real
 
     def draw(self, screen):
         x, y = self.position()
-        x -= self.w / 2
-        y -= self.w / 2
         pygame.draw.ellipse(screen, (0, 0, 0), (x, y, self.w, self.w))
         pygame.draw.ellipse(
             screen,

@@ -6,11 +6,13 @@ from ViewObject import ViewObject
 
 class PlayerView(ViewObject):
     def __init__(self, player, app, w, h):
+        top_position = h * 0.03
+        bottom_position = h - top_position
         if player.team == app.team:
-            y = h * 0.95
+            y = bottom_position
             flipped = False
         else:
-            y = h * 0.05
+            y = top_position
             flipped = True
         super().__init__(player, app, w / 4, y)
         self.player = self.real
