@@ -25,12 +25,6 @@ class Side:
         card.minion = None
         self.cards = [c for c in self.cards if c is not card]
 
-    def find_card(self, card_id):
-        for card in self.cards:
-            if card.card_id == card_id:
-                return card
-        return None
-
     def to_json(self, player):
         return {'cards': [card.to_json(player) for card in self.cards]}
 

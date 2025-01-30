@@ -1,4 +1,5 @@
 from Board.Lane.Side.Minion.Minion import Minion
+from Triggers.DeathTrigger import DeathTrigger
 
 
 class ServerMinion(Minion):
@@ -23,6 +24,7 @@ class ServerMinion(Minion):
         if self.pair:
             self.pair.pair = None
         self.card.move_to(self.game.graveyard)
+        self.game.trigger(DeathTrigger(self.card))
 
     def to_json(self):
         data = {

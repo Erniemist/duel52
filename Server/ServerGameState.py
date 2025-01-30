@@ -15,6 +15,7 @@ class ServerGameState:
         self.board = Board(self)
         self.active_player_index = random.randint(0, 1)
         self.active_player().start_turn(actions=2)
+        self.triggers = []
 
     def active_player(self):
         return self.players[self.active_player_index]
@@ -30,12 +31,10 @@ class ServerGameState:
         return None
 
     def find_card_from_board(self, card_id):
-        for lane in self.board.lanes:
-            for side in lane.sides:
-                card = side.find_card(card_id)
-                if card:
-                    return card
-        return None
+        return next((card for card in self.board_cards() if card.card_id == card_id), None)
+
+    def board_cards(self):
+        return [card for lane in self.board.lanes for side in lane.sides for card in side.cards]
 
     def make_players(self, main_deck):
         players = []
@@ -61,6 +60,16 @@ class ServerGameState:
 
     def check_victory(self):
         self.winner = self.determine_winner()
+
+    def trigger(self, trigger):
+        self.triggers.append(trigger)
+
+    def resolve_triggers(self):
+        while len(self.triggers) > 0:
+            trigger = self.triggers.pop()
+            for card in self.board_cards():
+                if card.type:
+                    card.type.handle_triggers(trigger)
 
     def determine_winner(self):
         if not self.all_cards_played():

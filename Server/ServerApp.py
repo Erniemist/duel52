@@ -63,4 +63,5 @@ class ServerApp:
             case _:
                 raise Exception(f"Didn't recognise event: {data}")
 
+        self.game.resolve_triggers()
         await self.send(websocket, data['event_id'])

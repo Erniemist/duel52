@@ -15,19 +15,19 @@ class ClientGameState(ServerGameState):
 
     def play_event(self, card, side):
         self.app.event('play', {'card': card.card_id, 'side': side.side_id})
-        self.active_player().play_card(card=card, side=side)
+        # self.active_player().play_card(card=card, side=side)
 
     def flip_event(self, minion):
         self.app.event('flip', {'card': minion.card.card_id})
-        self.active_player().flip_minion(minion=minion)
+        # self.active_player().flip_minion(minion=minion)
 
     def attack_event(self, minion_1, minion_2):
         self.app.event('attack', {'card_1': minion_1.card.card_id, 'card_2': minion_2.card.card_id})
-        self.active_player().attack(friendly_minion=minion_1, enemy_minion=minion_2)
+        # self.active_player().attack(friendly_minion=minion_1, enemy_minion=minion_2)
 
     def pair_event(self, minion_1, minion_2):
         self.app.event('pair', {'card_1': minion_1.card.card_id, 'card_2': minion_2.card.card_id})
-        self.active_player().pair_minions(minion=minion_1, second_minion=minion_2)
+        # self.active_player().pair_minions(minion=minion_1, second_minion=minion_2)
 
     @staticmethod
     def from_json(data, app):
