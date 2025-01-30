@@ -16,6 +16,7 @@ class ServerPlayer:
     def start_turn(self, actions=3):
         self.actions = actions
         self.deck.draw_from_top(self.hand)
+
     def end_turn(self):
         for minion in self.minions():
             minion.end_turn()
@@ -34,28 +35,11 @@ class ServerPlayer:
         self.actions -= 1
         self.game.check_victory()
         if self.actions == 0 or self.no_possible_actions():
+            self.actions = 0
             self.game.new_turn()
 
     def no_possible_actions(self):
-        return (
-            len(self.hand.cards)
-            + len([
-                minion
-                for minion in self.minions()
-                if (
-                    minion.attacks_left() > 0
-                    or minion.face_down
-                    or (
-                        minion.pair is None
-                        and minion.value in [
-                            other.value
-                            for other in minion.side.cards
-                            if other.minion is not minion and other.minion.pair is None
-                        ]
-                    )
-                )
-            ])
-        ) == 0
+        return len(self.hand.cards) == 0 and len([minion for minion in self.minions() if minion.could_act()]) == 0
 
     def play_card(self, side, card):
         self.take_action(lambda: card.move_to(side))

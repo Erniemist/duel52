@@ -9,9 +9,9 @@ class Lane:
 
     def player_winning_lane(self):
         if len(self.sides[0].cards) == 0 and len(self.sides[1].cards) > 0:
-            return self.sides[0].team
-        if len(self.sides[1].cards) == 0 and len(self.sides[0].cards) > 0:
             return self.sides[1].team
+        if len(self.sides[1].cards) == 0 and len(self.sides[0].cards) > 0:
+            return self.sides[0].team
         return None
 
     def to_json(self, player):

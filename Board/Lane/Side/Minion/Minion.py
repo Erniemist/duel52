@@ -20,3 +20,20 @@ class Minion:
     def pair_with(self, other):
         self.pair = other
         other.pair = self
+
+    def could_pair(self):
+        return self.pair is None and self.value in [
+            other.value
+            for other in self.side.cards
+            if other.minion is not self and other.minion.pair is None
+        ]
+
+    def could_attack(self):
+        return self.attacks_left() > 0 and len([
+            enemy
+            for enemy in self.player.other_player().minions()
+            if enemy.side == self.side
+        ]) > 0
+
+    def could_act(self):
+        return self.could_attack() or self.face_down or self.could_pair()
