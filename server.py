@@ -77,16 +77,17 @@ async def handler(websocket):
                 case data:
                     await handle_event(websocket, data)
     finally:
-        apps.pop(websocket.app.game_id)
+        if hasattr(websocket, 'app'):
+            apps.pop(websocket.app.game_id)
 
 
 async def list_games(websocket):
     await websocket.send(json.dumps([
         {
-            'game_id': app.game_id,
+            'game_id': game_id,
             'name': app.name,
         }
-        for app in apps
+        for game_id, app in apps.items()
         if len(app.teams) < 2
     ]))
 
