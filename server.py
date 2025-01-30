@@ -74,17 +74,20 @@ async def handler(websocket):
     global apps
     try:
         async for message in websocket:
-            match json.loads(message):
-                case {'event': 'list'}:
-                    await list_games(websocket)
-                case {'event': 'create', 'name': name}:
-                    await create(websocket, name)
-                case {'event': 'join', 'game_id': game_id}:
-                    await join(websocket, game_id)
-                case {'event': 'close'}:
-                    break
-                case data:
-                    await handle_event(websocket, data)
+            try:
+                match json.loads(message):
+                    case {'event': 'list'}:
+                        await list_games(websocket)
+                    case {'event': 'create', 'name': name}:
+                        await create(websocket, name)
+                    case {'event': 'join', 'game_id': game_id}:
+                        await join(websocket, game_id)
+                    case {'event': 'close'}:
+                        break
+                    case data:
+                        await handle_event(websocket, data)
+            except Exception as e:
+                print(e)
     finally:
         if hasattr(websocket, 'app'):
             for connection in websocket.app.teams.keys():
