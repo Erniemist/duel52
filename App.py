@@ -26,7 +26,6 @@ class App:
         self.tick = 0
 
     async def update(self, event):
-        print(event.name)
         event.sent = True
         await self.websocket.send(event.json())
 
