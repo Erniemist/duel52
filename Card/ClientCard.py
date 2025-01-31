@@ -1,14 +1,15 @@
 from Board.Lane.Side.Minion.ClientMinion import ClientMinion
+from Card.Card import Card
 from Server.ServerCard import ServerCard
 
 
-class ClientCard(ServerCard):
+class ClientCard(Card):
     def __init__(self, value: str, host, card_id, game, minion=None):
-        self.card_id = card_id
-        self.value = value
-        self.host = host
-        self.game = game
-        self.minion = ClientMinion.from_json(card=self, side=host, game=game, data=minion) if minion else None
+        super().__init__(value, host, card_id, game)
+        if minion is not None:
+            self.minion = ClientMinion.from_json(card=self, side=host, game=game, data=minion)
+        else:
+            self.minion = None
 
     def can_select(self, my_turn):
         return my_turn and self.game.active_player().team == self.host.player.team and self.game.active_player().actions > 0

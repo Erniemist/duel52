@@ -1,40 +1,23 @@
 import random
+import uuid
 
-from Board.Board import Board
+from Server.ServerBoard import ServerBoard
+from GameState import GameState
 from Server.ServerCard import ServerCard
 from Deck.Deck import Deck
 from Graveyard.Graveyard import Graveyard
 from Server.ServerPlayer import ServerPlayer
 
 
-class ServerGameState:
+class ServerGameState(GameState):
     def __init__(self):
-        self.winner = None
-        self.graveyard = Graveyard(self)
-        self.players = self.make_players(self.make_deck())
-        self.board = Board(self)
-        self.active_player_index = random.randint(0, 1)
+        winner = None
+        graveyard = Graveyard(self, [])
+        players = self.make_players(self.make_deck())
+        board = ServerBoard(self, players)
+        active_player_index = random.randint(0, 1)
+        super().__init__(winner, graveyard, players, board, active_player_index)
         self.active_player().start_turn(actions=2)
-        self.triggers = []
-
-    def active_player(self):
-        return self.players[self.active_player_index]
-
-    def player_by_team(self, team):
-        return next(player for player in self.players if player.team == team)
-
-    def find_card_from_hand(self, card_id):
-        for player in self.players:
-            for card in player.hand.cards:
-                if card.card_id == card_id:
-                    return card
-        return None
-
-    def find_card_from_board(self, card_id):
-        return next((card for card in self.board_cards() if card.card_id == card_id), None)
-
-    def board_cards(self):
-        return [card for lane in self.board.lanes for side in lane.sides for card in side.cards]
 
     def make_players(self, main_deck):
         players = []
@@ -49,9 +32,9 @@ class ServerGameState:
 
     def make_deck(self):
         main_deck = Deck(self, None)
-        values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'] * 4
+        values = ['A', '2', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'] * 4
         cards = [
-            ServerCard(value=value, host=main_deck, card_id=card_id, game=self)
+            ServerCard(value=value, host=main_deck, card_id=str(uuid.uuid4().int), game=self)
             for card_id, value in enumerate(values)
         ]
         random.shuffle(cards)
@@ -60,16 +43,6 @@ class ServerGameState:
 
     def check_victory(self):
         self.winner = self.determine_winner()
-
-    def trigger(self, trigger):
-        self.triggers.append(trigger)
-
-    def resolve_triggers(self):
-        while len(self.triggers) > 0:
-            trigger = self.triggers.pop()
-            for card in self.board_cards():
-                if card.type:
-                    card.type.handle_triggers(trigger)
 
     def determine_winner(self):
         if not self.all_cards_played():

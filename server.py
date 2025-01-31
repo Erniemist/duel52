@@ -2,6 +2,7 @@ import asyncio
 import json
 import os
 import signal
+import traceback
 
 from websockets.asyncio.server import serve
 
@@ -25,6 +26,7 @@ async def handler(websocket):
     global apps
     try:
         async for message in websocket:
+            print(message)
             try:
                 match json.loads(message):
                     case {'event': 'list'}:
@@ -39,8 +41,8 @@ async def handler(websocket):
                         return
                     case data:
                         await websocket.app.handle_event(websocket, data)
-            except Exception as e:
-                print(e)
+            except Exception:
+                print(traceback.format_exc())
     finally:
         if hasattr(websocket, 'app'):
             for connection in websocket.app.teams.keys():

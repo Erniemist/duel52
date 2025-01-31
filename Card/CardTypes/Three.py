@@ -9,8 +9,11 @@ class Three:
         self.card = card
 
     def handle_triggers(self, trigger):
-        match trigger:
-            case DeathTrigger(self.card):
-                if self.card.minion.face_down:
-                    self.card.move_to(self.card.minion.side)
-                    self.card.minion.flip_up()
+        if (
+            isinstance(trigger, DeathTrigger)
+            and trigger.source_is(self.card)
+            and self.card.minion
+            and self.card.minion.face_down
+        ):
+            self.card.move_to(self.card.minion.side)
+            self.card.minion.flip_up()

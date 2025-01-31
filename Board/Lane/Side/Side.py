@@ -22,7 +22,6 @@ class Side:
         self.cards.append(card)
 
     def remove_card(self, card):
-        card.minion = None
         self.cards = [c for c in self.cards if c is not card]
 
     def to_json(self, player):

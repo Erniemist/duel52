@@ -48,6 +48,7 @@ class ServerPlayer:
         self.take_action(lambda: minion.flip_up())
 
     def attack(self, friendly_minion, enemy_minion):
+        print('attack from player')
         if friendly_minion.team != self.team:
             raise Exception("Tried to attack from an enemy minion")
         if enemy_minion.team == self.team:
@@ -57,7 +58,6 @@ class ServerPlayer:
         self.take_action(lambda: friendly_minion.attack(enemy_minion))
 
     def pair_minions(self, minion, second_minion):
-        self.start_action()
         if minion.team != self.team or second_minion.team != self.team:
             raise Exception("Tried to pair minion from the other team")
         if minion.value != second_minion.value:
