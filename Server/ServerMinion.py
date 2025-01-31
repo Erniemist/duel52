@@ -14,7 +14,6 @@ class ServerMinion(Minion):
         self.player.other_player().learn(self.card)
 
     def attack(self, enemy):
-        print('attack from minion')
         self.attacks_made += 1
         damage = 2 if self.pair else 1
         enemy.hp -= damage
@@ -22,11 +21,9 @@ class ServerMinion(Minion):
             enemy.die()
 
     def die(self):
-        print('minion dying', self.card.card_id)
         if self.pair:
             self.pair.pair = None
         self.card.move_to(self.game.graveyard)
-        print(self.card.minion)
         self.game.trigger(DeathTrigger(self.card.card_id))
 
     def to_json(self):

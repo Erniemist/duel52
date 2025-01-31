@@ -30,16 +30,12 @@ class GameState:
         return [card for player in self.players for card in player.hand.cards]
 
     def trigger(self, trigger):
-        print(trigger)
         self.triggers.append(trigger)
 
     def resolve_triggers(self):
-        print(self.triggers)
         while len(self.triggers) > 0:
             trigger = self.triggers.pop()
-            print(trigger.card_id, 'died')
             for card in self.get_cards():
-                print(card, card.card_id, card.type, card.minion)
                 if card.type:
                     card.type.handle_triggers(trigger)
 

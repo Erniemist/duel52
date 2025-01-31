@@ -29,7 +29,7 @@ class ServerPlayer:
 
     def start_action(self):
         if self.actions < 1:
-            raise Exception("Tried to take action with actions left")
+            raise Exception("Tried to take action with no actions left")
 
     def finish_action(self):
         self.actions -= 1
@@ -48,7 +48,6 @@ class ServerPlayer:
         self.take_action(lambda: minion.flip_up())
 
     def attack(self, friendly_minion, enemy_minion):
-        print('attack from player')
         if friendly_minion.team != self.team:
             raise Exception("Tried to attack from an enemy minion")
         if enemy_minion.team == self.team:

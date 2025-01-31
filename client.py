@@ -32,7 +32,7 @@ async def list_games(websocket):
 
 
 async def choose_game(websocket, games):
-    print('listing games')
+    print('Welcome to Duel52!')
     print('0) Create a new game')
     for i, game in enumerate(games):
         print(f'{i + 1}) {game['name']}')

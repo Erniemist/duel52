@@ -37,7 +37,6 @@ class ServerApp:
         await self.send(websocket)
 
     async def handle_event(self, websocket, data):
-        print(data)
         player = self.game.active_player()
         if player.team != self.teams[websocket]:
             raise Exception(f'Non-active player attempted to take action: {data}')
@@ -59,7 +58,6 @@ class ServerApp:
             case {'event': 'attack', 'data': {'card_1': card_1, 'card_2': card_2}}:
                 minion_1 = self.game.find_card_from_board(card_1).minion
                 minion_2 = self.game.find_card_from_board(card_2).minion
-                print('attacking', minion_2)
                 player.attack(minion_1, minion_2)
 
             case _:

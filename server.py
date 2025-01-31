@@ -26,7 +26,6 @@ async def handler(websocket):
     global apps
     try:
         async for message in websocket:
-            print(message)
             try:
                 match json.loads(message):
                     case {'event': 'list'}:
