@@ -1,28 +1,48 @@
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from App import App
 from Board.ClientBoard import ClientBoard
-from GameState import GameState
 from Graveyard.Graveyard import Graveyard
 from Player.ClientPlayer import ClientPlayer
+from Card.ClientCard import ClientCard
+from Triggers.Trigger import Trigger
 
 
-class ClientGameState(GameState):
-    def __init__(self, active_player_index, winner, graveyard, players, board, app):
-        graveyard = Graveyard.from_json(game=self, data=graveyard)
-        players = [ClientPlayer.from_json(game=self, data=player_data) for player_data in players]
-        board = ClientBoard.from_json(game=self, players=players, data=board)
-        active_player_index = active_player_index
-        super().__init__(winner, graveyard, players, board, active_player_index)
-        self.app = app
+class ClientGameState:
+    def __init__(self, active_player_index, winner, graveyard, players_data, board, app):
+        self.winner: None | ClientPlayer = winner
+        self.graveyard: Graveyard = Graveyard.from_json(game=self, data=graveyard)
+        self.players: list[ClientPlayer] = [
+            ClientPlayer.from_json(game=self, data=player_data)
+            for player_data in players_data
+        ]
+        self._active_player: ClientPlayer = self.players[active_player_index]
+        self.board: ClientBoard = ClientBoard.from_json(game=self, players=self.players, data=board)
+        self.triggers: list[Trigger] = []
+        self.app: App = app
+
+    def active_player(self):
+        return self._active_player
+
+    def find_card_from_board(self, card_id) -> None | ClientCard:
+        return next((card for card in self.board.get_cards() if card.card_id == card_id))
+
+    def find_card_from_hand(self, card_id) -> None | ClientCard:
+        for player in self.players:
+            for card in player.hand.cards:
+                if card.card_id == card_id:
+                    return card
+        return None
 
     def play_event(self, card, side):
         self.app.event('play', {'card': card.card_id, 'side': side.side_id})
-        self.active_player().play_card(card=card, side=side)
 
     def flip_event(self, minion):
         self.app.event('flip', {'card': minion.card.card_id})
 
     def attack_event(self, minion_1, minion_2):
         self.app.event('attack', {'card_1': minion_1.card.card_id, 'card_2': minion_2.card.card_id})
-        self.active_player().attack(friendly_minion=minion_1, enemy_minion=minion_2)
 
     def pair_event(self, minion_1, minion_2):
         self.app.event('pair', {'card_1': minion_1.card.card_id, 'card_2': minion_2.card.card_id})
@@ -33,7 +53,7 @@ class ClientGameState(GameState):
             active_player_index=data['active_player_index'],
             winner=data['winner'],
             graveyard=data['graveyard'],
-            players=data['players'],
+            players_data=data['players'],
             board=data['board'],
             app=app,
         )

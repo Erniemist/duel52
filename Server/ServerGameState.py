@@ -2,24 +2,29 @@ import random
 import uuid
 
 from Server.ServerBoard import ServerBoard
-from GameState import GameState
 from Server.ServerCard import ServerCard
 from Deck.Deck import Deck
 from Graveyard.Graveyard import Graveyard
 from Server.ServerPlayer import ServerPlayer
 
 
-class ServerGameState(GameState):
+class ServerGameState:
     def __init__(self):
-        winner = None
-        graveyard = Graveyard(self, [])
-        players = self.make_players(self.make_deck())
-        board = ServerBoard(self, players)
-        active_player_index = random.randint(0, 1)
-        super().__init__(winner, graveyard, players, board, active_player_index)
+        self.winner: None | ServerPlayer = None
+        self.graveyard: Graveyard = Graveyard(self, [])
+        self.players: list[ServerPlayer] = self.make_players(self.make_deck())
+        self.board: ServerBoard = ServerBoard(self, self.players)
+        self.active_player_index = random.randint(0, 1)
+        self.triggers = []
         self.active_player().start_turn(actions=2)
 
-    def make_players(self, main_deck):
+    def active_player(self) -> ServerPlayer:
+        return self.players[self.active_player_index]
+
+    def player_by_team(self, team):
+        return next(player for player in self.players if player.team == team)
+
+    def make_players(self, main_deck: Deck) -> list[ServerPlayer]:
         players = []
         for team in ['A', 'B']:
             player = ServerPlayer(team, self)
@@ -30,7 +35,7 @@ class ServerGameState(GameState):
             players.append(player)
         return players
 
-    def make_deck(self):
+    def make_deck(self) -> Deck:
         main_deck = Deck(self, None)
         values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'] * 4
         cards = [
@@ -44,17 +49,17 @@ class ServerGameState(GameState):
     def check_victory(self):
         self.winner = self.determine_winner()
 
-    def determine_winner(self):
+    def determine_winner(self) -> None | ServerPlayer:
         if not self.all_cards_played():
             return None
         lanes_won = {player.team: 0 for player in self.players}
         for lane in self.board.lanes:
             winner = lane.player_winning_lane()
             if winner is not None:
-                lanes_won[winner] += 1
+                lanes_won[winner.team] += 1
         for player in self.players:
             if lanes_won[player.team] > 1:
-                return player.team
+                return player
         return None
 
     def all_cards_played(self):
@@ -67,6 +72,30 @@ class ServerGameState(GameState):
                     return side
         return None
 
+    def find_card_from_board(self, card_id) -> ServerCard:
+        return next((card for card in self.board.get_cards() if card.card_id == card_id))
+
+    def find_card_from_hand(self, card_id) -> None | ServerCard:
+        return next((card for card in self.get_hand_cards() if card.card_id == card_id), None)
+
+    def get_hand_cards(self):
+        return (card for player in self.players for card in player.hand.cards)
+
+    def get_cards(self):
+        yield from self.board.get_cards()
+        yield from self.graveyard.get_cards()
+        yield from self.get_hand_cards()
+
+    def trigger(self, trigger):
+        self.triggers.append(trigger)
+
+    def resolve_triggers(self):
+        while len(self.triggers) > 0:
+            trigger = self.triggers.pop()
+            for card in self.get_cards():
+                if card.type:
+                    card.type.handle_triggers(trigger)
+
     def new_turn(self):
         self.active_player().end_turn()
         self.active_player_index = (self.active_player_index + 1) % 2
@@ -76,9 +105,9 @@ class ServerGameState(GameState):
         player = self.player_by_team(team)
         return {
             'active_player_index': self.active_player_index,
-            'graveyard': self.graveyard.to_json(player),
-            'players': [player.to_json(player) for player in self.players],
-            'board': self.board.to_json(player),
-            'winner': self.winner,
+            'graveyard': self.graveyard.to_json(for_player=player),
+            'players': [player.to_json(for_player=player) for player in self.players],
+            'board': self.board.to_json(for_player=player),
+            'winner': self.winner.team if self.winner else None,
         }
 

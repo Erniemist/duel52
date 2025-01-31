@@ -1,19 +1,25 @@
 from Deck.Deck import Deck
 from Hand.Hand import Hand
 
+from typing import TYPE_CHECKING, Self
+
+if TYPE_CHECKING:
+    from Server.ServerCard import ServerCard
+    from Server.ServerGameState import ServerGameState
+
 
 class ServerPlayer:
     TEAMS = ['A', 'B']
 
-    def __init__(self, team, game):
+    def __init__(self, team: str, game):
         self.team = team
-        self.game = game
+        self.game: ServerGameState = game
         self.hand = Hand(game, self)
         self.deck = Deck(game, self)
         self.actions = 0
-        self.known_cards = []
+        self.known_cards: list[ServerCard] = []
 
-    def start_turn(self, actions=3):
+    def start_turn(self, actions: int = 3):
         self.actions = actions
         self.deck.draw_from_top(self.hand)
 
@@ -22,7 +28,7 @@ class ServerPlayer:
             minion.end_turn()
 
     def minions(self):
-        return [card.minion for side in self.sides() for card in side.cards]
+        return (card.minion for side in self.sides() for card in side.cards)
 
     def sides(self):
         return [side for lane in self.game.board.lanes for side in lane.sides if side.team == self.team]
@@ -84,10 +90,10 @@ class ServerPlayer:
     def knows(self, card):
         return card in self.known_cards
 
-    def to_json(self, player):
+    def to_json(self, for_player: Self):
         return {
-            'hand': self.hand.to_json(player),
-            'deck': self.deck.to_json(player),
+            'hand': self.hand.to_json(for_player),
+            'deck': self.deck.to_json(for_player),
             'actions': self.actions,
             'team': self.team,
         }

@@ -27,7 +27,7 @@ class HandView(ViewObject):
         self.set_children(self.card_views)
 
     def generate_cards(self):
-        cards = []
+        cards: list[CardView] = []
         for i, card in enumerate(self.cards_to_show):
             rotation = self.card_rotation(i)
             y = self.card_y(rotation)

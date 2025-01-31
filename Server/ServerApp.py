@@ -1,42 +1,42 @@
 import json
 import uuid
 
+from websockets import ServerConnection
 from Server.ServerGameState import ServerGameState
 from Server.ServerPlayer import ServerPlayer
 
 
 class ServerApp:
-    def __init__(self, name):
+    def __init__(self, name: str):
         self.name = name
         self.game_id = str(uuid.uuid4().int)
         self.game = ServerGameState()
-        self.teams = {}
+        self.teams: dict[ServerConnection, str] = {}
 
-    def add_connection(self, connection, team):
-        connection.app = self
+    def add_connection(self, connection: ServerConnection, team: str):
         self.teams[connection] = team
 
-    def to_json(self, connection):
+    def to_json(self, connection: ServerConnection) -> dict:
         return self.game.to_json(self.teams[connection])
 
-    async def send(self, sender, event_id=None):
+    async def send(self, sender: ServerConnection, event_id: None | str = None):
         for connection, team in self.teams.items():
             data = {'game': self.game.to_json(team), 'team': team}
             if connection == sender and event_id is not None:
                 data['event_id'] = event_id
             await connection.send(json.dumps(data))
 
-    async def create(self, websocket):
+    async def create(self, websocket: ServerConnection):
         team = ServerPlayer.TEAMS[0]
         self.add_connection(websocket, team)
         await self.send(websocket)
 
-    async def join(self, websocket):
+    async def join(self, websocket: ServerConnection):
         team = ServerPlayer.TEAMS[1]
         self.add_connection(websocket, team)
         await self.send(websocket)
 
-    async def handle_event(self, websocket, data):
+    async def handle_action(self, websocket: ServerConnection, data: dict):
         player = self.game.active_player()
         if player.team != self.teams[websocket]:
             raise Exception(f'Non-active player attempted to take action: {data}')

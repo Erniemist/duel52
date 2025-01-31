@@ -1,5 +1,10 @@
 import pygame
 
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from Board.Lane.Side.Pair.PairView import PairView
 from Card.CardView import CardView
 from ViewObject import ViewObject
 
@@ -16,10 +21,12 @@ class MinionView(ViewObject):
     exahusted_colour = (200, 200, 200)
 
     def __init__(self, minion, app, position):
-        super().__init__(minion, app, *position, self.w, self.h)
+        x, y = position
+        super().__init__(minion, app, x, y, self.w, self.h)
+        self.parent: None | MinionView | PairView
         self.minion = self.real
         self.minion.view_object = self
-        self.border_colour = None
+        self.border_colour = self.normal
         damage = minion.max_hp - minion.hp
         self.rotation = -90 / minion.max_hp * damage
 

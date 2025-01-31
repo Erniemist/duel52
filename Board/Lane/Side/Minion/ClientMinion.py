@@ -1,7 +1,7 @@
-from Server.ServerMinion import ServerMinion
+from Board.Lane.Side.Minion.Minion import Minion
 
 
-class ClientMinion(ServerMinion):
+class ClientMinion(Minion):
     def __init__(self, card, side, game, hp, face_down, attacks_made, pair_id):
         self.card = card
         self.value = card.value

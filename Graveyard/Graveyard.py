@@ -18,8 +18,8 @@ class Graveyard:
     def get_cards(self):
         return [self.cards[key] for key in self.cards.keys()]
 
-    def to_json(self, player):
-        return {'cards': [card.to_json(player) for card in self.cards.values()]}
+    def to_json(self, for_player):
+        return {'cards': [card.to_json(for_player) for card in self.cards.values()]}
 
     @staticmethod
     def from_json(game, data):

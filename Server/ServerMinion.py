@@ -1,10 +1,18 @@
 from Board.Lane.Side.Minion.Minion import Minion
-from Triggers.DeathTrigger import DeathTrigger
 
 
 class ServerMinion(Minion):
     def __init__(self, card, side, game):
-        super().__init__(card, side, game, hp=self.max_hp, face_down=True, attacks_made=0)
+        self.card = card
+        self.value = card.value
+        self.side = side
+        self.player = side.player
+        self.team = self.player.team
+        self.game = game
+        self.hp = self.max_hp
+        self.face_down = True
+        self.pair = None
+        self.attacks_made = 0
 
     def end_turn(self):
         self.attacks_made = 0
@@ -24,9 +32,25 @@ class ServerMinion(Minion):
         if self.pair:
             self.pair.pair = None
         self.card.move_to(self.game.graveyard)
-        self.game.trigger(DeathTrigger(self.card.card_id))
 
-    def to_json(self):
+    def could_pair(self):
+        return self.pair is None and self.value in [
+            other.value
+            for other in self.side.cards
+            if other.minion is not self and other.minion.pair is None
+        ]
+
+    def could_attack(self):
+        return self.attacks_left() > 0 and len([
+            enemy
+            for enemy in self.player.other_player().minions()
+            if enemy.side == self.side
+        ]) > 0
+
+    def could_act(self):
+        return self.could_attack() or self.face_down or self.could_pair()
+
+    def to_json(self) -> dict:
         data = {
             'hp': self.hp,
             'face_down': self.face_down,

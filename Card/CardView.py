@@ -12,7 +12,8 @@ class CardView(ViewObject):
     front_colour = (230, 230, 230)
 
     def __init__(self, card, app, pos, rotation=0, face_down=False, w=None, h=None):
-        super().__init__(card, app, *pos, 125 if w is None else w, 175 if h is None else h)
+        x, y = pos
+        super().__init__(card, app, x, y, 125 if w is None else w, 175 if h is None else h)
         self.card = self.real
         self.rotation = rotation
         self.face_down = face_down

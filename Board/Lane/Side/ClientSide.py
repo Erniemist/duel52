@@ -1,10 +1,14 @@
-from Board.Lane.Side.Side import Side
 from Card.ClientCard import ClientCard
 
 
-class ClientSide(Side):
+class ClientSide:
     def __init__(self, game, lane, side_id, player, cards_data):
-        super().__init__(game, lane, side_id, player)
+        self.game = game
+        self.lane = lane
+        self.side_id = side_id
+        self.player = player
+        self.team = player.team
+        self.cards: list[ClientCard] = []
         for card_data in cards_data:
             self.cards.append(ClientCard.from_json(host=self, game=game, data=card_data))
 

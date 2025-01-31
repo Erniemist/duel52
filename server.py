@@ -4,25 +4,25 @@ import os
 import signal
 import traceback
 
-from websockets.asyncio.server import serve
+from websockets.asyncio.server import serve, ServerConnection
 
 from Server.ServerApp import ServerApp
 
-apps = {}
+apps: dict[ServerConnection, ServerApp] = {}
 
 
-async def list_games(websocket):
+async def list_games(websocket: ServerConnection):
     await websocket.send(json.dumps([
         {
-            'game_id': game_id,
+            'game_id': app.game_id,
             'name': app.name,
         }
-        for game_id, app in apps.items()
+        for app in apps.values()
         if len(app.teams) < 2
     ]))
 
 
-async def handler(websocket):
+async def handler(websocket: ServerConnection):
     global apps
     try:
         async for message in websocket:
@@ -32,22 +32,23 @@ async def handler(websocket):
                         await list_games(websocket)
                     case {'event': 'create', 'name': name}:
                         app = ServerApp(name)
-                        apps[app.game_id] = app
+                        apps[websocket] = app
                         await app.create(websocket)
                     case {'event': 'join', 'game_id': game_id}:
-                        await apps[game_id].join(websocket)
+                        app = next(app for app in apps.values() if app.game_id == game_id)
+                        apps[websocket] = app
+                        await app.join(websocket)
                     case {'event': 'close'}:
                         return
                     case data:
-                        await websocket.app.handle_event(websocket, data)
+                        await apps[websocket].handle_action(websocket, data)
             except Exception:
                 print(traceback.format_exc())
     finally:
-        if hasattr(websocket, 'app'):
-            for connection in websocket.app.teams.keys():
+        if websocket in apps.keys():
+            for connection in apps[websocket].teams.keys():
                 await connection.close()
-            if websocket.app.game_id in apps.keys():
-                apps.pop(websocket.app.game_id)
+                apps.pop(websocket)
         else:
             await websocket.close()
 

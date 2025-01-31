@@ -12,8 +12,7 @@ class Three:
         if (
             isinstance(trigger, DeathTrigger)
             and trigger.source_is(self.card)
-            and self.card.minion
-            and self.card.minion.face_down
+            and self.card.minion_last_info.face_down
         ):
-            self.card.move_to(self.card.minion.side)
+            self.card.move_to(self.card.minion_last_info.side)
             self.card.minion.flip_up()
