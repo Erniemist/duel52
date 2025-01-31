@@ -1,4 +1,5 @@
-from Card.Card import Three, Card
+from Card.Card import Card
+from Card.CardTypes.Three import Three
 
 
 class ServerCard(Card):

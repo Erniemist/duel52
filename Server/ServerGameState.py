@@ -32,7 +32,7 @@ class ServerGameState(GameState):
 
     def make_deck(self):
         main_deck = Deck(self, None)
-        values = ['A', '2', '3', '3', '3', '3', '3', '3', '3', '3', '3', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'] * 4
+        values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'] * 4
         cards = [
             ServerCard(value=value, host=main_deck, card_id=str(uuid.uuid4().int), game=self)
             for card_id, value in enumerate(values)

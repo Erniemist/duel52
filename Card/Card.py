@@ -1,4 +1,3 @@
-from Board.Lane.Side.ClientSide import ClientSide
 from GameState import GameState
 
 
