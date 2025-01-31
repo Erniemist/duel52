@@ -34,7 +34,7 @@ class HandView(ViewObject):
             if self.flipped:
                 rotation *= -1
                 y *= -1
-            if self.app.last_focused and card is self.app.last_focused.real:
+            if self.card_is_focused(card):
                 cards.append(FocusedHandCardView(
                     card,
                     self.app,
@@ -52,6 +52,10 @@ class HandView(ViewObject):
                     face_down=self.flipped,
                 ))
         return cards
+
+    def card_is_focused(self, card):
+        focused = self.app.focused_object()
+        return focused and isinstance(focused, CardView) and focused.real.card_id == card.card_id
 
     def card_x(self, i):
         return i * self.card_w - CardView.w * (1 - self.squish) / 2

@@ -1,6 +1,5 @@
 from Board.Lane.Side.Minion.ClientMinion import ClientMinion
 from Card.Card import Card
-from Server.ServerCard import ServerCard
 
 
 class ClientCard(Card):

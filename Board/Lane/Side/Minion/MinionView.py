@@ -94,7 +94,7 @@ class MinionView(ViewObject):
         return self.normal
 
     def source_of_pairing(self):
-        other_pair = self.app.last_focused
+        other_pair = self.app.focused_object()
         if not other_pair:
             return False
         if not isinstance(other_pair, MinionView):

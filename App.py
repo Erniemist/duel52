@@ -19,7 +19,6 @@ class App:
         self.team = None
         self.game_state = None
         self.cursor = Cursor(self)
-        self.last_focused = None
         self.game_view = None
         self.running = True
         self.events = []
@@ -74,13 +73,17 @@ class App:
         if event and not event.sent:
             await self.update(event)
         self.cursor.position = pygame.mouse.get_pos()
-        self.last_focused = self.game_view.focused_object if self.game_view else None
         self.game_view = GameView(self)
         self.handle_events()
         self.game_view = GameView(self)
         self.game_view.draw_all(self.screen)
         pygame.display.flip()
         self.tick += 1
+
+    def focused_object(self):
+        if self.game_view is None:
+            return None
+        return self.game_view.focused_object
 
     def handle_events(self):
         for event in pygame.event.get():

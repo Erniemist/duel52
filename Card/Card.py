@@ -6,7 +6,6 @@ class Card:
         self.value = value
         self.host = host
         self.card_id = card_id
-        self.player = host.player
         self.game = game
 
     def move_to(self, new_host):
