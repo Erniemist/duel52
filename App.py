@@ -1,5 +1,6 @@
 import asyncio
 import json
+import traceback
 
 import pygame
 
@@ -7,6 +8,8 @@ from ClientGameState import ClientGameState
 from Cursor.Cursor import Cursor
 from Event import Event
 from GameView import GameView
+from Server.ServerApp import ServerApp
+from Server.ServerGameState import ServerGameState
 
 LEFT = 1
 RIGHT = 3
@@ -23,10 +26,17 @@ class App:
         self.running = True
         self.events = []
         self.tick = 0
+        self.fake_server: None | ServerApp = None
 
     async def update(self, event):
         event.sent = True
-        await self.websocket.send(event.json())
+        try:
+            self.fake_server.resolve_action(event.json())
+        except Exception as e:
+            print(e)
+            print(traceback.format_exc())
+        self.game_state = ClientGameState.from_json(self.fake_server.game.to_json(self.team), self)
+        await self.websocket.send(json.dumps(event.json()))
 
     def next_event(self):
         return next((event for event in self.events if not event.resolved), None)
@@ -39,6 +49,12 @@ class App:
             self.game_state = ClientGameState.from_json(response['game'], self)
             if not self.team:
                 self.team = response['team']
+            self.make_fake_server(response['game'])
+
+    def make_fake_server(self, game_data):
+        fake_game = ServerGameState.from_json(game_data)
+        self.fake_server = ServerApp('fake')
+        self.fake_server.game = fake_game
 
     def players(self):
         return self.game_state.players

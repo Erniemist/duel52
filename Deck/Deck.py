@@ -1,4 +1,5 @@
 from Card.ClientCard import ClientCard
+from Server.ServerCard import ServerCard
 
 
 class Deck:
@@ -18,11 +19,17 @@ class Deck:
     def add_card(self, card):
         self.cards.append(card)
 
-    def to_json(self, player):
-        return {'cards': [card.to_json(player) for card in self.cards]}
+    def to_json(self, for_player):
+        return {'cards': [card.to_json(for_player) for card in self.cards]}
 
     @staticmethod
     def from_json(game, player, data):
         deck = Deck(game=game, player=player)
         deck.cards = [ClientCard.from_json(host=deck, game=game, data=card_data) for card_data in data['cards']]
+        return deck
+
+    @staticmethod
+    def from_json_server(game, player, data):
+        deck = Deck(game=game, player=player)
+        deck.cards = [ServerCard.from_json(host=deck, game=game, data=card_data) for card_data in data['cards']]
         return deck

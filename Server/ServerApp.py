@@ -37,9 +37,13 @@ class ServerApp:
         await self.send(websocket)
 
     async def handle_action(self, websocket: ServerConnection, data: dict):
-        player = self.game.active_player()
-        if player.team != self.teams[websocket]:
+        if self.game.active_player().team != self.teams[websocket]:
             raise Exception(f'Non-active player attempted to take action: {data}')
+        self.resolve_action(data)
+        await self.send(websocket, data['event_id'])
+
+    def resolve_action(self, data):
+        player = self.game.active_player()
         match data:
             case {'event': 'play', 'data': {'side': side, 'card': card}}:
                 side = self.game.find_side(side)
@@ -62,6 +66,4 @@ class ServerApp:
 
             case _:
                 raise Exception(f"Didn't recognise event: {data}")
-
         self.game.resolve_triggers()
-        await self.send(websocket, data['event_id'])

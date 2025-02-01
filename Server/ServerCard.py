@@ -1,10 +1,10 @@
 from Card.CardTypes.Three import Three
+from Server.ServerMinion import ServerMinion
 from typing import TYPE_CHECKING
 
 
 if TYPE_CHECKING:
     from Server.ServerSide import ServerSide
-    from Server.ServerMinion import ServerMinion
     from Server.ServerGameState import ServerGameState
     from Deck.Deck import Deck
     from Graveyard.Graveyard import Graveyard
@@ -33,10 +33,26 @@ class ServerCard:
         self.host.add_card(self)
         old_host.remove_card(self)
 
-    def to_json(self, player):
-        data: dict = {'card_id': self.card_id}
-        if player.knows(self):
-            data['value'] = self.value
+    def to_json(self, for_player):
+        data: dict = {
+            'card_id': self.card_id,
+            'value': self.value if for_player.knows(self) else '',
+        }
         if self.minion:
             data['minion'] = self.minion.to_json()
         return data
+
+    @staticmethod
+    def from_json(game, host, data):
+        card = ServerCard(data['value'], host, data['card_id'], game)
+        if 'minion' in data.keys():
+            card.minion = ServerMinion(card, host, game)
+            card.minion.hp = data['minion']['hp']
+            card.minion.face_down = data['minion']['face_down']
+            card.minion.attacks_made = data['minion']['attacks_made']
+            if 'pair' in data['minion'].keys():
+                for other in host.cards:
+                    if other.card_id == data['pair']:
+                        card.minion.pair_with(other.minion)
+                        break
+        return card

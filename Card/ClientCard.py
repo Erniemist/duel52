@@ -33,11 +33,10 @@ class ClientCard:
 
     @staticmethod
     def from_json(host, game, data):
-        value = data['value'] if 'value' in data.keys() else ''
         minion_data = data['minion'] if 'minion' in data.keys() else None
 
         return ClientCard(
-            value=value,
+            value=data['value'],
             host=host,
             card_id=data['card_id'],
             game=game,

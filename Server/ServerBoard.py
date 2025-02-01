@@ -21,3 +21,14 @@ class ServerBoard:
 
     def to_json(self, for_player: ServerPlayer) -> dict:
         return {'lanes': [lane.to_json(for_player) for lane in self.lanes]}
+
+    @staticmethod
+    def from_json(game, players, data):
+        board = ServerBoard(game=game, players=players)
+        for i, lane_data in enumerate(data['lanes']):
+            lane = board.lanes[i]
+            for j, side_data in enumerate(lane_data['sides']):
+                side = lane.sides[j]
+                for card_data in side_data['cards']:
+                    side.cards.append(ServerCard.from_json(game, side, card_data))
+        return board

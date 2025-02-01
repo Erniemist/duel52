@@ -101,13 +101,23 @@ class ServerGameState:
         self.active_player_index = (self.active_player_index + 1) % 2
         self.active_player().start_turn()
 
+    @staticmethod
+    def from_json(data):
+        game = ServerGameState()
+        game.winner = data['winner']
+        game.active_player_index = data['active_player_index']
+        game.players = [ServerPlayer.from_json(game, player_data) for player_data in data['players']]
+        game.graveyard = Graveyard.from_json(game, data['graveyard'])
+        game.board = ServerBoard.from_json(game, game.players, data['board'])
+        return game
+
     def to_json(self, team):
-        player = self.player_by_team(team)
+        for_player = self.player_by_team(team)
         return {
             'active_player_index': self.active_player_index,
-            'graveyard': self.graveyard.to_json(for_player=player),
-            'players': [player.to_json(for_player=player) for player in self.players],
-            'board': self.board.to_json(for_player=player),
+            'graveyard': self.graveyard.to_json(for_player=for_player),
+            'players': [player.to_json(for_player=for_player) for player in self.players],
+            'board': self.board.to_json(for_player=for_player),
             'winner': self.winner.team if self.winner else None,
         }
 

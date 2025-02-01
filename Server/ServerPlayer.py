@@ -17,7 +17,7 @@ class ServerPlayer:
         self.hand = Hand(game, self)
         self.deck = Deck(game, self)
         self.actions = 0
-        self.known_cards: list[ServerCard] = []
+        self.known_cards: list[str] = []
 
     def start_turn(self, actions: int = 3):
         self.actions = actions
@@ -85,10 +85,19 @@ class ServerPlayer:
         return self.game.player_by_team(self.other_team())
 
     def learn(self, card):
-        self.known_cards.append(card)
+        self.known_cards.append(card.card_id)
 
     def knows(self, card):
-        return card in self.known_cards
+        return card.card_id in self.known_cards
+
+    @staticmethod
+    def from_json(game, data):
+        player = ServerPlayer(data['team'], game)
+        player.hand = Hand.from_json_server(game=game, player=player, data=data['hand'])
+        player.known_cards = data['known_cards']
+        player.deck = Deck.from_json_server(game=game, player=player, data=data['deck'])
+        player.actions = data['actions']
+        return player
 
     def to_json(self, for_player: Self):
         return {
@@ -96,4 +105,5 @@ class ServerPlayer:
             'deck': self.deck.to_json(for_player),
             'actions': self.actions,
             'team': self.team,
+            'known_cards': self.known_cards,
         }

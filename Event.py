@@ -10,4 +10,4 @@ class Event:
         self.resolved = False
 
     def json(self):
-        return json.dumps({'event': self.name, 'data': self.data, 'event_id': self.event_id})
+        return {'event': self.name, 'data': self.data, 'event_id': self.event_id}
