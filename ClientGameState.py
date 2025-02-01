@@ -6,20 +6,16 @@ from Board.ClientBoard import ClientBoard
 from Graveyard.Graveyard import Graveyard
 from Player.ClientPlayer import ClientPlayer
 from Card.ClientCard import ClientCard
-from Triggers.Trigger import Trigger
 
 
 class ClientGameState:
-    def __init__(self, active_player_index, winner, graveyard, players_data, board, app):
-        self.winner: None | ClientPlayer = winner
-        self.graveyard: Graveyard = Graveyard.from_json(game=self, data=graveyard)
-        self.players: list[ClientPlayer] = [
-            ClientPlayer.from_json(game=self, data=player_data)
-            for player_data in players_data
-        ]
-        self._active_player: ClientPlayer = self.players[active_player_index]
-        self.board: ClientBoard = ClientBoard.from_json(game=self, players=self.players, data=board)
-        self.triggers: list[Trigger] = []
+    def __init__(self, game_data, app):
+        graveyard, players, board = game_data.build_for_client(self)
+        self.winner = game_data.winner
+        self.graveyard: Graveyard = graveyard
+        self.players: list[ClientPlayer] = players
+        self._active_player: ClientPlayer = self.players[game_data.active_player_index]
+        self.board: ClientBoard = board
         self.app: App = app
 
     def active_player(self):
@@ -46,14 +42,3 @@ class ClientGameState:
 
     def pair_event(self, minion_1, minion_2):
         self.app.event('pair', {'card_1': minion_1.card.card_id, 'card_2': minion_2.card.card_id})
-
-    @staticmethod
-    def from_json(data, app):
-        return ClientGameState(
-            active_player_index=data['active_player_index'],
-            winner=data['winner'],
-            graveyard=data['graveyard'],
-            players_data=data['players'],
-            board=data['board'],
-            app=app,
-        )

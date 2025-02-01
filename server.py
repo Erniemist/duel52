@@ -7,6 +7,7 @@ import traceback
 from websockets.asyncio.server import serve, ServerConnection
 
 from Server.ServerApp import ServerApp
+from Server.ServerGameState import ServerGameState
 
 apps: dict[ServerConnection, ServerApp] = {}
 
@@ -31,7 +32,7 @@ async def handler(websocket: ServerConnection):
                     case {'event': 'list'}:
                         await list_games(websocket)
                     case {'event': 'create', 'name': name}:
-                        app = ServerApp(name)
+                        app = ServerApp(name, ServerGameState())
                         apps[websocket] = app
                         await app.create(websocket)
                     case {'event': 'join', 'game_id': game_id}:

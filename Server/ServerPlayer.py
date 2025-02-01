@@ -4,7 +4,6 @@ from Hand.Hand import Hand
 from typing import TYPE_CHECKING, Self
 
 if TYPE_CHECKING:
-    from Server.ServerCard import ServerCard
     from Server.ServerGameState import ServerGameState
 
 

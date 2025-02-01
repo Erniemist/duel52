@@ -1,27 +1,27 @@
+import asyncio
 import json
 import uuid
 
 from websockets import ServerConnection
+
+from GameData import GameData
 from Server.ServerGameState import ServerGameState
 from Server.ServerPlayer import ServerPlayer
 
 
 class ServerApp:
-    def __init__(self, name: str):
+    def __init__(self, name: str, game):
         self.name = name
         self.game_id = str(uuid.uuid4().int)
-        self.game = ServerGameState()
+        self.game: ServerGameState = game
         self.teams: dict[ServerConnection, str] = {}
 
     def add_connection(self, connection: ServerConnection, team: str):
         self.teams[connection] = team
 
-    def to_json(self, connection: ServerConnection) -> dict:
-        return self.game.to_json(self.teams[connection])
-
     async def send(self, sender: ServerConnection, event_id: None | str = None):
         for connection, team in self.teams.items():
-            data = {'game': self.game.to_json(team), 'team': team}
+            data = {'game': GameData.from_server(self.game, team).to_json(), 'team': team}
             if connection == sender and event_id is not None:
                 data['event_id'] = event_id
             await connection.send(json.dumps(data))

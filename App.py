@@ -7,9 +7,9 @@ import pygame
 from ClientGameState import ClientGameState
 from Cursor.Cursor import Cursor
 from Event import Event
+from GameData import GameData
 from GameView import GameView
 from Server.ServerApp import ServerApp
-from Server.ServerGameState import ServerGameState
 
 LEFT = 1
 RIGHT = 3
@@ -20,7 +20,7 @@ class App:
         self.websocket = websocket
         self.screen = screen
         self.team = None
-        self.game_state = None
+        self.game_state: None | ClientGameState = None
         self.cursor = Cursor(self)
         self.game_view = None
         self.running = True
@@ -35,7 +35,7 @@ class App:
         except Exception as e:
             print(e)
             print(traceback.format_exc())
-        self.game_state = ClientGameState.from_json(self.fake_server.game.to_json(self.team), self)
+        self.game_state = GameData.from_server(self.fake_server.game, self.team).make_client(self)
         await self.websocket.send(json.dumps(event.json()))
 
     def next_event(self):
@@ -46,15 +46,11 @@ class App:
             response = json.loads(message)
             if 'event_id' in response.keys():
                 self.events[response['event_id']].resolved = True
-            self.game_state = ClientGameState.from_json(response['game'], self)
+            game_data = GameData.from_json(response['game'])
+            self.game_state = game_data.make_client(self)
             if not self.team:
                 self.team = response['team']
-            self.make_fake_server(response['game'])
-
-    def make_fake_server(self, game_data):
-        fake_game = ServerGameState.from_json(game_data)
-        self.fake_server = ServerApp('fake')
-        self.fake_server.game = fake_game
+            self.fake_server = ServerApp(name='fake', game=game_data.make_server())
 
     def players(self):
         return self.game_state.players

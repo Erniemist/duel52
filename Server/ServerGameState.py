@@ -9,14 +9,22 @@ from Server.ServerPlayer import ServerPlayer
 
 
 class ServerGameState:
-    def __init__(self):
-        self.winner: None | ServerPlayer = None
-        self.graveyard: Graveyard = Graveyard(self, [])
-        self.players: list[ServerPlayer] = self.make_players(self.make_deck())
-        self.board: ServerBoard = ServerBoard(self, self.players)
-        self.active_player_index = random.randint(0, 1)
+    def __init__(self, game_data=None):
         self.triggers = []
-        self.active_player().start_turn(actions=2)
+        if game_data is None:
+            self.winner: None | ServerPlayer = None
+            self.active_player_index = random.randint(0, 1)
+            self.graveyard: Graveyard = Graveyard(self, [])
+            self.players: list[ServerPlayer] = self.make_players(self.make_deck())
+            self.board: ServerBoard = ServerBoard(self, self.players)
+            self.active_player().start_turn(actions=2)
+        else:
+            graveyard, players, board = game_data.build_for_server(self)
+            self.winner = game_data.winner
+            self.active_player_index = game_data.active_player_index
+            self.graveyard: Graveyard = graveyard
+            self.players: list[ServerPlayer] = players
+            self.board: ServerBoard = board
 
     def active_player(self) -> ServerPlayer:
         return self.players[self.active_player_index]
@@ -100,24 +108,3 @@ class ServerGameState:
         self.active_player().end_turn()
         self.active_player_index = (self.active_player_index + 1) % 2
         self.active_player().start_turn()
-
-    @staticmethod
-    def from_json(data):
-        game = ServerGameState()
-        game.winner = data['winner']
-        game.active_player_index = data['active_player_index']
-        game.players = [ServerPlayer.from_json(game, player_data) for player_data in data['players']]
-        game.graveyard = Graveyard.from_json_server(game, data['graveyard'])
-        game.board = ServerBoard.from_json(game, game.players, data['board'])
-        return game
-
-    def to_json(self, team):
-        for_player = self.player_by_team(team)
-        return {
-            'active_player_index': self.active_player_index,
-            'graveyard': self.graveyard.to_json(for_player=for_player),
-            'players': [player.to_json(for_player=for_player) for player in self.players],
-            'board': self.board.to_json(for_player=for_player),
-            'winner': self.winner.team if self.winner else None,
-        }
-
