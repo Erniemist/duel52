@@ -107,7 +107,7 @@ class ServerGameState:
         game.winner = data['winner']
         game.active_player_index = data['active_player_index']
         game.players = [ServerPlayer.from_json(game, player_data) for player_data in data['players']]
-        game.graveyard = Graveyard.from_json(game, data['graveyard'])
+        game.graveyard = Graveyard.from_json_server(game, data['graveyard'])
         game.board = ServerBoard.from_json(game, game.players, data['board'])
         return game
 

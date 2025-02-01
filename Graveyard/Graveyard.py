@@ -1,4 +1,5 @@
 from Card.ClientCard import ClientCard
+from Server.ServerCard import ServerCard
 
 
 class Graveyard:
@@ -24,3 +25,12 @@ class Graveyard:
     @staticmethod
     def from_json(game, data):
         return Graveyard(game=game, cards_data=data['cards'])
+
+    @staticmethod
+    def from_json_server(game, data):
+        graveyard = Graveyard(game=game, cards_data=data['cards'])
+        graveyard.cards = {
+            card_data['card_id']: ServerCard.from_json(host=graveyard, game=game, data=card_data)
+            for card_data in data['cards']
+        }
+        return graveyard

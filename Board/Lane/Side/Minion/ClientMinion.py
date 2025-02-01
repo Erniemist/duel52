@@ -57,6 +57,9 @@ class ClientMinion(Minion):
 
     @staticmethod
     def from_json(card, side, game, data):
+        pair = None
+        if 'pair' in data.keys():
+            pair = data['pair']
         return ClientMinion(
             card=card,
             side=side,
@@ -64,5 +67,5 @@ class ClientMinion(Minion):
             hp=data['hp'],
             face_down=data['face_down'],
             attacks_made=data['attacks_made'],
-            pair_id=data['pair'] if 'pair' in data.keys() else None,
+            pair_id=pair,
         )

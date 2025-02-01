@@ -52,7 +52,7 @@ class ServerCard:
             card.minion.attacks_made = data['minion']['attacks_made']
             if 'pair' in data['minion'].keys():
                 for other in host.cards:
-                    if other.card_id == data['pair']:
+                    if other.card_id == data['minion']['pair']:
                         card.minion.pair_with(other.minion)
                         break
         return card
