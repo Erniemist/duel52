@@ -4,7 +4,7 @@ from dotenv import dotenv_values
 import pygame
 import websockets
 
-from App import App
+from Client.App import App
 
 URI = dotenv_values(".env.local").get('WEBSOCKET_URI')
 URI = "wss://duel52-8b7c8276f3dd.herokuapp.com" if not URI else URI
