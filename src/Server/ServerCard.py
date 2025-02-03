@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from Server.ServerSide import ServerSide
     from Server.ServerGameState import ServerGameState
     from Client.Deck.Deck import Deck
-    from Client.Graveyard.Graveyard import Graveyard
+    from Client.Graveyard.ClientGraveyard import ClientGraveyard
     from Client.Hand.Hand import Hand
 
 
@@ -21,7 +21,7 @@ class ServerCard:
         if value in self.types:
             self.type = self.types[value](self)
         self.value = value
-        self.host: Deck | Hand | ServerSide | Graveyard = host
+        self.host: Deck | Hand | ServerSide | ClientGraveyard = host
         self.card_id = card_id
         self.game: ServerGameState = game
         self.minion: None | ServerMinion = None

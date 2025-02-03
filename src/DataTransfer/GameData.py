@@ -1,6 +1,7 @@
 from Client.Board.ClientBoard import ClientBoard
 from Client.ClientGameState import ClientGameState
-from Client.Graveyard.Graveyard import Graveyard
+from Client.Graveyard.ClientGraveyard import ClientGraveyard
+from DataTransfer.GraveyardData import GraveyardData
 from DataTransfer.PlayerData import PlayerData
 from Server.ServerBoard import ServerBoard
 from Server.ServerGameState import ServerGameState
@@ -18,7 +19,7 @@ class GameData:
     def from_json(data):
         return GameData(
             active_player_index=data['active_player_index'],
-            graveyard=data['graveyard'],
+            graveyard=GraveyardData.from_json(data['graveyard']),
             players=[PlayerData.from_json(player) for player in data['players']],
             board=data['board'],
             winner=data['winner'],
@@ -30,7 +31,7 @@ class GameData:
     def build_for_server(self, game):
         players = [player_data.make_server(game) for player_data in self.players]
         return (
-            Graveyard.from_json(game, self.graveyard),
+            self.graveyard.make_server(game),
             players,
             ServerBoard.from_json(game, players, self.board),
         )
@@ -40,7 +41,7 @@ class GameData:
         for_player = server.player_by_team(team)
         return GameData(
             active_player_index=server.active_player_index,
-            graveyard=server.graveyard.to_json(for_player=for_player),
+            graveyard=GraveyardData.from_server(server.graveyard, for_player=for_player),
             players=[PlayerData.from_server(player, for_player) for player in server.players],
             board=server.board.to_json(for_player=for_player),
             winner=server.winner.team if server.winner else None
@@ -52,7 +53,7 @@ class GameData:
     def build_for_client(self, game):
         players = [player_data.make_client(game) for player_data in self.players]
         return (
-            Graveyard.from_json(game, self.graveyard),
+            self.graveyard.make_server(game),
             players,
             ClientBoard.from_json(game, players, self.board),
         )
@@ -60,7 +61,7 @@ class GameData:
     def to_json(self):
         return {
             'active_player_index': self.active_player_index,
-            'graveyard': self.graveyard,
+            'graveyard': self.graveyard.to_json(),
             'players': [player.to_json() for player in self.players],
             'board': self.board,
             'winner': self.winner

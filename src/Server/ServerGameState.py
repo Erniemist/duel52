@@ -4,7 +4,8 @@ import uuid
 from Server.ServerBoard import ServerBoard
 from Server.ServerCard import ServerCard
 from Client.Deck.Deck import Deck
-from Client.Graveyard.Graveyard import Graveyard
+from Client.Graveyard.ClientGraveyard import ClientGraveyard
+from Server.ServerGraveyard import ServerGraveyard
 from Server.ServerPlayer import ServerPlayer
 
 
@@ -14,7 +15,7 @@ class ServerGameState:
         if game_data is None:
             self.winner: None | ServerPlayer = None
             self.active_player_index = random.randint(0, 1)
-            self.graveyard: Graveyard = Graveyard(self, [])
+            self.graveyard: ServerGraveyard = ServerGraveyard(self)
             self.players: list[ServerPlayer] = self.make_players(self.make_deck())
             self.board: ServerBoard = ServerBoard(self, self.players)
             self.active_player().start_turn(actions=2)
@@ -22,7 +23,7 @@ class ServerGameState:
             graveyard, players, board = game_data.build_for_server(self)
             self.winner = game_data.winner
             self.active_player_index = game_data.active_player_index
-            self.graveyard: Graveyard = graveyard
+            self.graveyard: ServerGraveyard = graveyard
             self.players: list[ServerPlayer] = players
             self.board: ServerBoard = board
 
@@ -91,7 +92,7 @@ class ServerGameState:
 
     def get_cards(self):
         yield from self.board.get_cards()
-        yield from self.graveyard.get_cards()
+        yield from self.graveyard.cards.values()
         yield from self.get_hand_cards()
 
     def trigger(self, trigger):

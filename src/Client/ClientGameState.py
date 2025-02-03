@@ -1,7 +1,7 @@
 from Client.Board.ClientBoard import ClientBoard
 from Client.Card.ClientCard import ClientCard
 from Client.Event import Event
-from Client.Graveyard.Graveyard import Graveyard
+from Client.Graveyard.ClientGraveyard import ClientGraveyard
 from Client.Player.ClientPlayer import ClientPlayer
 
 
@@ -9,7 +9,7 @@ class ClientGameState:
     def __init__(self, game_data):
         graveyard, players, board = game_data.build_for_client(self)
         self.winner = game_data.winner
-        self.graveyard: Graveyard = graveyard
+        self.graveyard: ClientGraveyard = graveyard
         self.players: list[ClientPlayer] = players
         self._active_player: ClientPlayer = self.players[game_data.active_player_index]
         self.board: ClientBoard = board

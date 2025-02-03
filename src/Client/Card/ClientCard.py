@@ -6,14 +6,14 @@ if TYPE_CHECKING:
     from Client.Board.Lane.Side.ClientSide import ClientSide
     from Client.ClientGameState import ClientGameState
     from Client.Deck.Deck import Deck
-    from Client.Graveyard.Graveyard import Graveyard
+    from Client.Graveyard.ClientGraveyard import ClientGraveyard
     from Client.Hand.Hand import Hand
 
 
 class ClientCard:
     def __init__(self, value: str, host, card_id: str, game, minion_data: None | dict = None):
         self.value = value
-        self.host: Deck | Graveyard | Hand | ClientSide = host
+        self.host: Deck | ClientGraveyard | Hand | ClientSide = host
         self.card_id = card_id
         self.game: ClientGameState = game
         if minion_data is not None:
