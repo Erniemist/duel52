@@ -6,7 +6,6 @@ import pygame
 
 from Client.ClientGameState import ClientGameState
 from Client.Cursor.Cursor import Cursor
-from Client.Event import Event
 from DataTransfer.GameData import GameData
 from Client.GameView import GameView
 from Server.ServerApp import ServerApp

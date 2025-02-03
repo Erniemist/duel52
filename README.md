@@ -7,6 +7,6 @@
   - fish: `source .venv/bin/activate.fish`
 - Windows: `.venv\Scripts\activate.bat`
 - `pip install -r requirements.txt`
-- `python client.py`
+- `python src/client.py`
 
 rules: http://juddmadden.com/duel52/

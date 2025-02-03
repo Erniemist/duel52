@@ -6,7 +6,7 @@ import websockets
 
 from Client.App import App
 
-URI = dotenv_values(".env.local").get('WEBSOCKET_URI')
+URI = dotenv_values("../.env.local").get('WEBSOCKET_URI')
 URI = "wss://duel52-8b7c8276f3dd.herokuapp.com" if not URI else URI
 
 app = None
