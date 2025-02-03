@@ -38,16 +38,13 @@ class App:
         self.game_state = GameData.from_server(self.fake_server.game, self.team).make_client(self)
         await self.websocket.send(json.dumps(event.json()))
 
-    def next_event(self):
-        return next((event for event in self.events if not event.resolved), None)
-
     async def handle_incoming(self):
         async for message in self.websocket:
             response = json.loads(message)
             if 'event_id' in response.keys():
-                self.events[response['event_id']].resolved = True
+                self.game_state.resolve(response['event_id'])
             game_data = GameData.from_json(response['game'])
-            self.game_state = game_data.make_client(self)
+            self.game_state = game_data.make_client()
             if not self.team:
                 self.team = response['team']
             self.fake_server = ServerApp(name='fake', game=game_data.make_server())
@@ -81,7 +78,7 @@ class App:
             pygame.quit()
 
     async def loop(self):
-        event = self.next_event()
+        event = self.game_state.next_event()
         if event and not event.sent:
             await self.update(event)
         self.cursor.position = pygame.mouse.get_pos()
@@ -125,6 +122,3 @@ class App:
         self.running = False
         await self.websocket.send(json.dumps({'event': 'close'}))
         await self.websocket.close()
-
-    def event(self, name, data):
-        self.events.append(Event(event_id=len(self.events), name=name, data=data))

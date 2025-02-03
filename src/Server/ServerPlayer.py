@@ -10,13 +10,20 @@ if TYPE_CHECKING:
 class ServerPlayer:
     TEAMS = ['A', 'B']
 
-    def __init__(self, team: str, game):
-        self.team = team
+    def __init__(self, team, game, player_data=None):
         self.game: ServerGameState = game
-        self.hand = Hand(game, self)
-        self.deck = Deck(game, self)
-        self.actions = 0
-        self.known_cards: list[str] = []
+        self.team = team
+        if player_data is None:
+            self.hand = Hand(game, self)
+            self.deck = Deck(game, self)
+            self.actions = 0
+            self.known_cards: list[str] = []
+        else:
+            hand, deck = player_data.build_for_server(game, self)
+            self.hand = hand
+            self.deck = deck
+            self.actions = player_data.actions
+            self.known_cards: list[str] = player_data.known_cards
 
     def start_turn(self, actions: int = 3):
         self.actions = actions

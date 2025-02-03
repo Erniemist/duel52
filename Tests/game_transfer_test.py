@@ -1,8 +1,9 @@
+from Client.ClientGameState import ClientGameState
 from DataTransfer.GameData import GameData
 
 
 def test_make_server():
-    data = {
+    game_json = {
         'active_player_index': 0,
         'graveyard': {'cards': []},
         'players': [
@@ -28,5 +29,7 @@ def test_make_server():
         ]},
         'winner': None,
     }
-    server = GameData.from_json(data).make_server()
-    assert data == GameData.from_server(server, 'Team 1').to_json()
+    server = GameData.from_json(game_json).make_server()
+    game_data = GameData.from_server(server, 'Team 1')
+    assert game_json == game_data.to_json()
+    assert isinstance(game_data.make_client(), ClientGameState)

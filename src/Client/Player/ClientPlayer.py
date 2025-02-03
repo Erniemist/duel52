@@ -3,20 +3,11 @@ from Client.Hand.Hand import Hand
 
 
 class ClientPlayer:
-    def __init__(self, team, game, deck, hand, actions):
-        self.team = team
+    def __init__(self, game, player_data):
         self.game = game
-        self.hand = Hand.from_json(game=game, player=self, data=hand)
-        self.deck = Deck.from_json(game=game, player=self, data=deck)
-        self.actions = actions
-        self.known_cards = []
-
-    @staticmethod
-    def from_json(game, data):
-        return ClientPlayer(
-            team=data['team'],
-            game=game,
-            deck=data['deck'],
-            hand=data['hand'],
-            actions=data['actions'],
-        )
+        hand, deck = player_data.build_for_client(game, self)
+        self.team = player_data.team
+        self.hand: Hand = hand
+        self.deck: Deck = deck
+        self.actions = player_data.actions
+        self.known_cards = player_data.known_cards
