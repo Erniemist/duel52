@@ -29,17 +29,13 @@ class ClientGameState:
         return None
 
     def play_action(self, card, side):
-        self.action('play', {'card': card.card_id, 'side': side.side_id})
+        self.actions.append(Action.play(card.card_id, side.side_id))
 
     def flip_action(self, minion):
-        self.action('flip', {'card': minion.card.card_id})
+        self.actions.append(Action.flip(minion.card.card_id))
 
     def attack_action(self, minion_1, minion_2):
-        self.action('attack', {'card_1': minion_1.card.card_id, 'card_2': minion_2.card.card_id})
+        self.actions.append(Action.attack(minion_1.card.card_id, minion_2.card.card_id))
 
     def pair_action(self, minion_1, minion_2):
-        self.action('pair', {'card_1': minion_1.card.card_id, 'card_2': minion_2.card.card_id})
-
-    def action(self, name, data):
-        self.actions.append(Action(name=name, data=data))
-
+        self.actions.append(Action.pair(minion_1.card.card_id, minion_2.card.card_id))

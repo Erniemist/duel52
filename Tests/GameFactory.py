@@ -2,21 +2,53 @@ from DataTransfer.GameData import GameData
 
 
 class GameFactory:
+    base = {
+        'active_player_index': 0,
+        'graveyard': {'cards': []},
+        'players': [
+            {
+                'team': 'Team 1',
+                'hand': {'cards': [{
+                    'card_id': '1234',
+                    'value': 'A',
+                }]},
+                'deck': {'cards': []},
+                'known_cards': [],
+                'actions': 3,
+            },
+            {
+                'team': 'Team 2',
+                'hand': {'cards': []},
+                'deck': {'cards': []},
+                'known_cards': [],
+                'actions': 0,
+            },
+        ],
+        'board': {'lanes': [
+            {'sides': [
+                {'side_id': '111', 'cards': []},
+                {'side_id': '222', 'cards': []},
+            ]},
+            {'sides': [
+                {'side_id': '333', 'cards': []},
+                {'side_id': '444', 'cards': []},
+            ]},
+            {'sides': [
+                {'side_id': '555', 'cards': []},
+                {'side_id': '666', 'cards': []},
+            ]},
+        ]},
+        'winner': None,
+    }
+
     def __init__(self):
-        self.active_team = 'A'
-        self.winner = None
-        self.graveyard = []
-        self.board = []
-        self.players = []
+        self.game_data = GameData.from_json(self.base)
 
-    def build(self):
-        active_team_index = 0
-        players = self.players
-        return GameData(
-            self.winner,
-            active_team_index,
-            self.graveyard,
-            players,
-            self.board,
-        )
+    def with_hand(self, team, cards):
+        player = next(player for player in self.game_data.players if player.team == team)
+        player.hand = cards
+        for card in cards:
+            player.known_cards.append(card.card_id)
 
+    def make_server(self):
+        return self.game_data.make_server()
