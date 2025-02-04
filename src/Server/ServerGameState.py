@@ -1,6 +1,7 @@
 import random
 import uuid
 
+from DataTransfer.CardData import CardData
 from Server.ServerBoard import ServerBoard
 from Server.ServerCard import ServerCard
 from Client.Deck.Deck import Deck
@@ -47,7 +48,7 @@ class ServerGameState:
         main_deck = Deck(self, None)
         values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'] * 4
         cards = [
-            ServerCard(value=value, host=main_deck, card_id=str(uuid.uuid4().int), game=self)
+            CardData(str(uuid.uuid4().int), value).make(self, main_deck, True)
             for card_id, value in enumerate(values)
         ]
         random.shuffle(cards)

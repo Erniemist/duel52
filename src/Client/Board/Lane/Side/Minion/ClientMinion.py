@@ -2,24 +2,18 @@ from Client.Board.Lane.Side.Minion.Minion import Minion
 
 
 class ClientMinion(Minion):
-    def __init__(self, card, side, game, hp, face_down, attacks_made, pair_id):
+    def __init__(self, card, side, game, minion_data):
         self.card = card
-        self.value = card.value
         self.side = side
+        self.game = game
+        self.value = card.value
         self.player = side.player
         self.team = self.player.team
-        self.game = game
-        self.hp = hp
-        self.face_down = face_down
-        self.attacks_made = attacks_made
+        self.hp = minion_data['hp']
+        self.face_down = minion_data['face_down']
+        self.attacks_made = minion_data['attacks_made']
         self.pair = None
         self.view_object = None
-        if pair_id is None:
-            return
-        other = next((card for card in self.side.cards if card.card_id == pair_id), None)
-        if other is None:
-            return
-        self.pair_with(other.minion)
 
     def can_select(self, my_turn):
         if not my_turn or self.team != self.game.active_player().team or self.player.actions < 1:
@@ -54,18 +48,3 @@ class ClientMinion(Minion):
             self.game.attack_action(target_source, self)
         else:
             self.game.pair_action(target_source, self)
-
-    @staticmethod
-    def from_json(card, side, game, data):
-        pair = None
-        if 'pair' in data.keys():
-            pair = data['pair']
-        return ClientMinion(
-            card=card,
-            side=side,
-            game=game,
-            hp=data['hp'],
-            face_down=data['face_down'],
-            attacks_made=data['attacks_made'],
-            pair_id=pair,
-        )

@@ -1,8 +1,7 @@
-from Client.Card.ClientCard import ClientCard
 from Client.Deck.Deck import Deck
 from Client.Hand.Hand import Hand
 from Client.Player.ClientPlayer import ClientPlayer
-from Server.ServerCard import ServerCard
+from DataTransfer.CardData import CardData
 from Server.ServerPlayer import ServerPlayer
 
 
@@ -18,8 +17,8 @@ class PlayerData:
     @staticmethod
     def from_json(data):
         return PlayerData(
-            hand=data['hand'],
-            deck=data['deck'],
+            hand=[CardData.from_json(card_data) for card_data in data['hand']['cards']],
+            deck=[CardData.from_json(card_data) for card_data in data['deck']['cards']],
             actions=data['actions'],
             team=data['team'],
             known_cards=data['known_cards'],
@@ -35,17 +34,16 @@ class PlayerData:
             actions=player.actions,
             team=player.team,
             known_cards=player.known_cards,
-            hand={'cards': [card.to_json(for_player) for card in player.hand.cards]},
-            deck={'cards': [card.to_json(for_player) for card in player.deck.cards]},
+            hand=[CardData.from_server(card, for_player) for card in player.hand.cards],
+            deck=[CardData.from_server(card, for_player) for card in player.deck.cards],
         )
 
     def build(self, game, player):
         assert self.is_server is not None
-        card = ServerCard if self.is_server else ClientCard
         hand = Hand(game, player)
-        hand.cards = [card.from_json(host=hand, game=game, data=card_data) for card_data in self.hand['cards']]
+        hand.cards = [card_data.make(game, hand, self.is_server) for card_data in self.hand]
         deck = Deck(game, player)
-        deck.cards = [card.from_json(host=deck, game=game, data=card_data) for card_data in self.deck['cards']]
+        deck.cards = [card_data.make(game, deck, self.is_server) for card_data in self.deck]
         return hand, deck
 
     def to_json(self):
@@ -53,6 +51,6 @@ class PlayerData:
             'actions': self.actions,
             'team': self.team,
             'known_cards': self.known_cards,
-            'hand': self.hand,
-            'deck': self.deck,
+            'hand': {'cards': [card.to_json() for card in self.hand]},
+            'deck': {'cards': [card.to_json() for card in self.deck]},
         }

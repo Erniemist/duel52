@@ -1,9 +1,8 @@
-import uuid
-
 from Client.Board.ClientBoard import ClientBoard
 from Client.Board.Lane.ClientLane import ClientLane
 from Client.Board.Lane.Side.ClientSide import ClientSide
 from Client.Card.ClientCard import ClientCard
+from DataTransfer.CardData import CardData
 from Server.ServerBoard import ServerBoard
 from Server.ServerCard import ServerCard
 from Server.ServerLane import ServerLane
@@ -19,7 +18,14 @@ class BoardData:
 
     @staticmethod
     def from_json(data):
-        return BoardData(lanes=data['lanes'])
+        return BoardData(lanes=[
+            {'sides': [
+                {
+                    'side_id': side['side_id'],
+                    'cards': [CardData.from_json(card) for card in side['cards']]
+                } for side in lane['sides']
+            ]} for lane in data['lanes']
+        ])
 
     def make(self, game, players, is_server):
         self.is_server = is_server
@@ -33,7 +39,7 @@ class BoardData:
             {'sides': [
                 {
                     'side_id': side.side_id,
-                    'cards': [card.to_json(for_player) for card in side.cards]
+                    'cards': [CardData.from_server(card, for_player) for card in side.cards]
                 } for side in lane.sides
             ]} for lane in board.lanes
         ])
@@ -61,10 +67,17 @@ class BoardData:
         return lane
 
     def build_side(self, side_data, side):
-        card = ServerCard if self.is_server else ClientCard
         for card_data in side_data['cards']:
-            side.cards.append(card.from_json(host=side, game=self.game, data=card_data))
+            side.cards.append(card_data.make(self.game, side, self.is_server))
         return side
 
     def to_json(self):
-        return {'lanes': self.lanes}
+        print(self.lanes)
+        return {'lanes': [
+            {'sides': [
+                {
+                    'side_id': side['side_id'],
+                    'cards': [card.to_json() for card in side['cards']]
+                } for side in lane['sides']
+            ]} for lane in self.lanes
+        ]}

@@ -1,7 +1,5 @@
 from typing import TYPE_CHECKING
 
-from Client.Board.Lane.Side.Minion.ClientMinion import ClientMinion
-
 if TYPE_CHECKING:
     from Client.Board.Lane.Side.ClientSide import ClientSide
     from Client.ClientGameState import ClientGameState
@@ -11,15 +9,12 @@ if TYPE_CHECKING:
 
 
 class ClientCard:
-    def __init__(self, value: str, host, card_id: str, game, minion_data: None | dict = None):
-        self.value = value
+    def __init__(self, game, host, card_data):
+        self.value = card_data.value
         self.host: Deck | ClientGraveyard | Hand | ClientSide = host
-        self.card_id = card_id
+        self.card_id = card_data.card_id
         self.game: ClientGameState = game
-        if minion_data is not None:
-            self.minion = ClientMinion.from_json(card=self, side=host, game=game, data=minion_data)
-        else:
-            self.minion = None
+        self.minion = card_data.build()
 
     def can_select(self, my_turn):
         return (
@@ -30,15 +25,3 @@ class ClientCard:
 
     def on_select(self, cursor):
         cursor.pick_up(self)
-
-    @staticmethod
-    def from_json(host, game, data):
-        minion_data = data['minion'] if 'minion' in data.keys() else None
-
-        return ClientCard(
-            value=data['value'],
-            host=host,
-            card_id=data['card_id'],
-            game=game,
-            minion_data=minion_data,
-        )

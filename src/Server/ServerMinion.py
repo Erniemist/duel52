@@ -2,17 +2,22 @@ from Client.Board.Lane.Side.Minion.Minion import Minion
 
 
 class ServerMinion(Minion):
-    def __init__(self, card, side, game):
+    def __init__(self, card, side, game, minion_data=None):
         self.card = card
-        self.value = card.value
         self.side = side
+        self.game = game
+        self.value = card.value
         self.player = side.player
         self.team = self.player.team
-        self.game = game
-        self.hp = self.max_hp
-        self.face_down = True
         self.pair = None
-        self.attacks_made = 0
+        if minion_data is None:
+            self.hp = self.max_hp
+            self.face_down = True
+            self.attacks_made = 0
+        else:
+            self.hp = minion_data['hp']
+            self.face_down = minion_data['face_down']
+            self.attacks_made = minion_data['attacks_made']
 
     def end_turn(self):
         self.attacks_made = 0
@@ -49,13 +54,3 @@ class ServerMinion(Minion):
 
     def could_act(self):
         return self.could_attack() or self.face_down or self.could_pair()
-
-    def to_json(self) -> dict:
-        data = {
-            'hp': self.hp,
-            'face_down': self.face_down,
-            'attacks_made': self.attacks_made,
-        }
-        if self.pair:
-            data['pair'] = self.pair.card.card_id
-        return data
