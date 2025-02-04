@@ -1,3 +1,5 @@
+import json
+
 from DataTransfer.GameData import GameData
 
 
@@ -39,7 +41,7 @@ class GameFactory:
     }
 
     def __init__(self):
-        self.game_data = GameData.from_json(self.base)
+        self.game_data = GameData.from_json(json.loads(json.dumps(self.base)))
 
     def with_hand(self, team, cards):
         player = next(player for player in self.game_data.players if player.team == team)

@@ -25,7 +25,7 @@ class ServerCard:
         self.host: Deck | Hand | ServerSide | ClientGraveyard = host
         self.card_id = card_data.card_id
         self.game: ServerGameState = game
-        self.minion: None | ServerMinion = card_data.build(self)
+        self.minion: None | ServerMinion = None
         self.minion_last_info: None | dict = None
 
     def move_to(self, new_host):

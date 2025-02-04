@@ -15,9 +15,9 @@ class ServerMinion(Minion):
             self.face_down = True
             self.attacks_made = 0
         else:
-            self.hp = minion_data['hp']
-            self.face_down = minion_data['face_down']
-            self.attacks_made = minion_data['attacks_made']
+            self.hp = minion_data.hp
+            self.face_down = minion_data.face_down
+            self.attacks_made = minion_data.attacks_made
 
     def end_turn(self):
         self.attacks_made = 0

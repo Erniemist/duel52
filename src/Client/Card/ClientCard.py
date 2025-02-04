@@ -14,7 +14,7 @@ class ClientCard:
         self.host: Deck | ClientGraveyard | Hand | ClientSide = host
         self.card_id = card_data.card_id
         self.game: ClientGameState = game
-        self.minion = card_data.build(self)
+        self.minion = None
 
     def can_select(self, my_turn):
         return (

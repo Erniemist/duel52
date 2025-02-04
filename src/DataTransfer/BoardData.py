@@ -1,10 +1,9 @@
 from Client.Board.ClientBoard import ClientBoard
 from Client.Board.Lane.ClientLane import ClientLane
 from Client.Board.Lane.Side.ClientSide import ClientSide
-from Client.Card.ClientCard import ClientCard
 from DataTransfer.CardData import CardData
+from DataTransfer.MinionCardData import MinionCardData
 from Server.ServerBoard import ServerBoard
-from Server.ServerCard import ServerCard
 from Server.ServerLane import ServerLane
 from Server.ServerSide import ServerSide
 
@@ -22,7 +21,7 @@ class BoardData:
             {'sides': [
                 {
                     'side_id': side['side_id'],
-                    'cards': [CardData.from_json(card) for card in side['cards']]
+                    'cards': [MinionCardData.from_json(card) for card in side['cards']]
                 } for side in lane['sides']
             ]} for lane in data['lanes']
         ])
@@ -39,7 +38,7 @@ class BoardData:
             {'sides': [
                 {
                     'side_id': side.side_id,
-                    'cards': [CardData.from_server(card, for_player) for card in side.cards]
+                    'cards': [MinionCardData.from_server(card.minion, for_player) for card in side.cards]
                 } for side in lane.sides
             ]} for lane in board.lanes
         ])
@@ -72,7 +71,6 @@ class BoardData:
         return side
 
     def to_json(self):
-        print(self.lanes)
         return {'lanes': [
             {'sides': [
                 {
