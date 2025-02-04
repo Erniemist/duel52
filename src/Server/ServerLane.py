@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Generator, Any
 
 if TYPE_CHECKING:
     from Server.ServerGameState import ServerGameState
-    from Server.ServerPlayer import ServerPlayer
 
 
 class ServerLane:

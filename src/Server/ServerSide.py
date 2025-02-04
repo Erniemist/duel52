@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 
 
 class ServerSide:
-    def __init__(self, game, lane, side_id: int, player):
+    def __init__(self, game, lane, side_id, player):
         self.game: ServerGameState = game
         self.lane: ServerLane = lane
         self.side_id = side_id

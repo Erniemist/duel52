@@ -27,10 +27,11 @@ class BoardData:
     def from_server(board: ServerBoard, for_player):
         return BoardData(lanes=[
             {'sides': [
-                {'cards': [card.to_json(for_player) for card in side.cards]}
-                for side in lane.sides
-            ]}
-            for lane in board.lanes
+                {
+                    'side_id': side.side_id,
+                    'cards': [card.to_json(for_player) for card in side.cards]
+                } for side in lane.sides
+            ]} for lane in board.lanes
         ])
 
     def build(self, game, players):
@@ -45,8 +46,8 @@ class BoardData:
     def build_lane(self, game, players, i, lane, sides_data):
         sides = []
         side = ServerSide if self.is_server else ClientSide
-        for j, player, side_data in zip(range(len(players)), players, sides_data):
-            side_obj = side(game, lane, i * 2 + j, player)
+        for player, side_data in zip(players, sides_data):
+            side_obj = side(game, lane, side_data['side_id'], player)
             for card_data in side_data['cards']:
                 card = ServerCard if self.is_server else ClientCard
                 side_obj.cards.append(card.from_json(host=side_obj, game=game, data=card_data))

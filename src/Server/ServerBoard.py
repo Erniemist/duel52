@@ -1,3 +1,5 @@
+import uuid
+
 from Server.ServerLane import ServerLane
 from Server.ServerCard import ServerCard
 
@@ -19,8 +21,8 @@ class ServerBoard:
             for i in range(self.num_lanes):
                 lane = ServerLane(game)
                 sides = []
-                for j, player in enumerate(players):
-                    sides.append(ServerSide(game, lane, i * 2 + j, player))
+                for player in players:
+                    sides.append(ServerSide(game, lane, str(uuid.uuid4().int), player))
                 lane.sides = sides
                 self.lanes.append(lane)
         else:

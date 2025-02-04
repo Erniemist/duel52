@@ -23,9 +23,9 @@ def test_make_server():
             },
         ],
         'board': {'lanes': [
-            {'sides': [{'cards': []}, {'cards': []}]},
-            {'sides': [{'cards': []}, {'cards': []}]},
-            {'sides': [{'cards': []}, {'cards': []}]},
+            {'sides': [{'side_id': '111', 'cards': []}, {'side_id': '222', 'cards': []}]},
+            {'sides': [{'side_id': '333', 'cards': []}, {'side_id': '444', 'cards': []}]},
+            {'sides': [{'side_id': '555', 'cards': []}, {'side_id': '666', 'cards': []}]},
         ]},
         'winner': None,
     }
@@ -61,9 +61,9 @@ def test_graveyard():
             },
         ],
         'board': {'lanes': [
-            {'sides': [{'cards': []}, {'cards': []}]},
-            {'sides': [{'cards': []}, {'cards': []}]},
-            {'sides': [{'cards': []}, {'cards': []}]},
+            {'sides': [{'side_id': '111', 'cards': []}, {'side_id': '222', 'cards': []}]},
+            {'sides': [{'side_id': '333', 'cards': []}, {'side_id': '444', 'cards': []}]},
+            {'sides': [{'side_id': '555', 'cards': []}, {'side_id': '666', 'cards': []}]},
         ]},
         'winner': None,
     }
@@ -110,9 +110,9 @@ def test_hand():
             },
         ],
         'board': {'lanes': [
-            {'sides': [{'cards': []}, {'cards': []}]},
-            {'sides': [{'cards': []}, {'cards': []}]},
-            {'sides': [{'cards': []}, {'cards': []}]},
+            {'sides': [{'side_id': '111', 'cards': []}, {'side_id': '222', 'cards': []}]},
+            {'sides': [{'side_id': '333', 'cards': []}, {'side_id': '444', 'cards': []}]},
+            {'sides': [{'side_id': '555', 'cards': []}, {'side_id': '666', 'cards': []}]},
         ]},
         'winner': None,
     }
@@ -162,9 +162,9 @@ def test_deck():
             },
         ],
         'board': {'lanes': [
-            {'sides': [{'cards': []}, {'cards': []}]},
-            {'sides': [{'cards': []}, {'cards': []}]},
-            {'sides': [{'cards': []}, {'cards': []}]},
+            {'sides': [{'side_id': '111', 'cards': []}, {'side_id': '222', 'cards': []}]},
+            {'sides': [{'side_id': '333', 'cards': []}, {'side_id': '444', 'cards': []}]},
+            {'sides': [{'side_id': '555', 'cards': []}, {'side_id': '666', 'cards': []}]},
         ]},
         'winner': None,
     }
@@ -186,6 +186,7 @@ def test_deck():
         {'card_id': '4444', 'value': ''},
     ]
     assert game_data_2['players'][1]['deck']['cards'] == []
+
 
 def test_board():
     game_json = {
@@ -209,16 +210,16 @@ def test_board():
         ],
         'board': {'lanes': [
             {'sides': [
-                {'cards': [{'card_id': '1111', 'value': 'A'}]},
-                {'cards': [{'card_id': '2222', 'value': '2'}]},
+                {'side_id': '111', 'cards': [{'card_id': '1111', 'value': 'A'}]},
+                {'side_id': '222', 'cards': [{'card_id': '2222', 'value': '2'}]},
             ]},
             {'sides': [
-                {'cards': [{'card_id': '3333', 'value': '3'}]},
-                {'cards': [{'card_id': '4444', 'value': '4'}]},
+                {'side_id': '333', 'cards': [{'card_id': '3333', 'value': '3'}]},
+                {'side_id': '444', 'cards': [{'card_id': '4444', 'value': '4'}]},
             ]},
             {'sides': [
-                {'cards': [{'card_id': '5555', 'value': '5'}]},
-                {'cards': [{'card_id': '6666', 'value': '6'}]},
+                {'side_id': '555', 'cards': [{'card_id': '5555', 'value': '5'}]},
+                {'side_id': '666', 'cards': [{'card_id': '6666', 'value': '6'}]},
             ]},
         ]},
         'winner': None,
@@ -227,31 +228,31 @@ def test_board():
     game_data_1 = GameData.from_server(server, 'Team 1').to_json()
     assert game_data_1['board']['lanes'] == [
         {'sides': [
-            {'cards': [{'card_id': '1111', 'value': 'A'}]},
-            {'cards': [{'card_id': '2222', 'value': ''}]},
+            {'side_id': '111', 'cards': [{'card_id': '1111', 'value': 'A'}]},
+            {'side_id': '222', 'cards': [{'card_id': '2222', 'value': ''}]},
         ]},
         {'sides': [
-            {'cards': [{'card_id': '3333', 'value': '3'}]},
-            {'cards': [{'card_id': '4444', 'value': ''}]},
+            {'side_id': '333', 'cards': [{'card_id': '3333', 'value': '3'}]},
+            {'side_id': '444', 'cards': [{'card_id': '4444', 'value': ''}]},
         ]},
         {'sides': [
-            {'cards': [{'card_id': '5555', 'value': '5'}]},
-            {'cards': [{'card_id': '6666', 'value': ''}]},
+            {'side_id': '555', 'cards': [{'card_id': '5555', 'value': '5'}]},
+            {'side_id': '666', 'cards': [{'card_id': '6666', 'value': ''}]},
         ]},
     ]
 
     game_data_2 = GameData.from_server(server, 'Team 2').to_json()
     assert game_data_2['board']['lanes'] == [
         {'sides': [
-            {'cards': [{'card_id': '1111', 'value': ''}]},
-            {'cards': [{'card_id': '2222', 'value': '2'}]},
+            {'side_id': '111', 'cards': [{'card_id': '1111', 'value': ''}]},
+            {'side_id': '222', 'cards': [{'card_id': '2222', 'value': '2'}]},
         ]},
         {'sides': [
-            {'cards': [{'card_id': '3333', 'value': ''}]},
-            {'cards': [{'card_id': '4444', 'value': '4'}]},
+            {'side_id': '333', 'cards': [{'card_id': '3333', 'value': ''}]},
+            {'side_id': '444', 'cards': [{'card_id': '4444', 'value': '4'}]},
         ]},
         {'sides': [
-            {'cards': [{'card_id': '5555', 'value': ''}]},
-            {'cards': [{'card_id': '6666', 'value': '6'}]},
+            {'side_id': '555', 'cards': [{'card_id': '5555', 'value': ''}]},
+            {'side_id': '666', 'cards': [{'card_id': '6666', 'value': '6'}]},
         ]},
     ]

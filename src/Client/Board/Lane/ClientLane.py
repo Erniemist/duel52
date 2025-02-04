@@ -1,5 +1,4 @@
 from typing import Generator, Any
-from Client.Board.Lane.Side.ClientSide import ClientSide
 from Client.Card.ClientCard import ClientCard
 
 
