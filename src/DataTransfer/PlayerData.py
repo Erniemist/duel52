@@ -30,7 +30,9 @@ class PlayerData:
     def build_for_server(self, game, player):
         hand = Hand(game, player)
         hand.cards = [ServerCard.from_json(host=hand, game=game, data=card_data) for card_data in self.hand['cards']]
-        return hand, Deck.from_json_server(game, player, self.deck)
+        deck = Deck(game, player)
+        deck.cards = [ServerCard.from_json(host=deck, game=game, data=card_data) for card_data in self.deck['cards']]
+        return hand, deck
 
     @staticmethod
     def from_server(player: ServerPlayer, for_player):
@@ -39,7 +41,7 @@ class PlayerData:
             team=player.team,
             known_cards=player.known_cards,
             hand={'cards': [card.to_json(for_player) for card in player.hand.cards]},
-            deck=player.deck.to_json(for_player),
+            deck={'cards': [card.to_json(for_player) for card in player.deck.cards]},
         )
 
     def make_client(self, game):
@@ -48,7 +50,9 @@ class PlayerData:
     def build_for_client(self, game, player):
         hand = Hand(game, player)
         hand.cards = [ClientCard.from_json(host=hand, game=game, data=card_data) for card_data in self.hand['cards']]
-        return hand, Deck.from_json(game, player, self.deck)
+        deck = Deck(game, player)
+        deck.cards = [ClientCard.from_json(host=deck, game=game, data=card_data) for card_data in self.deck['cards']]
+        return hand, deck
 
     def to_json(self):
         return {
