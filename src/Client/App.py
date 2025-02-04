@@ -23,25 +23,25 @@ class App:
         self.cursor = Cursor(self)
         self.game_view = None
         self.running = True
-        self.events = []
+        self.actions = []
         self.tick = 0
         self.fake_server: None | ServerApp = None
 
-    async def update(self, event):
-        event.sent = True
+    async def update(self, action):
+        action.sent = True
         try:
-            self.fake_server.resolve_action(event.json())
+            self.fake_server.resolve_action(action.json())
         except Exception as e:
             print(e)
             print(traceback.format_exc())
-        self.game_state = GameData.from_server(self.fake_server.game, self.team).make_client(self)
-        await self.websocket.send(json.dumps(event.json()))
+        self.game_state = GameData.from_server(self.fake_server.game, self.team).make_client()
+        await self.websocket.send(json.dumps(action.json()))
 
     async def handle_incoming(self):
         async for message in self.websocket:
             response = json.loads(message)
-            if 'event_id' in response.keys():
-                self.game_state.resolve(response['event_id'])
+            if 'action_id' in response.keys():
+                self.mark_action_as_resolved(response['action_id'])
             game_data = GameData.from_json(response['game'])
             self.game_state = game_data.make_client()
             if not self.team:
@@ -77,9 +77,10 @@ class App:
             pygame.quit()
 
     async def loop(self):
-        event = self.game_state.next_event()
-        if event and not event.sent:
-            await self.update(event)
+        self.actions += self.game_state.actions
+        action = self.next_action()
+        if action and not action.sent:
+            await self.update(action)
         self.cursor.position = pygame.mouse.get_pos()
         self.game_view = GameView(self)
         self.handle_events()
@@ -87,6 +88,13 @@ class App:
         self.game_view.draw_all(self.screen)
         pygame.display.flip()
         self.tick += 1
+
+    def next_action(self):
+        return next((action for action in self.actions if not action.resolved), None)
+
+    def mark_action_as_resolved(self, action_id):
+        action = next(action for action in self.actions if action.action_id == action_id)
+        action.resolved = True
 
     def focused_object(self):
         if self.game_view is None:
@@ -119,5 +127,5 @@ class App:
 
     async def close(self):
         self.running = False
-        await self.websocket.send(json.dumps({'event': 'close'}))
+        await self.websocket.send(json.dumps({'action': 'close'}))
         await self.websocket.close()

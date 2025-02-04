@@ -1,7 +1,7 @@
 from Client.Deck.Deck import Deck
 from Client.Hand.Hand import Hand
 
-from typing import TYPE_CHECKING, Self
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from Server.ServerGameState import ServerGameState
@@ -95,21 +95,3 @@ class ServerPlayer:
 
     def knows(self, card):
         return card.card_id in self.known_cards
-
-    @staticmethod
-    def from_json(game, data):
-        player = ServerPlayer(data['team'], game)
-        player.hand = Hand.from_json_server(game=game, player=player, data=data['hand'])
-        player.known_cards = data['known_cards']
-        player.deck = Deck.from_json_server(game=game, player=player, data=data['deck'])
-        player.actions = data['actions']
-        return player
-
-    def to_json(self, for_player: Self):
-        return {
-            'hand': self.hand.to_json(for_player),
-            'deck': self.deck.to_json(for_player),
-            'actions': self.actions,
-            'team': self.team,
-            'known_cards': self.known_cards,
-        }

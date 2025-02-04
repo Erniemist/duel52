@@ -29,17 +29,17 @@ async def handler(websocket: ServerConnection):
         async for message in websocket:
             try:
                 match json.loads(message):
-                    case {'event': 'list'}:
+                    case {'action': 'list'}:
                         await list_games(websocket)
-                    case {'event': 'create', 'name': name}:
+                    case {'action': 'create', 'name': name}:
                         app = ServerApp(name, ServerGameState())
                         apps[websocket] = app
                         await app.create(websocket)
-                    case {'event': 'join', 'game_id': game_id}:
+                    case {'action': 'join', 'game_id': game_id}:
                         app = next(app for app in apps.values() if app.game_id == game_id)
                         apps[websocket] = app
                         await app.join(websocket)
-                    case {'event': 'close'}:
+                    case {'action': 'close'}:
                         return
                     case data:
                         await apps[websocket].handle_action(websocket, data)

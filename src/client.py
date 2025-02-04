@@ -6,7 +6,7 @@ import websockets
 
 from Client.App import App
 
-URI = dotenv_values("../.env.local").get('WEBSOCKET_URI')
+URI = dotenv_values().get('WEBSOCKET_URI')
 URI = "wss://duel52-8b7c8276f3dd.herokuapp.com" if not URI else URI
 
 app = None
@@ -27,7 +27,7 @@ async def main():
 
 
 async def list_games(websocket):
-    await websocket.send(json.dumps({'event': 'list'}))
+    await websocket.send(json.dumps({'action': 'list'}))
     return json.loads(await websocket.recv())
 
 
@@ -47,9 +47,9 @@ async def choose_game(websocket, games):
         name = input('Enter game name: ')
         if name in [game.name for game in games]:
             return await choose_game(websocket, games)
-        await websocket.send(json.dumps({'event': 'create', 'name': name}))
+        await websocket.send(json.dumps({'action': 'create', 'name': name}))
         return
-    await websocket.send(json.dumps({'event': 'join', 'game_id': games[choice - 1]['game_id']}))
+    await websocket.send(json.dumps({'action': 'join', 'game_id': games[choice - 1]['game_id']}))
 
 
 if __name__ == '__main__':

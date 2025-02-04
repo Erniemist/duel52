@@ -91,9 +91,11 @@ class ServerGameState:
         return (card for player in self.players for card in player.hand.cards)
 
     def get_cards(self):
-        yield from self.board.get_cards()
-        yield from self.graveyard.cards.values()
-        yield from self.get_hand_cards()
+        return [
+            *self.board.get_cards(),
+            *self.graveyard.cards.values(),
+            *self.get_hand_cards(),
+        ]
 
     def trigger(self, trigger):
         self.triggers.append(trigger)

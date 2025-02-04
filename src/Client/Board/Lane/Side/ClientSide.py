@@ -16,7 +16,7 @@ class ClientSide:
         return my_turn and self.team == self.game.active_player().team and self.player.actions > 0
 
     def on_place(self, card):
-        self.game.play_event(card, self)
+        self.game.play_action(card, self)
 
     @staticmethod
     def from_json(lane, player, side_id, game, data):

@@ -1,6 +1,6 @@
 from Client.Board.ClientBoard import ClientBoard
 from Client.Card.ClientCard import ClientCard
-from Client.Event import Event
+from Client.Action import Action
 from Client.Graveyard.ClientGraveyard import ClientGraveyard
 from Client.Player.ClientPlayer import ClientPlayer
 
@@ -13,7 +13,7 @@ class ClientGameState:
         self.players: list[ClientPlayer] = players
         self._active_player: ClientPlayer = self.players[game_data.active_player_index]
         self.board: ClientBoard = board
-        self.events = []
+        self.actions = []
 
     def active_player(self):
         return self._active_player
@@ -28,23 +28,18 @@ class ClientGameState:
                     return card
         return None
 
-    def play_event(self, card, side):
-        self.event('play', {'card': card.card_id, 'side': side.side_id})
+    def play_action(self, card, side):
+        self.action('play', {'card': card.card_id, 'side': side.side_id})
 
-    def flip_event(self, minion):
-        self.event('flip', {'card': minion.card.card_id})
+    def flip_action(self, minion):
+        self.action('flip', {'card': minion.card.card_id})
 
-    def attack_event(self, minion_1, minion_2):
-        self.event('attack', {'card_1': minion_1.card.card_id, 'card_2': minion_2.card.card_id})
+    def attack_action(self, minion_1, minion_2):
+        self.action('attack', {'card_1': minion_1.card.card_id, 'card_2': minion_2.card.card_id})
 
-    def pair_event(self, minion_1, minion_2):
-        self.event('pair', {'card_1': minion_1.card.card_id, 'card_2': minion_2.card.card_id})
+    def pair_action(self, minion_1, minion_2):
+        self.action('pair', {'card_1': minion_1.card.card_id, 'card_2': minion_2.card.card_id})
 
-    def event(self, name, data):
-        self.events.append(Event(event_id=len(self.events), name=name, data=data))
+    def action(self, name, data):
+        self.actions.append(Action(name=name, data=data))
 
-    def next_event(self):
-        return next((event for event in self.events if not event.resolved), None)
-
-    def resolve(self, event_id):
-        self.events[event_id].resolved = True

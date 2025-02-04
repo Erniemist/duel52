@@ -38,7 +38,12 @@ def test_make_server():
 def test_graveyard():
     game_json = {
         'active_player_index': 0,
-        'graveyard': {'cards': []},
+        'graveyard': {'cards': [
+            {'card_id': '1111', 'value': 'A'},
+            {'card_id': '2222', 'value': '2'},
+            {'card_id': '3333', 'value': '3'},
+            {'card_id': '4444', 'value': '4'},
+        ]},
         'players': [
             {
                 'team': 'Team 1',
@@ -62,20 +67,8 @@ def test_graveyard():
         ]},
         'winner': None,
     }
-    cards = {
-        '1111': 'A',
-        '2222': '2',
-        '3333': '3',
-        '4444': '4',
-    }
-    for card_id, value in cards.items():
-        game_json['graveyard']['cards'].append({
-            'card_id': card_id,
-            'value': value,
-        })
     server = GameData.from_json(game_json).make_server()
     game_data_1 = GameData.from_server(server, 'Team 1').to_json()
-    print(game_data_1)
     assert game_data_1['graveyard']['cards'] == [
         {'card_id': '1111', 'value': 'A'},
         {'card_id': '2222', 'value': '2'},
@@ -89,3 +82,55 @@ def test_graveyard():
         {'card_id': '3333', 'value': '3'},
         {'card_id': '4444', 'value': ''},
     ]
+
+
+def test_hand():
+    game_json = {
+        'active_player_index': 0,
+        'graveyard': {'cards': []},
+        'players': [
+            {
+                'team': 'Team 1',
+                'hand': {'cards': [
+                    {'card_id': '1111', 'value': 'A'},
+                    {'card_id': '2222', 'value': '2'},
+                    {'card_id': '3333', 'value': '3'},
+                    {'card_id': '4444', 'value': '4'},
+                ]},
+                'deck': {'cards': []},
+                'known_cards': ['1111', '2222', '3333', '4444'],
+                'actions': 3,
+            },
+            {
+                'team': 'Team 2',
+                'hand': {'cards': []},
+                'deck': {'cards': []},
+                'known_cards': [],
+                'actions': 0,
+            },
+        ],
+        'board': {'lanes': [
+            {'sides': [{'cards': []}, {'cards': []}]},
+            {'sides': [{'cards': []}, {'cards': []}]},
+            {'sides': [{'cards': []}, {'cards': []}]},
+        ]},
+        'winner': None,
+    }
+    server = GameData.from_json(game_json).make_server()
+    game_data_1 = GameData.from_server(server, 'Team 1').to_json()
+    assert game_data_1['players'][0]['hand']['cards'] == [
+        {'card_id': '1111', 'value': 'A'},
+        {'card_id': '2222', 'value': '2'},
+        {'card_id': '3333', 'value': '3'},
+        {'card_id': '4444', 'value': '4'},
+    ]
+    assert game_data_1['players'][1]['hand']['cards'] == []
+
+    game_data_2 = GameData.from_server(server, 'Team 2').to_json()
+    assert game_data_2['players'][0]['hand']['cards'] == [
+        {'card_id': '1111', 'value': ''},
+        {'card_id': '2222', 'value': ''},
+        {'card_id': '3333', 'value': ''},
+        {'card_id': '4444', 'value': ''},
+    ]
+    assert game_data_2['players'][1]['hand']['cards'] == []

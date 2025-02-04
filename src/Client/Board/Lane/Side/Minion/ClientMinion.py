@@ -28,7 +28,7 @@ class ClientMinion(Minion):
 
     def on_select(self, cursor):
         if self.face_down:
-            self.game.flip_event(self)
+            self.game.flip_action(self)
         else:
             cursor.set_target_source(self)
 
@@ -51,9 +51,9 @@ class ClientMinion(Minion):
 
     def on_target(self, target_source):
         if self.game.active_player().team != self.team:
-            self.game.attack_event(target_source, self)
+            self.game.attack_action(target_source, self)
         else:
-            self.game.pair_event(target_source, self)
+            self.game.pair_action(target_source, self)
 
     @staticmethod
     def from_json(card, side, game, data):
