@@ -75,3 +75,22 @@ def test_attack_card():
     assert attacker.value == '3'
     assert attacker.minion.hp == 2
 
+
+def test_pair_cards():
+    factory = GameFactory()
+    factory.with_hand('A', [CardData('1111', 'A'), CardData('2222', 'A')])
+    server_app = ServerApp('test', factory.make_server())
+
+    server_app.resolve_action(Action.play('1111', '111').json())
+    server_app.resolve_action(Action.play('2222', '111').json())
+    server_app.resolve_action(Action.flip('1111').json())
+    server_app.resolve_action(Action.flip('2222').json())
+    server_app.resolve_action(Action.pair('1111', '2222').json())
+
+    client_game = GameData.from_server(server_app.game, 'A').make_client()
+
+    minion_1 = client_game.board.lanes[0].sides[0].cards[0].minion
+    minion_2 = client_game.board.lanes[0].sides[0].cards[1].minion
+    assert minion_1.pair is minion_2
+    assert minion_2.pair is minion_1
+
