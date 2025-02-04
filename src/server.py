@@ -41,8 +41,8 @@ async def handler(websocket: ServerConnection):
                         await app.join(websocket)
                     case {'action': 'close'}:
                         return
-                    case data:
-                        await apps[websocket].handle_action(websocket, data)
+                    case action_data:
+                        await apps[websocket].handle_action(websocket, action_data)
             except Exception:
                 print(traceback.format_exc())
     finally:

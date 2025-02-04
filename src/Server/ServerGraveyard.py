@@ -7,7 +7,7 @@ class ServerGraveyard:
         if graveyard_data is None:
             self.cards = {}
         else:
-            self.cards: dict[str, ServerCard] = graveyard_data.build_for_server(game, self)
+            self.cards: dict[str, ServerCard] = graveyard_data.build(game, self)
 
     def add_card(self, card):
         self.cards[card.card_id] = card

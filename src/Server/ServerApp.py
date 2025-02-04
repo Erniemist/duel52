@@ -41,9 +41,9 @@ class ServerApp:
         self.resolve_action(data)
         await self.send(websocket, data['action_id'])
 
-    def resolve_action(self, data):
+    def resolve_action(self, action_data):
         player = self.game.active_player()
-        match data:
+        match action_data:
             case {'action': 'play', 'data': {'side': side, 'card': card}}:
                 side = self.game.find_side(side)
                 card = self.game.find_card_from_hand(card)
@@ -64,5 +64,5 @@ class ServerApp:
                 player.attack(minion_1, minion_2)
 
             case _:
-                raise Exception(f"Didn't recognise action: {data}")
+                raise Exception(f"Didn't recognise action: {action_data}")
         self.game.resolve_triggers()

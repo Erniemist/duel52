@@ -7,7 +7,7 @@ from Client.Player.ClientPlayer import ClientPlayer
 
 class ClientGameState:
     def __init__(self, game_data):
-        graveyard, players, board = game_data.build_for_client(self)
+        graveyard, players, board = game_data.build(self)
         self.winner = game_data.winner
         self.graveyard: ClientGraveyard = graveyard
         self.players: list[ClientPlayer] = players

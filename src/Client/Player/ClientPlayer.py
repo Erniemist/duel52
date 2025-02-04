@@ -5,7 +5,7 @@ from Client.Hand.Hand import Hand
 class ClientPlayer:
     def __init__(self, game, player_data):
         self.game = game
-        hand, deck = player_data.build_for_client(game, self)
+        hand, deck = player_data.build(game, self)
         self.team = player_data.team
         self.hand: Hand = hand
         self.deck: Deck = deck

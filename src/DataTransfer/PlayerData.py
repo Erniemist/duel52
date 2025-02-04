@@ -13,6 +13,7 @@ class PlayerData:
         self.known_cards = known_cards
         self.hand = hand
         self.deck = deck
+        self.is_server = None
 
     @staticmethod
     def from_json(data):
@@ -24,15 +25,9 @@ class PlayerData:
             known_cards=data['known_cards'],
         )
 
-    def make_server(self, game):
-        return ServerPlayer(self.team, game, self)
-
-    def build_for_server(self, game, player):
-        hand = Hand(game, player)
-        hand.cards = [ServerCard.from_json(host=hand, game=game, data=card_data) for card_data in self.hand['cards']]
-        deck = Deck(game, player)
-        deck.cards = [ServerCard.from_json(host=deck, game=game, data=card_data) for card_data in self.deck['cards']]
-        return hand, deck
+    def make(self, game, is_server):
+        self.is_server = is_server
+        return ServerPlayer(self.team, game, self) if is_server else ClientPlayer(game, self)
 
     @staticmethod
     def from_server(player: ServerPlayer, for_player):
@@ -44,14 +39,13 @@ class PlayerData:
             deck={'cards': [card.to_json(for_player) for card in player.deck.cards]},
         )
 
-    def make_client(self, game):
-        return ClientPlayer(game, self)
-
-    def build_for_client(self, game, player):
+    def build(self, game, player):
+        assert self.is_server is not None
+        card = ServerCard if self.is_server else ClientCard
         hand = Hand(game, player)
-        hand.cards = [ClientCard.from_json(host=hand, game=game, data=card_data) for card_data in self.hand['cards']]
+        hand.cards = [card.from_json(host=hand, game=game, data=card_data) for card_data in self.hand['cards']]
         deck = Deck(game, player)
-        deck.cards = [ClientCard.from_json(host=deck, game=game, data=card_data) for card_data in self.deck['cards']]
+        deck.cards = [card.from_json(host=deck, game=game, data=card_data) for card_data in self.deck['cards']]
         return hand, deck
 
     def to_json(self):

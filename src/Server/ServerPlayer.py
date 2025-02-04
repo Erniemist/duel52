@@ -19,7 +19,7 @@ class ServerPlayer:
             self.actions = 0
             self.known_cards: list[str] = []
         else:
-            hand, deck = player_data.build_for_server(game, self)
+            hand, deck = player_data.build(game, self)
             self.hand = hand
             self.deck = deck
             self.actions = player_data.actions

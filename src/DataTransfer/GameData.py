@@ -1,6 +1,5 @@
 from Client.Board.ClientBoard import ClientBoard
 from Client.ClientGameState import ClientGameState
-from Client.Graveyard.ClientGraveyard import ClientGraveyard
 from DataTransfer.GraveyardData import GraveyardData
 from DataTransfer.PlayerData import PlayerData
 from Server.ServerBoard import ServerBoard
@@ -14,6 +13,7 @@ class GameData:
         self.graveyard = graveyard
         self.players: list[PlayerData] = players
         self.board = board
+        self.is_server = None
 
     @staticmethod
     def from_json(data):
@@ -26,15 +26,8 @@ class GameData:
         )
 
     def make_server(self):
+        self.is_server = True
         return ServerGameState(self)
-
-    def build_for_server(self, game):
-        players = [player_data.make_server(game) for player_data in self.players]
-        return (
-            self.graveyard.make_server(game),
-            players,
-            ServerBoard.from_json(game, players, self.board),
-        )
 
     @staticmethod
     def from_server(server: ServerGameState, team):
@@ -48,14 +41,17 @@ class GameData:
         )
 
     def make_client(self):
+        self.is_server = False
         return ClientGameState(self)
 
-    def build_for_client(self, game):
-        players = [player_data.make_client(game) for player_data in self.players]
+    def build(self, game):
+        assert self.is_server is not None
+        board = ServerBoard if self.is_server else ClientBoard
+        players = [player_data.make(game, self.is_server) for player_data in self.players]
         return (
-            self.graveyard.make_server(game),
+            self.graveyard.make(game, self.is_server),
             players,
-            ClientBoard.from_json(game, players, self.board),
+            board.from_json(game, players, self.board),
         )
 
     def to_json(self):

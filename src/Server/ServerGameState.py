@@ -20,7 +20,7 @@ class ServerGameState:
             self.board: ServerBoard = ServerBoard(self, self.players)
             self.active_player().start_turn(actions=2)
         else:
-            graveyard, players, board = game_data.build_for_server(self)
+            graveyard, players, board = game_data.build(self)
             self.winner = game_data.winner
             self.active_player_index = game_data.active_player_index
             self.graveyard: ServerGraveyard = graveyard
