@@ -94,3 +94,35 @@ def test_pair_cards():
     assert minion_1.pair is minion_2
     assert minion_2.pair is minion_1
 
+
+def test_death():
+    factory = GameFactory()
+    factory.with_hand('A', [
+        CardData('1111', 'X'),
+        CardData('2222', 'X'),
+        CardData('3333', 'X'),
+    ])
+    factory.with_hand('B', [
+        CardData('4444', 'X'),
+        CardData('5555', 'X'),
+    ])
+    server_app = ServerApp('test', factory.make_server())
+
+    server_app.resolve_action(Action.play('1111', '111').json())
+    server_app.resolve_action(Action.play('3333', '111').json())
+
+    server_app.resolve_action(Action.play('4444', '222').json())
+    server_app.resolve_action(Action.flip('4444').json())
+    server_app.resolve_action(Action.attack('4444', '3333').json())
+
+    server_app.resolve_action(Action.flip('1111').json())
+    server_app.resolve_action(Action.play('2222', '111').json())
+    server_app.resolve_action(Action.flip('2222').json())
+
+    server_app.resolve_action(Action.attack('4444', '3333').json())
+
+    client_game = GameData.from_server(server_app.game, 'A').make_client()
+
+    assert client_game.find_card_from_board('3333') is None
+    assert '3333' in client_game.graveyard.cards.keys()
+    assert client_game.graveyard.cards['3333'].minion is None

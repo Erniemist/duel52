@@ -19,7 +19,7 @@ class ClientGameState:
         return self._active_player
 
     def find_card_from_board(self, card_id) -> None | ClientCard:
-        return next((card for card in self.board.get_cards() if card.card_id == card_id))
+        return next((card for card in self.board.get_cards() if card.card_id == card_id), None)
 
     def find_card_from_hand(self, card_id) -> None | ClientCard:
         for player in self.players:
