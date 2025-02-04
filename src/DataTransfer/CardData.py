@@ -35,10 +35,20 @@ class CardData:
 
     @staticmethod
     def from_server(card: ServerCard, for_player):
+        if card.minion is None:
+            minion = None
+        else:
+            minion = {
+                'hp': card.minion.hp,
+                'face_down': card.minion.face_down,
+                'attacks_made': card.minion.attacks_made,
+            }
+            if card.minion.pair:
+                minion['pair'] = card.minion.pair.card.card_id
         return CardData(
             card_id=card.card_id,
             value=card.value if for_player.knows(card) else '',
-            minion=card.minion.to_json() if card.minion else None
+            minion=minion,
         )
 
     def build(self, card):
