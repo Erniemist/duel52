@@ -1,6 +1,5 @@
 from Client.Action import Action
 from DataTransfer.CardData import CardData
-from DataTransfer.GameData import GameData
 from GameFactory import GameFactory
 from Server.ServerApp import ServerApp
 
@@ -8,13 +7,13 @@ from Server.ServerApp import ServerApp
 def test_three():
     factory = GameFactory()
     factory.with_hand('A', [
-        CardData('1111', 'A'),
-        CardData('2222', '2'),
+        CardData('1111', 'X'),
+        CardData('2222', 'X'),
         CardData('3333', '3'),
     ])
     factory.with_hand('B', [
-        CardData('4444', '4'),
-        CardData('5555', '5'),
+        CardData('4444', 'X'),
+        CardData('5555', 'X'),
     ])
     server_app = ServerApp('test', factory.make_server())
 
@@ -31,8 +30,6 @@ def test_three():
 
     server_app.resolve_action(Action.attack('4444', '3333').json())
 
-    client_game = GameData.from_server(server_app.game, 'A').make_client()
-
-    assert client_game.find_card_from_board('3333') is not None
-    assert not client_game.find_card_from_board('3333').minion.face_down
-    assert '3333' not in client_game.graveyard.cards.keys()
+    assert server_app.game.find_card_from_board('3333') is not None
+    assert not server_app.game.find_card_from_board('3333').minion.face_down
+    assert '3333' not in server_app.game.graveyard.cards.keys()

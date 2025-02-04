@@ -1,4 +1,5 @@
 from Client.Board.Lane.Side.Minion.Minion import Minion
+from Server.Triggers.FlipTrigger import FlipTrigger
 
 
 class ServerMinion(Minion):
@@ -23,7 +24,10 @@ class ServerMinion(Minion):
         self.attacks_made = 0
 
     def flip_up(self):
+        if not self.face_down:
+            return
         self.face_down = False
+        self.game.trigger(FlipTrigger(self.card.card_id))
         self.player.other_player().learn(self.card)
 
     def attack(self, enemy):
