@@ -14,6 +14,8 @@ class BoardData:
     def __init__(self, lanes):
         self.lanes = lanes
         self.is_server = None
+        self.game = None
+        self.players = None
 
     @staticmethod
     def from_json(data):
@@ -21,7 +23,9 @@ class BoardData:
 
     def make(self, game, players, is_server):
         self.is_server = is_server
-        return ServerBoard(game, players, self) if is_server else ClientBoard(game, players, self)
+        self.game = game
+        self.players = players
+        return ServerBoard(game, players, self) if is_server else ClientBoard(game, self)
 
     @staticmethod
     def from_server(board: ServerBoard, for_player):
@@ -34,26 +38,33 @@ class BoardData:
             ]} for lane in board.lanes
         ])
 
-    def build(self, game, players):
+    def build(self):
         assert self.is_server is not None
         lane = ServerLane if self.is_server else ClientLane
 
         lanes = []
-        for i, lane_data in enumerate(self.lanes):
-            lanes.append(self.build_lane(game, players, i, lane(game), lane_data['sides']))
+        for lane_data in self.lanes:
+            lanes.append(self.build_lane(lane(self.game), lane_data['sides']))
         return lanes
 
-    def build_lane(self, game, players, i, lane, sides_data):
+    def build_lane(self, lane, sides_data):
         sides = []
         side = ServerSide if self.is_server else ClientSide
-        for player, side_data in zip(players, sides_data):
-            side_obj = side(game, lane, side_data['side_id'], player)
-            for card_data in side_data['cards']:
-                card = ServerCard if self.is_server else ClientCard
-                side_obj.cards.append(card.from_json(host=side_obj, game=game, data=card_data))
-            sides.append(side_obj)
+        for player, side_data in zip(self.players, sides_data):
+            sides.append(
+                self.build_side(
+                    side_data,
+                    side(self.game, lane, side_data['side_id'], player),
+                )
+            )
         lane.sides = sides
         return lane
+
+    def build_side(self, side_data, side):
+        card = ServerCard if self.is_server else ClientCard
+        for card_data in side_data['cards']:
+            side.cards.append(card.from_json(host=side, game=self.game, data=card_data))
+        return side
 
     def to_json(self):
         return {'lanes': self.lanes}

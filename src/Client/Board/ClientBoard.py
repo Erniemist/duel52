@@ -3,9 +3,9 @@ from Client.Card.ClientCard import ClientCard
 
 
 class ClientBoard:
-    def __init__(self, game, players, board_data):
+    def __init__(self, game, board_data):
         self.game = game
-        self.lanes = board_data.build(game, players)
+        self.lanes = board_data.build()
 
     def get_cards(self) -> Generator[ClientCard, Any, None]:
         return (card for lane in self.lanes for card in lane.get_cards())

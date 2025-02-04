@@ -26,7 +26,7 @@ class ServerBoard:
                 lane.sides = sides
                 self.lanes.append(lane)
         else:
-            self.lanes = board_data.build(game, players)
+            self.lanes = board_data.build()
 
     def get_cards(self) -> Generator[ServerCard, Any, None]:
         return (card for lane in self.lanes for card in lane.get_cards())
