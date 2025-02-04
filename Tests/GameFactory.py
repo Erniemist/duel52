@@ -7,17 +7,14 @@ class GameFactory:
         'graveyard': {'cards': []},
         'players': [
             {
-                'team': 'Team 1',
-                'hand': {'cards': [{
-                    'card_id': '1234',
-                    'value': 'A',
-                }]},
+                'team': 'A',
+                'hand': {'cards': []},
                 'deck': {'cards': []},
                 'known_cards': [],
-                'actions': 3,
+                'actions': 2,
             },
             {
-                'team': 'Team 2',
+                'team': 'B',
                 'hand': {'cards': []},
                 'deck': {'cards': []},
                 'known_cards': [],
