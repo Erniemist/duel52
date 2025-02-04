@@ -43,7 +43,7 @@ class ServerCard:
         return data
 
     @staticmethod
-    def from_json(game, host, data):
+    def from_json(host, game, data):
         card = ServerCard(data['value'], host, data['card_id'], game)
         if 'minion' in data.keys():
             card.minion = ServerMinion(card, host, game)

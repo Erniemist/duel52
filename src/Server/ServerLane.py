@@ -9,14 +9,9 @@ if TYPE_CHECKING:
 
 
 class ServerLane:
-    def __init__(self, game, players, lane_id: int):
+    def __init__(self, game):
         self.game: ServerGameState = game
-        self.players: list[ServerPlayer] = players
-        self.lane_id = lane_id
-        self.sides: list[ServerSide] = [
-            ServerSide(game, self, side_id=lane_id * 2 + i, player=player)
-            for i, player in enumerate(players)
-        ]
+        self.sides: list[ServerSide] = []
 
     def player_winning_lane(self):
         if len(self.sides[0].cards) == 0 and len(self.sides[1].cards) > 0:
@@ -27,6 +22,3 @@ class ServerLane:
 
     def get_cards(self) -> Generator[ServerCard, Any, None]:
         return (card for side in self.sides for card in side.cards)
-
-    def to_json(self, for_player):
-        return {'sides': [side.to_json(for_player) for side in self.sides]}

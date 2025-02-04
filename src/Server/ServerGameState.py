@@ -4,7 +4,6 @@ import uuid
 from Server.ServerBoard import ServerBoard
 from Server.ServerCard import ServerCard
 from Client.Deck.Deck import Deck
-from Client.Graveyard.ClientGraveyard import ClientGraveyard
 from Server.ServerGraveyard import ServerGraveyard
 from Server.ServerPlayer import ServerPlayer
 

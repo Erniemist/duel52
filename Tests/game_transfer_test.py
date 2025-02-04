@@ -186,3 +186,72 @@ def test_deck():
         {'card_id': '4444', 'value': ''},
     ]
     assert game_data_2['players'][1]['deck']['cards'] == []
+
+def test_board():
+    game_json = {
+        'active_player_index': 0,
+        'graveyard': {'cards': []},
+        'players': [
+            {
+                'team': 'Team 1',
+                'hand': {'cards': []},
+                'deck': {'cards': []},
+                'known_cards': ['1111', '3333', '5555'],
+                'actions': 3,
+            },
+            {
+                'team': 'Team 2',
+                'hand': {'cards': []},
+                'deck': {'cards': []},
+                'known_cards': ['2222', '4444', '6666'],
+                'actions': 0,
+            },
+        ],
+        'board': {'lanes': [
+            {'sides': [
+                {'cards': [{'card_id': '1111', 'value': 'A'}]},
+                {'cards': [{'card_id': '2222', 'value': '2'}]},
+            ]},
+            {'sides': [
+                {'cards': [{'card_id': '3333', 'value': '3'}]},
+                {'cards': [{'card_id': '4444', 'value': '4'}]},
+            ]},
+            {'sides': [
+                {'cards': [{'card_id': '5555', 'value': '5'}]},
+                {'cards': [{'card_id': '6666', 'value': '6'}]},
+            ]},
+        ]},
+        'winner': None,
+    }
+    server = GameData.from_json(game_json).make_server()
+    game_data_1 = GameData.from_server(server, 'Team 1').to_json()
+    assert game_data_1['board']['lanes'] == [
+        {'sides': [
+            {'cards': [{'card_id': '1111', 'value': 'A'}]},
+            {'cards': [{'card_id': '2222', 'value': ''}]},
+        ]},
+        {'sides': [
+            {'cards': [{'card_id': '3333', 'value': '3'}]},
+            {'cards': [{'card_id': '4444', 'value': ''}]},
+        ]},
+        {'sides': [
+            {'cards': [{'card_id': '5555', 'value': '5'}]},
+            {'cards': [{'card_id': '6666', 'value': ''}]},
+        ]},
+    ]
+
+    game_data_2 = GameData.from_server(server, 'Team 2').to_json()
+    assert game_data_2['board']['lanes'] == [
+        {'sides': [
+            {'cards': [{'card_id': '1111', 'value': ''}]},
+            {'cards': [{'card_id': '2222', 'value': '2'}]},
+        ]},
+        {'sides': [
+            {'cards': [{'card_id': '3333', 'value': ''}]},
+            {'cards': [{'card_id': '4444', 'value': '4'}]},
+        ]},
+        {'sides': [
+            {'cards': [{'card_id': '5555', 'value': ''}]},
+            {'cards': [{'card_id': '6666', 'value': '6'}]},
+        ]},
+    ]

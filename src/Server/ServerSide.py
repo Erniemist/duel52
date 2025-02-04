@@ -29,6 +29,3 @@ class ServerSide:
         if card.host is self.game.graveyard:
             self.game.trigger(DeathTrigger(card.card_id))
         self.cards = [c for c in self.cards if c is not card]
-
-    def to_json(self, for_player):
-        return {'cards': [card.to_json(for_player) for card in self.cards]}
