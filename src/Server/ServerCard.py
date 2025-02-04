@@ -1,4 +1,5 @@
 from Client.Card.CardTypes.Five import Five
+from Client.Card.CardTypes.Six import Six
 from Client.Card.CardTypes.Three import Three
 from Server.ServerMinion import ServerMinion
 from typing import TYPE_CHECKING
@@ -15,7 +16,7 @@ if TYPE_CHECKING:
 class ServerCard:
     types = {
         card_type.value: card_type
-        for card_type in [Three, Five]
+        for card_type in [Three, Five, Six]
     }
 
     def __init__(self, game, host, card_data):

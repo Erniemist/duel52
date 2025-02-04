@@ -15,13 +15,16 @@ class ServerMinion(Minion):
             self.hp = self.max_hp
             self.face_down = True
             self.attacks_made = 0
+            self.frozen = False
         else:
             self.hp = minion_data.hp
             self.face_down = minion_data.face_down
             self.attacks_made = minion_data.attacks_made
+            self.frozen = minion_data.frozen
 
     def end_turn(self):
         self.attacks_made = 0
+        self.frozen = False
 
     def flip_up(self):
         if not self.face_down:

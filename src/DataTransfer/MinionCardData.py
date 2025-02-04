@@ -4,12 +4,13 @@ from Server.ServerMinion import ServerMinion
 
 
 class MinionCardData:
-    def __init__(self, card, hp, face_down, attacks_made, pair=None):
+    def __init__(self, card, hp, face_down, attacks_made, frozen, pair=None):
         self.card = card
         self.hp = hp
         self.face_down = face_down
         self.attacks_made = attacks_made
         self.pair = pair
+        self.frozen = frozen
         self.game = None
         self.side = None
         self.is_server = None
@@ -21,6 +22,7 @@ class MinionCardData:
             hp=data['minion']['hp'],
             face_down=data['minion']['face_down'],
             attacks_made=data['minion']['attacks_made'],
+            frozen=data['minion']['frozen'],
             pair=data['minion']['pair'] if 'pair' in data['minion'].keys() else None,
         )
 
@@ -43,6 +45,7 @@ class MinionCardData:
             hp=minion.hp,
             face_down=minion.face_down,
             attacks_made=minion.attacks_made,
+            frozen=minion.frozen,
             pair=minion.pair.card.card_id if minion.pair else None,
         )
 
@@ -53,6 +56,7 @@ class MinionCardData:
                 'hp': self.hp,
                 'face_down': self.face_down,
                 'attacks_made': self.attacks_made,
+                'frozen': self.frozen,
             }
         }
         if self.pair:

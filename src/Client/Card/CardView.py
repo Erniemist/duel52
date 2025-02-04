@@ -9,7 +9,9 @@ class CardView(ViewObject):
     weight = 4
     font_size = 30
     back_colour = (230, 100, 100)
+    back_colour_frozen = (200, 70, 125)
     front_colour = (230, 230, 230)
+    front_colour_frozen = (200, 200, 255)
 
     def __init__(self, card, app, pos, rotation=0, face_down=False, w=None, h=None):
         x, y = pos

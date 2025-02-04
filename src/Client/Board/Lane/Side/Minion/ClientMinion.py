@@ -12,10 +12,13 @@ class ClientMinion(Minion):
         self.hp = minion_data.hp
         self.face_down = minion_data.face_down
         self.attacks_made = minion_data.attacks_made
+        self.frozen = minion_data.frozen
         self.pair = None
         self.view_object = None
 
     def can_select(self, my_turn):
+        if self.frozen:
+            return False
         if not my_turn or self.team != self.game.active_player().team or self.player.actions < 1:
             return False
         return not self.pair or self.attacks_left() > 0

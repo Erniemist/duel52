@@ -73,13 +73,14 @@ class MinionView(ViewObject):
 
     def main_colour(self):
         if self.minion.face_down:
-            colour = CardView.back_colour
-        else:
-            if self.minion.attacks_left() > 0:
-                colour = CardView.front_colour
-            else:
-                colour = self.exahusted_colour
-        return colour
+            if self.minion.frozen:
+                return CardView.back_colour_frozen
+            return CardView.back_colour
+        if self.minion.frozen:
+            return CardView.front_colour_frozen
+        if self.minion.attacks_left() > 0:
+            return CardView.front_colour
+        return self.exahusted_colour
 
     def get_border(self):
         source = self.app.cursor.target_source()

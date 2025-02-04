@@ -29,3 +29,6 @@ class ServerSide:
         if card.host is self.game.graveyard:
             self.game.trigger(DeathTrigger(card.card_id))
         self.cards = [c for c in self.cards if c is not card]
+
+    def other_side(self):
+        return next(side for side in self.lane.sides if side.side_id != self.side_id)
