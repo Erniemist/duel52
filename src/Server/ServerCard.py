@@ -1,6 +1,6 @@
-from Client.Card.CardTypes.Five import Five
-from Client.Card.CardTypes.Six import Six
-from Client.Card.CardTypes.Three import Three
+from Server.CardTypes.Five import Five
+from Server.CardTypes.Six import Six
+from Server.CardTypes.Three import Three
 from Server.ServerMinion import ServerMinion
 from typing import TYPE_CHECKING
 
