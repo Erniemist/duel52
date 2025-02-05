@@ -29,7 +29,11 @@ def test_seven():
 
     server_app.resolve_action(Action.flip('1111').json())
     server_app.resolve_action(Action.attack('1111', '4444').json())
-    server_app.resolve_action(Action.play('2222', '111').json())
+    server_app.resolve_action(Action.play('2222', '333').json())
+
+    server_app.resolve_action(Action.play('3333', '444').json())
+    server_app.resolve_action(Action.flip('3333').json())
+    server_app.resolve_action(Action.attack('3333', '2222').json())
 
     server_app.resolve_action(Action.flip('7777').json())
 

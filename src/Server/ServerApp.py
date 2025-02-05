@@ -8,6 +8,18 @@ from Server.ServerGameState import ServerGameState
 from Server.ServerPlayer import ServerPlayer
 
 
+class Mode:
+    EXPECTING_ACTION = 0
+    EXPECTING_TARGET = 1
+    def __init__(self, mode):
+        self.mode = mode
+
+    def am_expecting_action(self):
+        return self.mode == self.EXPECTING_ACTION
+
+    def am_expecting_target(self):
+        return self.mode == self.EXPECTING_TARGET
+
 class ServerApp:
     def __init__(self, name: str, game):
         self.name = name

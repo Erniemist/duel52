@@ -49,5 +49,9 @@ class GameFactory:
         for card in cards:
             player.known_cards.append(card.card_id)
 
+    def with_deck(self, team, cards):
+        player = next(player for player in self.game_data.players if player.team == team)
+        player.deck = cards
+
     def make_server(self):
         return self.game_data.make_server()

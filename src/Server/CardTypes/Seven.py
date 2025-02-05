@@ -2,7 +2,7 @@ from Server.Triggers.FlipTrigger import FlipTrigger
 
 
 class Seven:
-    """When this card flips, heal all friendly minions in the same lane."""
+    """When this card flips, heal ALL friendly minions."""
     value = '7'
 
     def __init__(self, card):
@@ -13,5 +13,5 @@ class Seven:
             isinstance(trigger, FlipTrigger)
             and trigger.source_is(self.card)
         ):
-            for card in self.card.host.cards:
-                card.minion.hp = card.minion.max_hp
+            for minion in self.card.minion.player.minions():
+                minion.hp = minion.max_hp
