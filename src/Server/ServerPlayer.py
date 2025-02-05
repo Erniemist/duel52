@@ -57,34 +57,12 @@ class ServerPlayer:
         self.take_action(lambda: card.move_to(side))
 
     def flip_minion(self, minion):
-        if minion.frozen:
-            raise Exception(f"Frozen minion {minion.card.card_id} cannot flip")
         self.take_action(lambda: minion.flip_up())
 
     def attack(self, friendly_minion, enemy_minion):
-        if friendly_minion.frozen:
-            raise Exception(f"Frozen minion {friendly_minion.card.card_id} cannot attack")
-        if friendly_minion.team != self.team:
-            raise Exception("Tried to attack from an enemy minion")
-        if enemy_minion.team == self.team:
-            raise Exception("Tried to attack a friendly minion")
-        if friendly_minion.attacks_left() < 1:
-            raise Exception("Tried to attack with an exhausted minion")
         self.take_action(lambda: friendly_minion.attack(enemy_minion))
 
     def pair_minions(self, minion, second_minion):
-        if minion.frozen:
-            raise Exception(f"Frozen minion {minion.card.card_id} cannot pair")
-        if second_minion.frozen:
-            raise Exception(f"Frozen minion {second_minion.card.card_id} cannot pair")
-        if minion.team != self.team or second_minion.team != self.team:
-            raise Exception("Tried to pair minion from the other team")
-        if minion.value != second_minion.value:
-            raise Exception("Can't pair non-matching minions")
-        if minion.pair or second_minion.pair:
-            raise Exception("Can't pair already paired minions")
-        if minion.face_down or second_minion.face_down:
-            raise Exception("Can't pair facedown minions")
         self.take_action(lambda: minion.pair_with(second_minion))
 
     def take_action(self, action):

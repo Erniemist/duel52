@@ -54,26 +54,18 @@ class ServerApp:
         await self.send(websocket, data['action_id'])
 
     def resolve_action(self, action_data):
-        player = self.game.active_player()
         match action_data:
-            case {'action': 'play', 'data': {'side': side, 'card': card}}:
-                side = self.game.find_side(side)
-                card = self.game.find_card_from_hand(card)
-                player.play_card(card=card, side=side)
+            case {'action': 'play', 'data': {'side': side_id, 'card': card_id}}:
+                self.game.play(card_id, side_id)
 
-            case {'action': 'flip', 'data': {'card': card}}:
-                minion = self.game.find_card_from_board(card).minion
-                player.flip_minion(minion)
+            case {'action': 'flip', 'data': {'card': card_id}}:
+                self.game.flip_minion(card_id)
 
-            case {'action': 'pair', 'data': {'card_1': card_1, 'card_2': card_2}}:
-                minion_1 = self.game.find_card_from_board(card_1).minion
-                minion_2 = self.game.find_card_from_board(card_2).minion
-                player.pair_minions(minion_1, minion_2)
+            case {'action': 'pair', 'data': {'card_1': card_1_id, 'card_2': card_2_id}}:
+                self.game.pair(card_1_id, card_2_id)
 
-            case {'action': 'attack', 'data': {'card_1': card_1, 'card_2': card_2}}:
-                minion_1 = self.game.find_card_from_board(card_1).minion
-                minion_2 = self.game.find_card_from_board(card_2).minion
-                player.attack(minion_1, minion_2)
+            case {'action': 'attack', 'data': {'card_1': card_1_id, 'card_2': card_2_id}}:
+                self.game.attack(card_1_id, card_2_id)
 
             case _:
                 raise Exception(f"Didn't recognise action: {action_data}")
