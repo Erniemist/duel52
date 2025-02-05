@@ -34,7 +34,6 @@ class App:
         except Exception as e:
             print(e)
             print(traceback.format_exc())
-        self.game_state = GameData.from_server(self.fake_server.game, self.team).make_client()
         await self.websocket.send(json.dumps(action.json()))
 
     async def handle_incoming(self):
@@ -81,6 +80,7 @@ class App:
         action = self.next_action()
         if action and not action.sent:
             await self.update(action)
+        self.game_state = GameData.from_server(self.fake_server.game, self.team).make_client()
         self.cursor.position = pygame.mouse.get_pos()
         self.game_view = GameView(self)
         self.handle_events()
