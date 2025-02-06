@@ -28,6 +28,8 @@ class ServerPlayer:
     def start_turn(self, actions: int = 3):
         self.actions = actions
         self.deck.draw_from_top(self.hand)
+        if self.no_possible_actions():
+            self.game.new_turn()
 
     def end_turn(self):
         for minion in self.minions():
