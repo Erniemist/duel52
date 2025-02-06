@@ -1,8 +1,5 @@
-from Client.Actions.FlipAction import FlipAction
-from Client.Actions.PlayAction import PlayAction
 from DataTransfer.CardData import CardData
 from GameFactory import GameFactory
-from Server.ServerApp import ServerApp
 
 
 def test_five():
@@ -12,14 +9,14 @@ def test_five():
         CardData('2222', 'X'),
         CardData('5555', '5'),
     ])
-    server_app = ServerApp('test', factory.make_server())
+    game = factory.make_server()
 
-    server_app.resolve_action(PlayAction('5555', '111').json())
-    server_app.resolve_action(PlayAction('1111', '111').json())
-    server_app.resolve_action(PlayAction('2222', '111').json())
-    server_app.resolve_action(FlipAction('5555').json())
+    game.play('5555', '111')
+    game.play('1111', '111')
+    game.play('2222', '111')
+    game.flip('5555')
 
-    side = server_app.game.board.lanes[0].sides[0]
+    side = game.board.lanes[0].sides[0]
     assert not side.cards[0].minion.face_down
     assert not side.cards[1].minion.face_down
     assert not side.cards[2].minion.face_down

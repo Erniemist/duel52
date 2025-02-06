@@ -7,4 +7,4 @@ class PlayAction:
         self.side = game.find_side(side_id)
 
     def resolve(self):
-        self.player.play_card(card=self.card, side=self.side)
+        self.card.move_to(self.side)

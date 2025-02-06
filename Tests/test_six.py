@@ -1,12 +1,7 @@
 import pytest
 
-from Client.Actions.AttackAction import AttackAction
-from Client.Actions.FlipAction import FlipAction
-from Client.Actions.PairAction import PairAction
-from Client.Actions.PlayAction import PlayAction
 from DataTransfer.CardData import CardData
 from GameFactory import GameFactory
-from Server.ServerApp import ServerApp
 
 
 def test_six_freezes():
@@ -21,29 +16,29 @@ def test_six_freezes():
         CardData('4444', 'X'),
         CardData('5555', 'X'),
     ])
-    server_app = ServerApp('test', factory.make_server())
+    game = factory.make_server()
 
-    server_app.resolve_action(PlayAction('6666', '111').json())
+    game.play('6666', '111')
 
-    server_app.game.new_turn()
-    server_app.resolve_action(PlayAction('3333', '222').json())
-    server_app.resolve_action(PlayAction('4444', '222').json())
-    server_app.resolve_action(FlipAction('4444').json())
+    game.new_turn()
+    game.play('3333', '222')
+    game.play('4444', '222')
+    game.flip('4444')
 
-    server_app.resolve_action(FlipAction('6666').json())
+    game.flip('6666')
 
-    server_app.game.new_turn()
-    server_app.resolve_action(PlayAction('5555', '222').json())
-    server_app.resolve_action(FlipAction('5555').json())
+    game.new_turn()
+    game.play('5555', '222')
+    game.flip('5555')
 
     with pytest.raises(Exception, match='Frozen minion 3333 cannot flip'):
-        server_app.resolve_action(FlipAction('3333').json())
+        game.flip('3333')
     with pytest.raises(Exception, match='Frozen minion 4444 cannot attack'):
-        server_app.resolve_action(AttackAction('4444', '6666').json())
+        game.attack('4444', '6666')
     with pytest.raises(Exception, match='Frozen minion 4444 cannot pair'):
-        server_app.resolve_action(PairAction('4444', '5555').json())
+        game.pair('4444', '5555')
     with pytest.raises(Exception, match='Frozen minion 4444 cannot pair'):
-        server_app.resolve_action(PairAction('5555', '4444').json())
+        game.pair('5555', '4444')
 
 
 def test_six_wears_off():
@@ -58,18 +53,18 @@ def test_six_wears_off():
         CardData('4444', 'X'),
         CardData('5555', 'X'),
     ])
-    server_app = ServerApp('test', factory.make_server())
+    game = factory.make_server()
 
-    server_app.resolve_action(PlayAction('6666', '111').json())
+    game.play('6666', '111')
 
-    server_app.game.new_turn()
-    server_app.resolve_action(PlayAction('3333', '222').json())
+    game.new_turn()
+    game.play('3333', '222')
 
-    server_app.game.new_turn()
-    server_app.resolve_action(FlipAction('6666').json())
+    game.new_turn()
+    game.flip('6666')
 
-    server_app.game.new_turn()
-    server_app.game.new_turn()
-    server_app.game.new_turn()
-    server_app.resolve_action(FlipAction('3333').json())
-    assert not server_app.game.find_card_from_board('3333').minion.face_down
+    game.new_turn()
+    game.new_turn()
+    game.new_turn()
+    game.flip('3333')
+    assert not game.find_card_from_board('3333').minion.face_down

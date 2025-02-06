@@ -1,3 +1,7 @@
+from Client.Actions.AttackAction import AttackAction
+from Client.Actions.FlipAction import FlipAction
+from Client.Actions.PairAction import PairAction
+from Client.Actions.PlayAction import PlayAction
 from Client.Board.ClientBoard import ClientBoard
 from Client.Card.ClientCard import ClientCard
 from Client.Graveyard.ClientGraveyard import ClientGraveyard

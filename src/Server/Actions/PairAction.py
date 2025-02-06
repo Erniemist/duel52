@@ -9,7 +9,7 @@ class PairAction:
 
     def resolve(self):
         self.validate()
-        self.player.pair_minions(self.minion_1, self.minion_2)
+        self.minion_1.pair_with(self.minion_2)
 
     def validate(self):
         if self.minion_1.frozen:

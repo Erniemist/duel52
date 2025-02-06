@@ -53,23 +53,6 @@ class ServerPlayer:
     def no_possible_actions(self):
         return len(self.hand.cards) == 0 and len([minion for minion in self.minions() if minion.could_act()]) == 0
 
-    def play_card(self, side, card):
-        self.take_action(lambda: card.move_to(side))
-
-    def flip_minion(self, minion):
-        self.take_action(lambda: minion.flip_up())
-
-    def attack(self, friendly_minion, enemy_minion):
-        self.take_action(lambda: friendly_minion.attack(enemy_minion))
-
-    def pair_minions(self, minion, second_minion):
-        self.take_action(lambda: minion.pair_with(second_minion))
-
-    def take_action(self, action):
-        self.start_action()
-        action()
-        self.finish_action()
-
     def other_team(self):
         return next(team for team in self.TEAMS if team is not self.team)
 

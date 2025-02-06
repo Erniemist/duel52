@@ -7,7 +7,7 @@ class FlipAction:
 
     def resolve(self):
         self.validate()
-        self.player.flip_minion(self.minion)
+        self.minion.flip_up()
 
     def validate(self):
         if self.minion.frozen:

@@ -8,7 +8,7 @@ class AttackAction:
 
     def resolve(self):
         self.validate()
-        self.player.attack(self.friendly_minion, self.enemy_minion)
+        self.friendly_minion.attack(self.enemy_minion)
 
     def validate(self):
         if self.friendly_minion.frozen:

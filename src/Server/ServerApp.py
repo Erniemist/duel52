@@ -60,17 +60,16 @@ class ServerApp:
     def resolve_action(self, action_data):
         match action_data:
             case {'action': PlayAction.name, 'data': {'card': card_id, 'side': side_id}}:
-                PlayAction(self.game, card_id, side_id).resolve()
+                self.game.play(card_id, side_id)
 
             case {'action': FlipAction.name, 'data': {'card': card_id}}:
-                FlipAction(self.game, card_id).resolve()
+                self.game.flip(card_id)
 
             case {'action': PairAction.name, 'data': {'card_1': card_1_id, 'card_2': card_2_id}}:
-                PairAction(self.game, card_1_id, card_2_id).resolve()
+                self.game.pair(card_1_id, card_2_id)
 
             case {'action': AttackAction.name, 'data': {'card_1': card_1_id, 'card_2': card_2_id}}:
-                AttackAction(self.game, card_1_id, card_2_id).resolve()
+                self.game.attack(card_1_id, card_2_id)
 
             case _:
                 raise Exception(f"Didn't recognise action: {action_data}")
-        self.game.resolve_triggers()

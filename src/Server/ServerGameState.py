@@ -1,6 +1,10 @@
 import random
 import uuid
 
+from Server.Actions.AttackAction import AttackAction
+from Server.Actions.FlipAction import FlipAction
+from Server.Actions.PairAction import PairAction
+from Server.Actions.PlayAction import PlayAction
 from DataTransfer.CardData import CardData
 from Server.ServerBoard import ServerBoard
 from Server.ServerCard import ServerCard
@@ -96,6 +100,24 @@ class ServerGameState:
             *self.graveyard.cards.values(),
             *self.get_hand_cards(),
         ]
+
+    def play(self, card_id, side_id):
+        self.resolve_action(PlayAction(self, card_id, side_id))
+
+    def flip(self, card_id):
+        self.resolve_action(FlipAction(self, card_id))
+
+    def pair(self, card_1_id, card_2_id):
+        self.resolve_action(PairAction(self, card_1_id, card_2_id))
+
+    def attack(self, card_1_id, card_2_id):
+        self.resolve_action(AttackAction(self, card_1_id, card_2_id))
+
+    def resolve_action(self, action):
+        self.active_player().start_action()
+        action.resolve()
+        self.active_player().finish_action()
+        self.resolve_triggers()
 
     def trigger(self, trigger):
         self.triggers.append(trigger)
