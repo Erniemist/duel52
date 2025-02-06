@@ -4,6 +4,10 @@ import uuid
 from websockets import ServerConnection
 
 from DataTransfer.GameData import GameData
+from Server.Actions.FlipAction import FlipAction
+from Server.Actions.PlayAction import PlayAction
+from Server.Actions.AttackAction import AttackAction
+from Server.Actions.PairAction import PairAction
 from Server.ServerGameState import ServerGameState
 from Server.ServerPlayer import ServerPlayer
 
@@ -55,17 +59,17 @@ class ServerApp:
 
     def resolve_action(self, action_data):
         match action_data:
-            case {'action': 'play', 'data': {'side': side_id, 'card': card_id}}:
-                self.game.play(card_id, side_id)
+            case {'action': PlayAction.name, 'data': {'card': card_id, 'side': side_id}}:
+                PlayAction(self.game, card_id, side_id).resolve()
 
-            case {'action': 'flip', 'data': {'card': card_id}}:
-                self.game.flip_minion(card_id)
+            case {'action': FlipAction.name, 'data': {'card': card_id}}:
+                FlipAction(self.game, card_id).resolve()
 
-            case {'action': 'pair', 'data': {'card_1': card_1_id, 'card_2': card_2_id}}:
-                self.game.pair(card_1_id, card_2_id)
+            case {'action': PairAction.name, 'data': {'card_1': card_1_id, 'card_2': card_2_id}}:
+                PairAction(self.game, card_1_id, card_2_id).resolve()
 
-            case {'action': 'attack', 'data': {'card_1': card_1_id, 'card_2': card_2_id}}:
-                self.game.attack(card_1_id, card_2_id)
+            case {'action': AttackAction.name, 'data': {'card_1': card_1_id, 'card_2': card_2_id}}:
+                AttackAction(self.game, card_1_id, card_2_id).resolve()
 
             case _:
                 raise Exception(f"Didn't recognise action: {action_data}")

@@ -1,6 +1,6 @@
-import pytest
-
-from Client.Action import Action
+from Client.Actions.AttackAction import AttackAction
+from Client.Actions.FlipAction import FlipAction
+from Client.Actions.PlayAction import PlayAction
 from DataTransfer.CardData import CardData
 from GameFactory import GameFactory
 from Server.ServerApp import ServerApp
@@ -20,22 +20,22 @@ def test_seven():
     ])
     server_app = ServerApp('test', factory.make_server())
 
-    server_app.resolve_action(Action.play('1111', '111').json())
-    server_app.resolve_action(Action.play('7777', '111').json())
+    server_app.resolve_action(PlayAction('1111', '111').json())
+    server_app.resolve_action(PlayAction('7777', '111').json())
 
-    server_app.resolve_action(Action.play('4444', '222').json())
-    server_app.resolve_action(Action.flip('4444').json())
-    server_app.resolve_action(Action.attack('4444', '1111').json())
+    server_app.resolve_action(PlayAction('4444', '222').json())
+    server_app.resolve_action(FlipAction('4444').json())
+    server_app.resolve_action(AttackAction('4444', '1111').json())
 
-    server_app.resolve_action(Action.flip('1111').json())
-    server_app.resolve_action(Action.attack('1111', '4444').json())
-    server_app.resolve_action(Action.play('2222', '333').json())
+    server_app.resolve_action(FlipAction('1111').json())
+    server_app.resolve_action(AttackAction('1111', '4444').json())
+    server_app.resolve_action(PlayAction('2222', '333').json())
 
-    server_app.resolve_action(Action.play('3333', '444').json())
-    server_app.resolve_action(Action.flip('3333').json())
-    server_app.resolve_action(Action.attack('3333', '2222').json())
+    server_app.resolve_action(PlayAction('3333', '444').json())
+    server_app.resolve_action(FlipAction('3333').json())
+    server_app.resolve_action(AttackAction('3333', '2222').json())
 
-    server_app.resolve_action(Action.flip('7777').json())
+    server_app.resolve_action(FlipAction('7777').json())
 
     assert server_app.game.find_card_from_board('1111').minion.hp == 2
     assert server_app.game.find_card_from_board('2222').minion.hp == 2

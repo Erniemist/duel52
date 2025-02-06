@@ -97,51 +97,6 @@ class ServerGameState:
             *self.get_hand_cards(),
         ]
 
-    def play(self, card_id, side_id):
-        self.active_player().play_card(
-            card=self.find_card_from_hand(card_id),
-            side=self.find_side(side_id),
-        )
-
-    def flip_minion(self, card_id):
-        minion = self.find_card_from_board(card_id).minion
-        if minion.frozen:
-            raise Exception(f"Frozen minion {minion.card.card_id} cannot flip")
-        self.active_player().flip_minion(minion)
-
-    def pair(self, card_1_id, card_2_id):
-        minion = self.find_card_from_board(card_1_id).minion
-        second_minion = self.find_card_from_board(card_2_id).minion
-        player = self.active_player()
-        if minion.frozen:
-            raise Exception(f"Frozen minion {minion.card.card_id} cannot pair")
-        if second_minion.frozen:
-            raise Exception(f"Frozen minion {second_minion.card.card_id} cannot pair")
-        if minion.team != player.team or second_minion.team != player.team:
-            raise Exception("Tried to pair minion from the other team")
-        if minion.value != second_minion.value:
-            raise Exception("Can't pair non-matching minions")
-        if minion.pair or second_minion.pair:
-            raise Exception("Can't pair already paired minions")
-        if minion.face_down or second_minion.face_down:
-            raise Exception("Can't pair facedown minions")
-
-        player.pair_minions(minion, second_minion)
-
-    def attack(self, card_1_id, card_2_id):
-        friendly_minion = self.find_card_from_board(card_1_id).minion
-        enemy_minion = self.find_card_from_board(card_2_id).minion
-        player = self.active_player()
-        if friendly_minion.frozen:
-            raise Exception(f"Frozen minion {friendly_minion.card.card_id} cannot attack")
-        if friendly_minion.team != player.team:
-            raise Exception("Tried to attack from an enemy minion")
-        if enemy_minion.team == player.team:
-            raise Exception("Tried to attack a friendly minion")
-        if friendly_minion.attacks_left() < 1:
-            raise Exception("Tried to attack with an exhausted minion")
-        player.attack(friendly_minion, enemy_minion)
-
     def trigger(self, trigger):
         self.triggers.append(trigger)
 

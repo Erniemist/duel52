@@ -1,4 +1,7 @@
-from Client.Action import Action
+from Client.Actions.AttackAction import AttackAction
+from Client.Actions.FlipAction import FlipAction
+from Client.Actions.PairAction import PairAction
+from Client.Actions.PlayAction import PlayAction
 from DataTransfer.CardData import CardData
 from DataTransfer.GameData import GameData
 from GameFactory import GameFactory
@@ -9,7 +12,7 @@ def test_play_card():
     factory = GameFactory()
     factory.with_hand('A', [CardData('1234', '6')])
     server_app = ServerApp('test', factory.make_server())
-    server_app.resolve_action(Action.play('1234', '111').json())
+    server_app.resolve_action(PlayAction('1234', '111').json())
     client_game_1 = GameData.from_server(server_app.game, 'A').make_client()
 
     assert len(client_game_1.players[0].hand.cards) == 0
@@ -36,8 +39,8 @@ def test_flip_card():
     factory.with_hand('A', [CardData('1111', 'A'), CardData('2222', '2')])
     factory.with_hand('B', [CardData('3333', '3'), CardData('4444', '4')])
     server_app = ServerApp('test', factory.make_server())
-    server_app.resolve_action(Action.play('1111', '111').json())
-    server_app.resolve_action(Action.flip('1111').json())
+    server_app.resolve_action(PlayAction('1111', '111').json())
+    server_app.resolve_action(FlipAction('1111').json())
     client_game_1 = GameData.from_server(server_app.game, 'A').make_client()
 
     card = client_game_1.board.lanes[0].sides[0].cards[0]
@@ -56,12 +59,12 @@ def test_attack_card():
     factory.with_hand('B', [CardData('3333', '3'), CardData('4444', '4')])
     server_app = ServerApp('test', factory.make_server())
 
-    server_app.resolve_action(Action.play('1111', '111').json())
-    server_app.resolve_action(Action.flip('1111').json())
+    server_app.resolve_action(PlayAction('1111', '111').json())
+    server_app.resolve_action(FlipAction('1111').json())
 
-    server_app.resolve_action(Action.play('3333', '222').json())
-    server_app.resolve_action(Action.flip('3333').json())
-    server_app.resolve_action(Action.attack('3333', '1111').json())
+    server_app.resolve_action(PlayAction('3333', '222').json())
+    server_app.resolve_action(FlipAction('3333').json())
+    server_app.resolve_action(AttackAction('3333', '1111').json())
 
     client_game = GameData.from_server(server_app.game, 'A').make_client()
 
@@ -81,11 +84,11 @@ def test_pair_cards():
     factory.with_hand('A', [CardData('1111', 'A'), CardData('2222', 'A')])
     server_app = ServerApp('test', factory.make_server())
 
-    server_app.resolve_action(Action.play('1111', '111').json())
-    server_app.resolve_action(Action.play('2222', '111').json())
-    server_app.resolve_action(Action.flip('1111').json())
-    server_app.resolve_action(Action.flip('2222').json())
-    server_app.resolve_action(Action.pair('1111', '2222').json())
+    server_app.resolve_action(PlayAction('1111', '111').json())
+    server_app.resolve_action(PlayAction('2222', '111').json())
+    server_app.resolve_action(FlipAction('1111').json())
+    server_app.resolve_action(FlipAction('2222').json())
+    server_app.resolve_action(PairAction('1111', '2222').json())
 
     client_game = GameData.from_server(server_app.game, 'A').make_client()
 
@@ -108,18 +111,18 @@ def test_death():
     ])
     server_app = ServerApp('test', factory.make_server())
 
-    server_app.resolve_action(Action.play('1111', '111').json())
-    server_app.resolve_action(Action.play('3333', '111').json())
+    server_app.resolve_action(PlayAction('1111', '111').json())
+    server_app.resolve_action(PlayAction('3333', '111').json())
 
-    server_app.resolve_action(Action.play('4444', '222').json())
-    server_app.resolve_action(Action.flip('4444').json())
-    server_app.resolve_action(Action.attack('4444', '3333').json())
+    server_app.resolve_action(PlayAction('4444', '222').json())
+    server_app.resolve_action(FlipAction('4444').json())
+    server_app.resolve_action(AttackAction('4444', '3333').json())
 
-    server_app.resolve_action(Action.flip('1111').json())
-    server_app.resolve_action(Action.play('2222', '111').json())
-    server_app.resolve_action(Action.flip('2222').json())
+    server_app.resolve_action(FlipAction('1111').json())
+    server_app.resolve_action(PlayAction('2222', '111').json())
+    server_app.resolve_action(FlipAction('2222').json())
 
-    server_app.resolve_action(Action.attack('4444', '3333').json())
+    server_app.resolve_action(AttackAction('4444', '3333').json())
 
     client_game = GameData.from_server(server_app.game, 'A').make_client()
 

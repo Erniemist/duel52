@@ -1,4 +1,5 @@
-from Client.Action import Action
+from Client.Actions.FlipAction import FlipAction
+from Client.Actions.PlayAction import PlayAction
 from DataTransfer.CardData import CardData
 from GameFactory import GameFactory
 from Server.ServerApp import ServerApp
@@ -13,10 +14,10 @@ def test_five():
     ])
     server_app = ServerApp('test', factory.make_server())
 
-    server_app.resolve_action(Action.play('5555', '111').json())
-    server_app.resolve_action(Action.play('1111', '111').json())
-    server_app.resolve_action(Action.play('2222', '111').json())
-    server_app.resolve_action(Action.flip('5555').json())
+    server_app.resolve_action(PlayAction('5555', '111').json())
+    server_app.resolve_action(PlayAction('1111', '111').json())
+    server_app.resolve_action(PlayAction('2222', '111').json())
+    server_app.resolve_action(FlipAction('5555').json())
 
     side = server_app.game.board.lanes[0].sides[0]
     assert not side.cards[0].minion.face_down
