@@ -79,7 +79,7 @@ class Cursor:
         if mode == 'target':
             return lambda x: self.target(x)
         else:
-            return lambda x: x.on_select(self)
+            return lambda x: x.on_select(self, self.app.awaiting_choice)
 
     def pick_up(self, card):
         self.card_id = card.card_id
@@ -100,4 +100,4 @@ class Cursor:
         if mode == 'target':
             return lambda x: x.can_target(self.target_source(), self.app.is_my_turn())
         else:
-            return lambda x: x.can_select(self.app.is_my_turn())
+            return lambda x: x.can_select(self.app.is_my_turn(), self.app.awaiting_choice)

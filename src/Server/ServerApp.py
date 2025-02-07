@@ -12,18 +12,6 @@ from Server.ServerGameState import ServerGameState
 from Server.ServerPlayer import ServerPlayer
 
 
-class Mode:
-    EXPECTING_ACTION = 0
-    EXPECTING_TARGET = 1
-    def __init__(self, mode):
-        self.mode = mode
-
-    def am_expecting_action(self):
-        return self.mode == self.EXPECTING_ACTION
-
-    def am_expecting_target(self):
-        return self.mode == self.EXPECTING_TARGET
-
 class ServerApp:
     def __init__(self, name: str, game):
         self.name = name
@@ -39,6 +27,8 @@ class ServerApp:
             data = {'game': GameData.from_server(self.game, team).to_json(), 'team': team}
             if connection == sender and action_id is not None:
                 data['action_id'] = action_id
+            if self.game.awaiting_choice():
+                data['awaiting_choice'] = self.game.awaited_choices[0].name
             await connection.send(json.dumps(data))
 
     async def create(self, websocket: ServerConnection):
@@ -54,7 +44,12 @@ class ServerApp:
     async def handle_action(self, websocket: ServerConnection, data: dict):
         if self.game.active_player().team != self.teams[websocket]:
             raise Exception(f'Non-active player attempted to take action: {data}')
-        self.resolve_action(data)
+        if self.game.awaiting_choice():
+            if data['action'] != 'choose':
+                raise Exception(f"Expected action to be 'choose', got {data['action']}")
+            self.game.choose(data['data']['card'])
+        else:
+            self.resolve_action(data)
         await self.send(websocket, data['action_id'])
 
     def resolve_action(self, action_data):

@@ -27,7 +27,7 @@ class ServerSide:
         card.minion_last_info = card.minion
         card.minion = None
         if card.host is self.game.graveyard:
-            self.game.trigger(DeathTrigger(card.card_id))
+            self.game.trigger(DeathTrigger(card.card_id, self.player))
         self.cards = [c for c in self.cards if c is not card]
 
     def other_side(self):

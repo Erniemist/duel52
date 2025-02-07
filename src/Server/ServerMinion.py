@@ -30,7 +30,7 @@ class ServerMinion(Minion):
         if not self.face_down:
             return
         self.face_down = False
-        self.game.trigger(FlipTrigger(self.card.card_id))
+        self.game.trigger(FlipTrigger(self.card.card_id, self.player))
         self.player.other_player().learn(self.card)
 
     def attack(self, enemy):

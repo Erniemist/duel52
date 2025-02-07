@@ -16,6 +16,7 @@ from Server.ServerPlayer import ServerPlayer
 class ServerGameState:
     def __init__(self, game_data=None):
         self.triggers = []
+        self.awaited_choices = []
         if game_data is None:
             self.winner: None | ServerPlayer = None
             self.active_player_index = random.randint(0, 1)
@@ -91,6 +92,9 @@ class ServerGameState:
     def find_card_from_hand(self, card_id) -> None | ServerCard:
         return next((card for card in self.get_hand_cards() if card.card_id == card_id), None)
 
+    def find_card(self, card_id):
+        return self.find_card_from_hand(card_id) or self.find_card_from_board(card_id)
+
     def get_hand_cards(self):
         return (card for player in self.players for card in player.hand.cards)
 
@@ -117,6 +121,18 @@ class ServerGameState:
         self.active_player().start_action()
         action.resolve()
         self.active_player().finish_action()
+        self.resolve_triggers()
+
+    def await_choice(self, choice):
+        self.awaited_choices.append(choice)
+
+    def awaiting_choice(self):
+        return len(self.awaited_choices) > 0
+
+    def choose(self, card_id):
+        choice = self.awaited_choices.pop(0)
+        card = self.find_card(card_id)
+        choice.callback(card)
         self.resolve_triggers()
 
     def trigger(self, trigger):

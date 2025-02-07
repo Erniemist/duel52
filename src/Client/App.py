@@ -26,6 +26,7 @@ class App:
         self.actions = []
         self.tick = 0
         self.fake_server: None | ServerApp = None
+        self.awaiting_choice = None
 
     async def update(self, action):
         action.sent = True
@@ -41,6 +42,8 @@ class App:
             response = json.loads(message)
             if 'action_id' in response.keys():
                 self.mark_action_as_resolved(response['action_id'])
+            if 'awaiting_choice' in response.keys():
+                self.awaiting_choice = response['awaiting_choice']
             game_data = GameData.from_json(response['game'])
             self.game_state = game_data.make_client()
             if not self.team:
@@ -95,6 +98,8 @@ class App:
     def mark_action_as_resolved(self, action_id):
         action = next(action for action in self.actions if action.action_id == action_id)
         action.resolved = True
+        if action.name == 'choose':
+            self.awaiting_choice = None
 
     def focused_object(self):
         if self.game_view is None:

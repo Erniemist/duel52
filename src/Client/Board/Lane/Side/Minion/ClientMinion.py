@@ -16,14 +16,18 @@ class ClientMinion(Minion):
         self.pair = None
         self.view_object = None
 
-    def can_select(self, my_turn):
+    def can_select(self, my_turn, awaiting_choice):
+        if awaiting_choice:
+            return False
         if self.frozen:
             return False
         if not my_turn or self.team != self.game.active_player().team or self.player.actions < 1:
             return False
         return not self.pair or self.attacks_left() > 0
 
-    def on_select(self, cursor):
+    def on_select(self, cursor, awaiting_choice):
+        if awaiting_choice:
+            return
         if self.face_down:
             self.game.flip_action(self)
         else:

@@ -1,4 +1,5 @@
 from Client.Actions.AttackAction import AttackAction
+from Client.Actions.ChooseAction import ChooseAction
 from Client.Actions.FlipAction import FlipAction
 from Client.Actions.PairAction import PairAction
 from Client.Actions.PlayAction import PlayAction
@@ -42,3 +43,7 @@ class ClientGameState:
 
     def pair_action(self, minion_1, minion_2):
         self.actions.append(PairAction(minion_1.card.card_id, minion_2.card.card_id))
+
+    def submit_choice(self, card_id):
+        print('choosing card', card_id)
+        self.actions.append(ChooseAction(card_id))
