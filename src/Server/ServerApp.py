@@ -25,10 +25,11 @@ class ServerApp:
     async def send(self, sender: ServerConnection, action_id: None | str = None):
         for connection, team in self.teams.items():
             data = {'game': GameData.from_server(self.game, team).to_json(), 'team': team}
-            if connection == sender and action_id is not None:
-                data['action_id'] = action_id
-            if self.game.awaiting_choice():
-                data['awaiting_choice'] = self.game.awaited_choices[0].name
+            if connection == sender:
+                if action_id is not None:
+                    data['action_id'] = action_id
+                if self.game.awaiting_choice():
+                    data['awaiting_choice'] = self.game.awaited_choices[0].name
             await connection.send(json.dumps(data))
 
     async def create(self, websocket: ServerConnection):
@@ -44,15 +45,16 @@ class ServerApp:
     async def handle_action(self, websocket: ServerConnection, data: dict):
         if self.game.active_player().team != self.teams[websocket]:
             raise Exception(f'Non-active player attempted to take action: {data}')
-        if self.game.awaiting_choice():
-            if data['action'] != 'choose':
-                raise Exception(f"Expected action to be 'choose', got {data['action']}")
-            self.game.choose(data['data']['card'])
-        else:
-            self.resolve_action(data)
+        self.resolve_action(data)
         await self.send(websocket, data['action_id'])
 
     def resolve_action(self, action_data):
+        if self.game.awaiting_choice():
+            if action_data['action'] != 'choose':
+                raise Exception(f"Expected action to be 'choose', got {action_data['action']}")
+            self.game.choose(action_data['data']['card'])
+            return
+
         match action_data:
             case {'action': PlayAction.name, 'data': {'card': card_id, 'side': side_id}}:
                 self.game.play(card_id, side_id)

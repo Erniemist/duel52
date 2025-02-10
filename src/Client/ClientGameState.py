@@ -45,5 +45,4 @@ class ClientGameState:
         self.actions.append(PairAction(minion_1.card.card_id, minion_2.card.card_id))
 
     def submit_choice(self, card_id):
-        print('choosing card', card_id)
         self.actions.append(ChooseAction(card_id))

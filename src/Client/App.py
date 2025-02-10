@@ -8,6 +8,7 @@ from Client.ClientGameState import ClientGameState
 from Client.Cursor.Cursor import Cursor
 from DataTransfer.GameData import GameData
 from Client.GameView import GameView
+from Server.Choices.FromHand import FromHand
 from Server.ServerApp import ServerApp
 
 LEFT = 1
@@ -43,12 +44,20 @@ class App:
             if 'action_id' in response.keys():
                 self.mark_action_as_resolved(response['action_id'])
             if 'awaiting_choice' in response.keys():
-                self.awaiting_choice = response['awaiting_choice']
+                self.set_awaiting_choice(response)
+                self.fake_server.game.awaited_choices.append(self.awaiting_choice)
             game_data = GameData.from_json(response['game'])
             self.game_state = game_data.make_client()
             if not self.team:
                 self.team = response['team']
             self.fake_server = ServerApp(name='fake', game=game_data.make_server())
+
+    def set_awaiting_choice(self, response):
+        match response:
+            case {'awaiting_choice': FromHand.name}:
+                self.awaiting_choice = FromHand(self.my_player())
+            case _:
+                raise Exception(f'{response['awaiting_choice']} is not a valid choice')
 
     def players(self):
         return self.game_state.players
@@ -58,6 +67,9 @@ class App:
 
     def active_player(self):
         return self.game_state.active_player()
+
+    def my_player(self):
+        return next(player for player in self.players() if player.team == self.team)
 
     def is_my_turn(self):
         return self.game_state.active_player().team == self.team
@@ -83,7 +95,7 @@ class App:
         action = self.next_action()
         if action and not action.sent:
             await self.update(action)
-        self.game_state = GameData.from_server(self.fake_server.game, self.team).make_client()
+            self.game_state = GameData.from_server(self.fake_server.game, self.team).make_client()
         self.cursor.position = pygame.mouse.get_pos()
         self.game_view = GameView(self)
         self.handle_events()

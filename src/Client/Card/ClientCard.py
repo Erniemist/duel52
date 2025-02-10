@@ -18,7 +18,7 @@ class ClientCard:
 
     def can_select(self, my_turn, awaiting_choice):
         if awaiting_choice:
-            return self.card_id in [card.card_id for card in self.game.active_player().hand.cards]
+            return awaiting_choice.could_choose_card(self)
         return (
             my_turn
             and self.game.active_player().team == self.host.player.team

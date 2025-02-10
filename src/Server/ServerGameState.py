@@ -17,6 +17,7 @@ class ServerGameState:
     def __init__(self, game_data=None):
         self.triggers = []
         self.awaited_choices = []
+        self.abilities = []
         if game_data is None:
             self.winner: None | ServerPlayer = None
             self.active_player_index = random.randint(0, 1)
@@ -122,17 +123,16 @@ class ServerGameState:
         action.resolve()
         self.active_player().finish_action()
         self.resolve_triggers()
-
-    def await_choice(self, choice):
-        self.awaited_choices.append(choice)
+        self.resolve_abilities()
+        self.resolve_triggers()
 
     def awaiting_choice(self):
         return len(self.awaited_choices) > 0
 
     def choose(self, card_id):
-        choice = self.awaited_choices.pop(0)
-        card = self.find_card(card_id)
-        choice.callback(card)
+        requirement = self.awaited_choices.pop(0)
+        requirement.submit(card_id, self)
+        self.resolve_abilities()
         self.resolve_triggers()
 
     def trigger(self, trigger):
@@ -143,7 +143,19 @@ class ServerGameState:
             trigger = self.triggers.pop()
             for card in self.get_cards():
                 if card.type:
-                    card.type.handle_triggers(trigger)
+                    abilities = card.type.handle_triggers(trigger)
+                    if abilities is not None:
+                        self.abilities += [*abilities]
+
+    def resolve_abilities(self):
+        while len(self.abilities) > 0:
+            ability = self.abilities[0]
+            for effect in ability.unresolved_effects():
+                if effect.choices_remaining():
+                    self.awaited_choices.append(effect.next_choice())
+                    return
+                effect.resolve()
+            self.abilities.pop(0)
 
     def new_turn(self):
         self.active_player().end_turn()
