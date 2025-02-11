@@ -1,7 +1,5 @@
 class Effect:
-    def __init__(self, game, player, choices_required=None):
-        self.game = game
-        self.player = player
+    def __init__(self, choices_required=None):
         self.choices_required = choices_required if choices_required else []
         self.resolved = False
 

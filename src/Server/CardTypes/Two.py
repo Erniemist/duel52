@@ -9,8 +9,8 @@ class Two(CardType):
     """When this card flips, draw a card, then discard a card."""
 
     class Ability1(Ability):
-        def __init__(self, game, player):
-            super().__init__(effects=[Draw(game, player), Discard(game, player)])
+        def __init__(self, card, game, player):
+            super().__init__(effects=[Draw(player), Discard(game, player)])
 
         @staticmethod
         def should_trigger(card, trigger):

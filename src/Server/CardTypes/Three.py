@@ -1,18 +1,25 @@
+from Server.Ability import Ability
+from Server.CardTypes.CardType import CardType
+from Server.Effects.FlipUp import FlipUp
+from Server.Effects.Reanimate import Reanimate
 from Server.Triggers.DeathTrigger import DeathTrigger
 
 
-class Three:
+class Three(CardType):
     """When this card dies face down, return it to its lane face up."""
     value = '3'
 
-    def __init__(self, card):
-        self.card = card
+    class Ability1(Ability):
+        def __init__(self, card, game, player):
+            super().__init__(effects=[Reanimate(card, side=card.minion_last_info.side), FlipUp(card)])
 
-    def handle_triggers(self, trigger):
-        if (
-            isinstance(trigger, DeathTrigger)
-            and trigger.source_is(self.card)
-            and self.card.minion_last_info.face_down
-        ):
-            self.card.move_to(self.card.minion_last_info.side)
-            self.card.minion.flip_up()
+        @staticmethod
+        def should_trigger(card, trigger):
+            return (
+                isinstance(trigger, DeathTrigger)
+                and trigger.source_is(card)
+                and card.minion_last_info.face_down
+            )
+
+    def __init__(self, card):
+        super().__init__(card, abilities=[self.Ability1])
