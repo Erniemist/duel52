@@ -9,6 +9,14 @@ class Three(CardType):
     value = '3'
 
     class Ability1(Ability):
+        @staticmethod
+        def should_trigger(card, trigger):
+            return (
+                isinstance(trigger, DeathTrigger)
+                and trigger.source_is(card)
+                and card.minion_last_info.face_down
+            )
+
         def __init__(self, card, game, player):
             self.card = card
             self.reanimated_minion = None
@@ -20,14 +28,6 @@ class Three(CardType):
         def reanimate(self):
             self.card.move_to(self.card.minion_last_info.side)
             self.reanimated_minion = self.card.minion
-
-        @staticmethod
-        def should_trigger(card, trigger):
-            return (
-                isinstance(trigger, DeathTrigger)
-                and trigger.source_is(card)
-                and card.minion_last_info.face_down
-            )
 
     def __init__(self, card):
         super().__init__(card, abilities=[self.Ability1])

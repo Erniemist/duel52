@@ -8,8 +8,13 @@ from Server.Triggers.FlipTrigger import FlipTrigger
 
 class Two(CardType):
     """When this card flips, draw a card, then discard a card."""
+    value = '2'
 
     class Ability1(Ability):
+        @staticmethod
+        def should_trigger(card, trigger):
+            return isinstance(trigger, FlipTrigger) and trigger.source_is(card)
+
         def __init__(self, card, game, player):
             self.discard_choice = FromHand(player)
             super().__init__(
@@ -19,12 +24,6 @@ class Two(CardType):
                     Effect(lambda: discard(game, self.discard_choice.card)),
                 ],
             )
-
-        @staticmethod
-        def should_trigger(card, trigger):
-            return isinstance(trigger, FlipTrigger) and trigger.source_is(card)
-
-    value = '2'
 
     def __init__(self, card):
         super().__init__(card, abilities=[self.Ability1])

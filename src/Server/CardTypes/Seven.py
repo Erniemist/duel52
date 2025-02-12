@@ -9,6 +9,10 @@ class Seven(CardType):
     value = '7'
 
     class Ability1(Ability):
+        @staticmethod
+        def should_trigger(card, trigger):
+            return isinstance(trigger, FlipTrigger) and trigger.source_is(card)
+
         def __init__(self, card, game, player):
             self.player = player
             super().__init__(parts=[
@@ -18,10 +22,6 @@ class Seven(CardType):
         def heal_all_friendly(self):
             for minion in self.player.minions():
                 minion.hp = minion.max_hp
-
-        @staticmethod
-        def should_trigger(card, trigger):
-            return isinstance(trigger, FlipTrigger) and trigger.source_is(card)
 
     def __init__(self, card):
         super().__init__(card, abilities=[self.Ability1])
