@@ -1,3 +1,4 @@
+from Server.CardTypes.Ace import Ace
 from Server.CardTypes.Five import Five
 from Server.CardTypes.King import King
 from Server.CardTypes.Four import Four
@@ -20,7 +21,7 @@ if TYPE_CHECKING:
 class ServerCard:
     types = {
         card_type.value: card_type
-        for card_type in [Two, Three, Four, Five, Six, Seven, King]
+        for card_type in [Ace, Two, Three, Four, Five, Six, Seven, King]
     }
 
     def __init__(self, game, host, card_data):

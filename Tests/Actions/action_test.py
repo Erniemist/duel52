@@ -5,27 +5,25 @@ from GameFactory import GameFactory
 
 def test_attack_card():
     factory = GameFactory()
-    factory.with_hand('A', [CardData('1111', 'A'), CardData('2222', '2')])
-    factory.with_hand('B', [CardData('3333', '3'), CardData('4444', '4')])
+    factory.with_hand('A', [CardData('X_1', 'X'), CardData('X_2', 'X')])
+    factory.with_hand('B', [CardData('X_3', 'X'), CardData('x_4', 'X')])
     game = factory.make_server()
 
-    game.play('1111', '111')
-    game.flip('1111')
+    game.play('X_1', '111')
+    game.flip('X_1')
 
-    game.play('3333', '222')
-    game.flip('3333')
-    game.attack('3333', '1111')
+    game.play('X_3', '222')
+    game.flip('X_3')
+    game.attack('X_3', 'X_1')
 
     client_game = GameData.from_server(game, 'A').make_client()
 
     defender = client_game.board.lanes[0].sides[0].cards[0]
-    assert defender.card_id == '1111'
-    assert defender.value == 'A'
+    assert defender.card_id == 'X_1'
     assert defender.minion.hp == 1
 
     attacker = client_game.board.lanes[0].sides[1].cards[0]
-    assert attacker.card_id == '3333'
-    assert attacker.value == '3'
+    assert attacker.card_id == 'X_3'
     assert attacker.minion.hp == 2
 
 

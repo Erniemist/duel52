@@ -24,6 +24,7 @@ class ServerMinion(Minion):
 
     def end_turn(self):
         self.attacks_made = 0
+        self.max_attacks = Minion.max_attacks
         self.frozen = False
 
     def flip_up(self):
