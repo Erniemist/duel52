@@ -139,11 +139,16 @@ class ServerGameState:
         self.resolve_abilities()
         self.resolve_triggers()
 
-        if len(self.abilities) == 0 and len(self.triggers) == 0:
-            self.check_victory()
-            if self.active_player().actions == 0 or self.active_player().no_possible_actions():
-                self.active_player().actions = 0
-                self.new_turn()
+        if self.awaiting_choice():
+            return
+        if len(self.abilities) > 0:
+            self.cleanup()
+            return
+
+        self.check_victory()
+        if self.active_player().actions == 0 or self.active_player().no_possible_actions():
+            self.active_player().actions = 0
+            self.new_turn()
 
     def trigger(self, trigger):
         self.triggers.append(trigger)
