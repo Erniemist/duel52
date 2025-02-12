@@ -1,6 +1,6 @@
 from Server.Ability import Ability
 from Server.CardTypes.CardType import CardType
-from Server.Effects.Freeze import Freeze
+from Server.Effects.Effect import Effect
 from Server.Triggers.FlipTrigger import FlipTrigger
 
 
@@ -10,10 +10,14 @@ class Six(CardType):
 
     class Ability1(Ability):
         def __init__(self, card, game, player):
-            super().__init__(effects=[
-                Freeze(other_card.minion)
-                for other_card in card.host.other_side().cards
+            self.card = card
+            super().__init__(parts=[
+                Effect(lambda: self.freeze_all_enemy_in_lane())
             ])
+
+        def freeze_all_enemy_in_lane(self):
+            for other_card in self.card.host.other_side().cards:
+                other_card.minion.frozen = True
 
         @staticmethod
         def should_trigger(card, trigger):

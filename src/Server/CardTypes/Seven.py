@@ -1,6 +1,6 @@
 from Server.Ability import Ability
 from Server.CardTypes.CardType import CardType
-from Server.Effects.Heal import Heal
+from Server.Effects.Effect import Effect
 from Server.Triggers.FlipTrigger import FlipTrigger
 
 
@@ -10,10 +10,14 @@ class Seven(CardType):
 
     class Ability1(Ability):
         def __init__(self, card, game, player):
-            super().__init__(effects=[
-                Heal(minion)
-                for minion in card.minion.player.minions()
+            self.player = player
+            super().__init__(parts=[
+                Effect(lambda: self.heal_all_friendly())
             ])
+
+        def heal_all_friendly(self):
+            for minion in self.player.minions():
+                minion.hp = minion.max_hp
 
         @staticmethod
         def should_trigger(card, trigger):

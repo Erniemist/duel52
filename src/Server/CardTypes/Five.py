@@ -1,6 +1,6 @@
 from Server.Ability import Ability
 from Server.CardTypes.CardType import CardType
-from Server.Effects.FlipUp import FlipUp
+from Server.Effects.Effect import Effect
 from Server.Triggers.FlipTrigger import FlipTrigger
 
 
@@ -10,11 +10,14 @@ class Five(CardType):
 
     class Ability1(Ability):
         def __init__(self, card, game, player):
-            super().__init__(effects=[
-                FlipUp(other_card)
-                for other_card in card.host.cards
-                if other_card.minion.face_down
+            self.card = card
+            super().__init__(parts=[
+                Effect(lambda: self.flip_friendly_in_lane())
             ])
+
+        def flip_friendly_in_lane(self):
+            for card in self.card.host.cards:
+                card.minion.flip_up()
 
         @staticmethod
         def should_trigger(card, trigger):

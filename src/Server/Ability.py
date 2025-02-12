@@ -1,8 +1,8 @@
 class Ability:
-    def __init__(self, effects):
-        self.effects = effects
+    def __init__(self, parts):
+        self.parts = parts
 
-    def unresolved_effects(self):
-        for effect in self.effects:
-            if not effect.resolved:
-                yield effect
+    def unresolved_parts(self):
+        for part in self.parts:
+            if not part.resolved:
+                yield part

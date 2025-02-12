@@ -1,7 +1,8 @@
 from Server.Ability import Ability
 from Server.CardTypes.CardType import CardType
-from Server.Effects.Discard import Discard
-from Server.Effects.Draw import Draw
+from Server.Choices.FromHand import FromHand
+from Server.Effects.Effect import Effect
+from Server.Effects.effects import discard, draw
 from Server.Triggers.FlipTrigger import FlipTrigger
 
 
@@ -10,7 +11,14 @@ class Two(CardType):
 
     class Ability1(Ability):
         def __init__(self, card, game, player):
-            super().__init__(effects=[Draw(player), Discard(game, player)])
+            self.discard_choice = FromHand(player)
+            super().__init__(
+                [
+                    Effect(lambda: draw(player)),
+                    self.discard_choice,
+                    Effect(lambda: discard(game, self.discard_choice.card)),
+                ],
+            )
 
         @staticmethod
         def should_trigger(card, trigger):

@@ -6,6 +6,7 @@ from Server.Actions.FlipAction import FlipAction
 from Server.Actions.PairAction import PairAction
 from Server.Actions.PlayAction import PlayAction
 from DataTransfer.CardData import CardData
+from Server.Effects.Effect import Effect
 from Server.ServerBoard import ServerBoard
 from Server.ServerCard import ServerCard
 from Client.Deck.Deck import Deck
@@ -150,11 +151,12 @@ class ServerGameState:
     def resolve_abilities(self):
         while len(self.abilities) > 0:
             ability = self.abilities[0]
-            for effect in ability.unresolved_effects():
-                if effect.choices_remaining():
-                    self.awaited_choices.append(effect.next_choice())
+            for next_step in ability.unresolved_parts():
+                if isinstance(next_step, Effect):
+                    next_step.resolve()
+                else:
+                    self.awaited_choices.append(next_step)
                     return
-                effect.resolve()
             self.abilities.pop(0)
 
     def new_turn(self):

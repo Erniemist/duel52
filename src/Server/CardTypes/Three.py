@@ -1,7 +1,6 @@
 from Server.Ability import Ability
 from Server.CardTypes.CardType import CardType
-from Server.Effects.FlipUp import FlipUp
-from Server.Effects.Reanimate import Reanimate
+from Server.Effects.Effect import Effect
 from Server.Triggers.DeathTrigger import DeathTrigger
 
 
@@ -11,7 +10,16 @@ class Three(CardType):
 
     class Ability1(Ability):
         def __init__(self, card, game, player):
-            super().__init__(effects=[Reanimate(card, side=card.minion_last_info.side), FlipUp(card)])
+            self.card = card
+            self.reanimated_minion = None
+            super().__init__(parts=[
+                Effect(lambda: self.reanimate()),
+                Effect(lambda: self.reanimated_minion.flip_up()),
+            ])
+
+        def reanimate(self):
+            self.card.move_to(self.card.minion_last_info.side)
+            self.reanimated_minion = self.card.minion
 
         @staticmethod
         def should_trigger(card, trigger):
