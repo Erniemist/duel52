@@ -13,15 +13,17 @@ def test_four():
         CardData('4444', '4'),
     ])
     game = factory.make_server()
+    game.active_player().actions = 3
     game.play('1111', '111')
     game.play('2222', '111')
+    game.flip('2222')
 
     game.play('4444', '222')
     assert len(game.player_by_team('A').known_cards) == 3
-    assert len(game.player_by_team('B').known_cards) == 1
+    assert len(game.player_by_team('B').known_cards) == 2
     game.flip('4444')
     assert len(game.player_by_team('A').known_cards) == 4
-    assert len(game.player_by_team('B').known_cards) == 1
+    assert len(game.player_by_team('B').known_cards) == 2
     game.choose('1111')
     assert len(game.player_by_team('A').known_cards) == 4
-    assert len(game.player_by_team('B').known_cards) == 2
+    assert len(game.player_by_team('B').known_cards) == 3

@@ -18,7 +18,7 @@ class ClientMinion(Minion):
 
     def can_select(self, my_turn, awaiting_choice):
         if awaiting_choice:
-            return awaiting_choice.could_choose_minion(self)
+            return awaiting_choice.could_choose(self.card)
         if self.frozen:
             return False
         if not my_turn or self.team != self.game.active_player().team or self.player.actions < 1:
@@ -28,6 +28,7 @@ class ClientMinion(Minion):
     def on_select(self, cursor, awaiting_choice):
         if awaiting_choice:
             self.game.submit_choice(self.card.card_id)
+            return
         if self.face_down:
             self.game.flip_action(self)
         else:

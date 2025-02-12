@@ -8,6 +8,8 @@ from Client.ClientGameState import ClientGameState
 from Client.Cursor.Cursor import Cursor
 from DataTransfer.GameData import GameData
 from Client.GameView import GameView
+from Server.Choices.CardChoice import CardChoice
+from Server.Choices.FromBoard import FromBoard
 from Server.Choices.FromHand import FromHand
 from Server.ServerApp import ServerApp
 
@@ -55,7 +57,9 @@ class App:
     def set_awaiting_choice(self, response):
         match response:
             case {'awaiting_choice': FromHand.name}:
-                self.awaiting_choice = FromHand(self.my_player())
+                self.awaiting_choice = CardChoice(FromHand(self.my_player()), self.game_state)
+            case {'awaiting_choice': FromBoard.name}:
+                self.awaiting_choice = CardChoice(FromBoard(self.game_state), self.game_state)
             case _:
                 raise Exception(f'{response['awaiting_choice']} is not a valid choice')
 

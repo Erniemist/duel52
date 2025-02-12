@@ -29,7 +29,7 @@ class ServerApp:
                 if action_id is not None:
                     data['action_id'] = action_id
                 if self.game.awaiting_choice():
-                    data['awaiting_choice'] = self.game.awaited_choices[0].name
+                    data['awaiting_choice'] = self.game.awaited_choices[0].choice_type.name
             await connection.send(json.dumps(data))
 
     async def create(self, websocket: ServerConnection):
@@ -43,6 +43,8 @@ class ServerApp:
         await self.send(websocket)
 
     async def handle_action(self, websocket: ServerConnection, data: dict):
+        print('team', self.teams[websocket])
+        print(data)
         if self.game.active_player().team != self.teams[websocket]:
             raise Exception(f'Non-active player attempted to take action: {data}')
         self.resolve_action(data)

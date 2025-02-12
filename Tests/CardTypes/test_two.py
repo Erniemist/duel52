@@ -1,3 +1,5 @@
+import pytest
+
 from DataTransfer.CardData import CardData
 from GameFactory import GameFactory
 
@@ -19,6 +21,8 @@ def test_two():
     game.flip('2222')
     assert len(game.player_by_team('A').hand.cards) == 3
     assert len(game.player_by_team('A').deck.cards) == 1
+    with pytest.raises(Exception, match="2222 is not a valid FromHand choice"):
+        game.choose('2222')
     game.choose('1111')
     assert game.player_by_team('A').actions == 1
     assert len(game.player_by_team('A').hand.cards) == 2

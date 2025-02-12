@@ -6,6 +6,7 @@ from Server.Actions.FlipAction import FlipAction
 from Server.Actions.PairAction import PairAction
 from Server.Actions.PlayAction import PlayAction
 from DataTransfer.CardData import CardData
+from Server.Choices.CardChoice import CardChoice
 from Server.Effects.Effect import Effect
 from Server.ServerBoard import ServerBoard
 from Server.ServerCard import ServerCard
@@ -131,8 +132,8 @@ class ServerGameState:
         return len(self.awaited_choices) > 0
 
     def choose(self, card_id):
-        requirement = self.awaited_choices.pop(0)
-        requirement.submit(card_id, self)
+        self.awaited_choices[0].submit(card_id, self)
+        self.awaited_choices.pop(0)
         self.resolve_abilities()
         self.resolve_triggers()
 
@@ -154,9 +155,11 @@ class ServerGameState:
             for next_step in ability.unresolved_parts():
                 if isinstance(next_step, Effect):
                     next_step.resolve()
-                else:
+                    continue
+                if isinstance(next_step, CardChoice):
                     self.awaited_choices.append(next_step)
                     return
+                raise Exception("Unrecognised step", next_step)
             self.abilities.pop(0)
 
     def new_turn(self):

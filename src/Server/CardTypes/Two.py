@@ -1,5 +1,6 @@
 from Server.Ability import Ability
 from Server.CardTypes.CardType import CardType
+from Server.Choices.CardChoice import CardChoice
 from Server.Choices.FromHand import FromHand
 from Server.Effects.Effect import Effect
 from Server.Effects.effects import discard, draw
@@ -16,7 +17,7 @@ class Two(CardType):
             return isinstance(trigger, FlipTrigger) and trigger.source_is(card)
 
         def __init__(self, card, game, player):
-            self.discard_choice = FromHand(player)
+            self.discard_choice = CardChoice(FromHand(player), game)
             super().__init__(
                 [
                     Effect(lambda: draw(player)),
