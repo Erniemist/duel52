@@ -18,7 +18,7 @@ class Four(CardType):
 
         def __init__(self, card, game, player):
             self.player = player
-            self.peek_choice = CardChoice([FromBoard(game), FaceDown()], game)
+            self.peek_choice = CardChoice([FromBoard(game), FaceDown()], game, player)
             super().__init__(
                 [
                     self.peek_choice,

@@ -1,6 +1,7 @@
 class CardChoice:
-    def __init__(self, choice_validators, game):
+    def __init__(self, choice_validators, game, chooser):
         self.game = game
+        self.chooser = chooser
         self.choice_validators = choice_validators
         self.card = None
         self.resolved = False

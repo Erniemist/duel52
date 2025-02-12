@@ -47,10 +47,6 @@ class ServerPlayer:
 
     def finish_action(self):
         self.actions -= 1
-        self.game.check_victory()
-        if self.actions == 0 or self.no_possible_actions():
-            self.actions = 0
-            self.game.new_turn()
 
     def no_possible_actions(self):
         return len(self.hand.cards) == 0 and len([minion for minion in self.minions() if minion.could_act()]) == 0

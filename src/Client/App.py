@@ -61,7 +61,7 @@ class App:
                 case FromHand.name: validators.append(FromHand(self.my_player()))
                 case FromBoard.name: validators.append(FromBoard(self.game_state))
                 case _: raise Exception(f'{response['awaiting_choice']} is not a valid choice')
-        self.awaiting_choice = CardChoice(validators, self.game_state)
+        self.awaiting_choice = CardChoice(validators, self.game_state, self.my_player())
 
     def players(self):
         return self.game_state.players

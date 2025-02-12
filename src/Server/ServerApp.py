@@ -48,12 +48,13 @@ class ServerApp:
     async def handle_action(self, websocket: ServerConnection, data: dict):
         print('team', self.teams[websocket])
         print(data)
-        if self.game.active_player().team != self.teams[websocket]:
-            raise Exception(f'Non-active player attempted to take action: {data}')
-        self.resolve_action(data)
+        self.resolve_action(data, self.teams[websocket])
         await self.send(websocket, data['action_id'])
 
-    def resolve_action(self, action_data):
+    def resolve_action(self, action_data, team):
+        if self.expected_player().team != team:
+            raise Exception(f'Non-active player attempted to take action: {action_data}')
+
         if self.game.awaiting_choice():
             if action_data['action'] != 'choose':
                 raise Exception(f"Expected action to be 'choose', got {action_data['action']}")
@@ -75,3 +76,8 @@ class ServerApp:
 
             case _:
                 raise Exception(f"Didn't recognise action: {action_data}")
+
+    def expected_player(self):
+        if not self.game.awaiting_choice():
+            return self.game.active_player()
+        return self.game.awaited_choices[0].chooser

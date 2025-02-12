@@ -11,6 +11,9 @@ def test_two():
         CardData('2222', '2'),
         CardData('3333', 'X'),
     ])
+    factory.with_hand('B', [
+        CardData('4444', 'X'),
+    ])
     factory.with_deck('A', [
         CardData('5555', 'X'),
         CardData('6666', 'X'),

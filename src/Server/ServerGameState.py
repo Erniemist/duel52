@@ -125,8 +125,7 @@ class ServerGameState:
         action.resolve()
         self.active_player().finish_action()
         self.resolve_triggers()
-        self.resolve_abilities()
-        self.resolve_triggers()
+        self.cleanup()
 
     def awaiting_choice(self):
         return len(self.awaited_choices) > 0
@@ -134,8 +133,17 @@ class ServerGameState:
     def choose(self, card_id):
         self.awaited_choices[0].submit(card_id, self)
         self.awaited_choices.pop(0)
+        self.cleanup()
+
+    def cleanup(self):
         self.resolve_abilities()
         self.resolve_triggers()
+
+        if len(self.abilities) == 0 and len(self.triggers) == 0:
+            self.check_victory()
+            if self.active_player().actions == 0 or self.active_player().no_possible_actions():
+                self.active_player().actions = 0
+                self.new_turn()
 
     def trigger(self, trigger):
         self.triggers.append(trigger)
