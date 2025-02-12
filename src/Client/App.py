@@ -9,6 +9,7 @@ from Client.Cursor.Cursor import Cursor
 from DataTransfer.GameData import GameData
 from Client.GameView import GameView
 from Server.Choices.CardChoice import CardChoice
+from Server.Choices.FaceDown import FaceDown
 from Server.Choices.FromBoard import FromBoard
 from Server.Choices.FromHand import FromHand
 from Server.ServerApp import ServerApp
@@ -60,7 +61,8 @@ class App:
             match validator_name:
                 case FromHand.name: validators.append(FromHand(self.my_player()))
                 case FromBoard.name: validators.append(FromBoard(self.game_state))
-                case _: raise Exception(f'{response['awaiting_choice']} is not a valid choice')
+                case FaceDown.name: validators.append(FaceDown())
+                case _: raise Exception(f'{validator_name} is not a valid choice')
         self.awaiting_choice = CardChoice(validators, self.game_state, self.my_player())
 
     def players(self):
