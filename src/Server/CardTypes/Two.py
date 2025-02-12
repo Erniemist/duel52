@@ -17,7 +17,7 @@ class Two(CardType):
             return isinstance(trigger, FlipTrigger) and trigger.source_is(card)
 
         def __init__(self, card, game, player):
-            self.discard_choice = CardChoice(FromHand(player), game)
+            self.discard_choice = CardChoice([FromHand(player)], game)
             super().__init__(
                 [
                     Effect(lambda: draw(player)),

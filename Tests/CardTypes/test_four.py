@@ -1,3 +1,5 @@
+import pytest
+
 from DataTransfer.CardData import CardData
 from GameFactory import GameFactory
 
@@ -24,6 +26,8 @@ def test_four():
     game.flip('4444')
     assert len(game.player_by_team('A').known_cards) == 4
     assert len(game.player_by_team('B').known_cards) == 2
+    with pytest.raises(Exception, match=f"2222 is not a valid FaceDown choice"):
+        game.choose('2222')
     game.choose('1111')
     assert len(game.player_by_team('A').known_cards) == 4
     assert len(game.player_by_team('B').known_cards) == 3

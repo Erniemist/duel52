@@ -1,6 +1,7 @@
 from Server.Ability import Ability
 from Server.CardTypes.CardType import CardType
 from Server.Choices.CardChoice import CardChoice
+from Server.Choices.FaceDown import FaceDown
 from Server.Choices.FromBoard import FromBoard
 from Server.Effects.Effect import Effect
 from Server.Triggers.FlipTrigger import FlipTrigger
@@ -17,7 +18,7 @@ class Four(CardType):
 
         def __init__(self, card, game, player):
             self.player = player
-            self.peek_choice = CardChoice(FromBoard(game), game)
+            self.peek_choice = CardChoice([FromBoard(game), FaceDown()], game)
             super().__init__(
                 [
                     self.peek_choice,

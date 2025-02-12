@@ -55,13 +55,13 @@ class App:
             self.fake_server = ServerApp(name='fake', game=game_data.make_server())
 
     def set_awaiting_choice(self, response):
-        match response:
-            case {'awaiting_choice': FromHand.name}:
-                self.awaiting_choice = CardChoice(FromHand(self.my_player()), self.game_state)
-            case {'awaiting_choice': FromBoard.name}:
-                self.awaiting_choice = CardChoice(FromBoard(self.game_state), self.game_state)
-            case _:
-                raise Exception(f'{response['awaiting_choice']} is not a valid choice')
+        validators = []
+        for validator_name in response['awaiting_choice']:
+            match validator_name:
+                case FromHand.name: validators.append(FromHand(self.my_player()))
+                case FromBoard.name: validators.append(FromBoard(self.game_state))
+                case _: raise Exception(f'{response['awaiting_choice']} is not a valid choice')
+        self.awaiting_choice = CardChoice(validators, self.game_state)
 
     def players(self):
         return self.game_state.players
