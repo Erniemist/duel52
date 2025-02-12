@@ -49,4 +49,3 @@ def test_play_validation():
 
     with pytest.raises(Exception, match="Card 4444 is not in hand to play"):
         game.play('4444', '111')
-

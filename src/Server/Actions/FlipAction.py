@@ -10,5 +10,9 @@ class FlipAction:
         self.minion.flip_up()
 
     def validate(self):
+        if self.minion not in self.player.minions():
+            raise Exception(f"Minion {self.minion.card.card_id} is not on your board")
         if self.minion.frozen:
             raise Exception(f"Frozen minion {self.minion.card.card_id} cannot flip")
+        if not self.minion.face_down:
+            raise Exception(f"Faceup minion {self.minion.card.card_id} cannot flip")
