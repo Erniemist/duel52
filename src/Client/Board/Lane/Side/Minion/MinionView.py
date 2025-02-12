@@ -57,7 +57,7 @@ class MinionView(ViewObject):
             (self.weight, self.weight, self.w - self.weight * 2, self.h - self.weight * 2),
             border_radius=self.weight
         )
-        if not self.minion.face_down:
+        if self.minion.card.card_id in self.app.my_player().known_cards:
             font = pygame.font.SysFont('arial', self.font_size)
             numeral = font.render(self.minion.card.value, True, (0, 0, 0))
 
