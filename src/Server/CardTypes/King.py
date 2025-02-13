@@ -1,4 +1,4 @@
-from Server.Ability import Ability
+from Server.CardTypes.Abilities.OnFlip import OnFlip
 from Server.CardTypes.CardType import CardType
 from Server.Effects.Effect import Effect
 from Server.Triggers.FlipTrigger import FlipTrigger
@@ -8,11 +8,7 @@ class King(CardType):
     """When this card flips, retrigger the flip abilities of all friendly non-king minions in the same lane."""
     value = 'K'
 
-    class Ability1(Ability):
-        @staticmethod
-        def should_trigger(card, trigger):
-            return isinstance(trigger, FlipTrigger) and trigger.source_is(card)
-
+    class Ability(OnFlip):
         def __init__(self, card, game, trigger):
             self.game = game
             self.card = card
@@ -27,4 +23,4 @@ class King(CardType):
                     self.game.trigger(FlipTrigger(card.card_id, self.player))
 
     def __init__(self, card):
-        super().__init__(card, abilities=[self.Ability1])
+        super().__init__(card, abilities=[self.Ability])

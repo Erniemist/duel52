@@ -8,7 +8,7 @@ class Eight(CardType):
     """When this card is attacked, it deals 1 damage to the attacker"""
     value = '8'
 
-    class Ability1(Ability):
+    class Ability(Ability):
         @staticmethod
         def should_trigger(card, trigger):
             return isinstance(trigger, AttackTrigger) and trigger.defender_id == card.card_id
@@ -17,7 +17,7 @@ class Eight(CardType):
             self.player = trigger.player
             self.attacker = game.find_card_from_board(trigger.source_id).minion
             super().__init__(parts=[
-                Effect(lambda: self.reflect_damage())
+                Effect(self.reflect_damage)
             ])
 
         def reflect_damage(self):
@@ -28,4 +28,4 @@ class Eight(CardType):
                 self.attacker.take_damage(1)
 
     def __init__(self, card):
-        super().__init__(card, abilities=[self.Ability1])
+        super().__init__(card, abilities=[self.Ability])

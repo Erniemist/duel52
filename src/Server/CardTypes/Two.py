@@ -1,22 +1,17 @@
 from Client.Cursor.Target import Target
-from Server.Ability import Ability
+from Server.CardTypes.Abilities.OnFlip import OnFlip
 from Server.CardTypes.CardType import CardType
 from Server.Choices.CardChoice import CardChoice
 from Server.Choices.FromHand import FromHand
 from Server.Effects.Effect import Effect
 from Server.Effects.effects import discard, draw
-from Server.Triggers.FlipTrigger import FlipTrigger
 
 
 class Two(CardType):
     """When this card flips, draw a card, then discard a card."""
     value = '2'
 
-    class Ability1(Ability):
-        @staticmethod
-        def should_trigger(card, trigger):
-            return isinstance(trigger, FlipTrigger) and trigger.source_is(card)
-
+    class Ability(OnFlip):
         def __init__(self, card, game, trigger):
             player = trigger.player
             self.discard_choice = CardChoice([FromHand(player)], game, player, Target.harm(card.minion))
@@ -29,4 +24,4 @@ class Two(CardType):
             )
 
     def __init__(self, card):
-        super().__init__(card, abilities=[self.Ability1])
+        super().__init__(card, abilities=[self.Ability])

@@ -1,24 +1,19 @@
-from Server.Ability import Ability
+from Server.CardTypes.Abilities.OnFlip import OnFlip
 from Server.CardTypes.CardType import CardType
 from Server.Effects.Effect import Effect
-from Server.Triggers.FlipTrigger import FlipTrigger
 
 
 class Ace(CardType):
     """When this card flips, gain an action. This card may attack twice if it flipped this turn."""
     value = 'A'
 
-    class Ability1(Ability):
-        @staticmethod
-        def should_trigger(card, trigger):
-            return isinstance(trigger, FlipTrigger) and trigger.source_is(card)
-
+    class Ability(OnFlip):
         def __init__(self, card, game, trigger):
             self.card = card
             self.player = trigger.player
             super().__init__(parts=[
-                Effect(lambda: self.gain_action()),
-                Effect(lambda: self.gain_attack()),
+                Effect(self.gain_action),
+                Effect(self.gain_attack),
             ])
 
         def gain_action(self):
@@ -28,4 +23,4 @@ class Ace(CardType):
             self.card.minion.max_attacks = 2
 
     def __init__(self, card):
-        super().__init__(card, abilities=[self.Ability1])
+        super().__init__(card, abilities=[self.Ability])

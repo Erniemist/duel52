@@ -8,7 +8,7 @@ class Three(CardType):
     """When this card dies face down, return it to its lane face up."""
     value = '3'
 
-    class Ability1(Ability):
+    class Ability(Ability):
         @staticmethod
         def should_trigger(card, trigger):
             return (
@@ -30,4 +30,4 @@ class Three(CardType):
             self.reanimated_minion = self.card.minion
 
     def __init__(self, card):
-        super().__init__(card, abilities=[self.Ability1])
+        super().__init__(card, abilities=[self.Ability])

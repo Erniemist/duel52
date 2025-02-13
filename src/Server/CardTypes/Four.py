@@ -1,22 +1,17 @@
 from Client.Cursor.Target import Target
-from Server.Ability import Ability
+from Server.CardTypes.Abilities.OnFlip import OnFlip
 from Server.CardTypes.CardType import CardType
 from Server.Choices.CardChoice import CardChoice
 from Server.Choices.FaceDown import FaceDown
 from Server.Choices.FromBoard import FromBoard
 from Server.Effects.Effect import Effect
-from Server.Triggers.FlipTrigger import FlipTrigger
 
 
 class Four(CardType):
     """When this card flips, look at a facedown card."""
     value = '4'
 
-    class Ability1(Ability):
-        @staticmethod
-        def should_trigger(card, trigger):
-            return isinstance(trigger, FlipTrigger) and trigger.source_is(card)
-
+    class Ability(OnFlip):
         def __init__(self, card, game, trigger):
             self.player = trigger.player
             self.peek_choice = CardChoice(
@@ -33,4 +28,4 @@ class Four(CardType):
             )
 
     def __init__(self, card):
-        super().__init__(card, abilities=[self.Ability1])
+        super().__init__(card, abilities=[self.Ability])
