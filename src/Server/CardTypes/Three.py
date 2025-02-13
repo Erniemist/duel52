@@ -17,7 +17,7 @@ class Three(CardType):
                 and card.minion_last_info.face_down
             )
 
-        def __init__(self, card, game, player):
+        def __init__(self, card, game, trigger):
             self.card = card
             self.reanimated_minion = None
             super().__init__(parts=[

@@ -17,7 +17,8 @@ class Two(CardType):
         def should_trigger(card, trigger):
             return isinstance(trigger, FlipTrigger) and trigger.source_is(card)
 
-        def __init__(self, card, game, player):
+        def __init__(self, card, game, trigger):
+            player = trigger.player
             self.discard_choice = CardChoice([FromHand(player)], game, player, Target.harm(card.minion))
             super().__init__(
                 [

@@ -1,11 +1,12 @@
 from Server.CardTypes.Ace import Ace
-from Server.CardTypes.Five import Five
-from Server.CardTypes.King import King
-from Server.CardTypes.Four import Four
-from Server.CardTypes.Seven import Seven
-from Server.CardTypes.Six import Six
-from Server.CardTypes.Three import Three
 from Server.CardTypes.Two import Two
+from Server.CardTypes.Three import Three
+from Server.CardTypes.Four import Four
+from Server.CardTypes.Five import Five
+from Server.CardTypes.Six import Six
+from Server.CardTypes.Seven import Seven
+from Server.CardTypes.Eight import Eight
+from Server.CardTypes.King import King
 from Server.ServerMinion import ServerMinion
 from typing import TYPE_CHECKING
 
@@ -21,7 +22,7 @@ if TYPE_CHECKING:
 class ServerCard:
     types = {
         card_type.value: card_type
-        for card_type in [Ace, Two, Three, Four, Five, Six, Seven, King]
+        for card_type in [Ace, Two, Three, Four, Five, Six, Seven, Eight, King]
     }
 
     def __init__(self, game, host, card_data):

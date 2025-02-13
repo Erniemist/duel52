@@ -13,10 +13,10 @@ class King(CardType):
         def should_trigger(card, trigger):
             return isinstance(trigger, FlipTrigger) and trigger.source_is(card)
 
-        def __init__(self, card, game, player):
+        def __init__(self, card, game, trigger):
             self.game = game
             self.card = card
-            self.player = player
+            self.player = trigger.player
             super().__init__(parts=[
                 Effect(lambda: self.repeat_battlecries())
             ])

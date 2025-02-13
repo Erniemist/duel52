@@ -1,4 +1,5 @@
 from Client.Board.Lane.Side.Minion.Minion import Minion
+from Server.Triggers.AttackTrigger import AttackTrigger
 from Server.Triggers.FlipTrigger import FlipTrigger
 
 
@@ -41,9 +42,17 @@ class ServerMinion(Minion):
     def attack(self, enemy):
         self.attacks_made += 1
         damage = 2 if self.pair else 1
-        enemy.hp -= damage
-        if enemy.hp <= 0:
-            enemy.die()
+        self.game.trigger(AttackTrigger(
+            attacker_id=self.card.card_id,
+            defender_id=enemy.card.card_id,
+            player=self.player,
+        ))
+        enemy.take_damage(damage)
+
+    def take_damage(self, damage):
+        self.hp -= damage
+        if self.hp <= 0:
+            self.die()
 
     def die(self):
         if self.pair:

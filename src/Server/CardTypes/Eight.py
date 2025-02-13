@@ -1,27 +1,24 @@
 from Server.Ability import Ability
 from Server.CardTypes.CardType import CardType
 from Server.Effects.Effect import Effect
-from Server.Triggers.FlipTrigger import FlipTrigger
+from Server.Triggers.AttackTrigger import AttackTrigger
 
 
-class Seven(CardType):
-    """When this card flips, heal ALL friendly minions."""
-    value = '7'
+class Eight(CardType):
+    """When this card is attacked, it deals 1 damage to the attacker"""
+    value = '8'
 
     class Ability1(Ability):
         @staticmethod
         def should_trigger(card, trigger):
-            return isinstance(trigger, FlipTrigger) and trigger.source_is(card)
+            return isinstance(trigger, AttackTrigger) and trigger.defender_id == card.card_id
 
         def __init__(self, card, game, trigger):
             self.player = trigger.player
+            self.attacker = game.find_card_from_board(trigger.source_id).minion
             super().__init__(parts=[
-                Effect(lambda: self.heal_all_friendly())
+                Effect(lambda: self.attacker.take_damage(1))
             ])
-
-        def heal_all_friendly(self):
-            for minion in self.player.minions():
-                minion.hp = minion.max_hp
 
     def __init__(self, card):
         super().__init__(card, abilities=[self.Ability1])

@@ -17,12 +17,12 @@ class Four(CardType):
         def should_trigger(card, trigger):
             return isinstance(trigger, FlipTrigger) and trigger.source_is(card)
 
-        def __init__(self, card, game, player):
-            self.player = player
+        def __init__(self, card, game, trigger):
+            self.player = trigger.player
             self.peek_choice = CardChoice(
                 [FromBoard(game), FaceDown()],
                 game,
-                player,
+                self.player,
                 Target.affect(card.minion),
             )
             super().__init__(
