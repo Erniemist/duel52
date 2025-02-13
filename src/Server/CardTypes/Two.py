@@ -1,3 +1,4 @@
+from Client.Cursor.Target import Target
 from Server.Ability import Ability
 from Server.CardTypes.CardType import CardType
 from Server.Choices.CardChoice import CardChoice
@@ -17,7 +18,7 @@ class Two(CardType):
             return isinstance(trigger, FlipTrigger) and trigger.source_is(card)
 
         def __init__(self, card, game, player):
-            self.discard_choice = CardChoice([FromHand(player)], game, player)
+            self.discard_choice = CardChoice([FromHand(player)], game, player, Target.harm(card.minion))
             super().__init__(
                 [
                     Effect(lambda: draw(player)),

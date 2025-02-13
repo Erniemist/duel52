@@ -16,7 +16,6 @@ class MinionView(ViewObject):
     font_size = 30
     highlight = (255, 255, 0)
     targeted = (255, 0, 0)
-    pairing = (100, 100, 255)
     normal = (0, 0, 0)
     exahusted_colour = (200, 200, 200)
 
@@ -85,19 +84,8 @@ class MinionView(ViewObject):
     def get_border(self):
         source = self.app.cursor.target_source()
         if source and source is not self.minion and self.focused:
-            if source.team != self.minion.team:
-                return self.targeted
-            return self.pairing
-        if self.minion.pair:
-            if source is self.minion or source is self.minion.pair:
-                return self.highlight
-        else:
-            if source is self.minion:
-                if self.source_of_pairing():
-                    return self.pairing
-                else:
-                    return self.highlight
-        if self.focused:
+            return self.app.cursor.targetter.style
+        if self.focused or source is self.minion or (self.minion.pair and source is self.minion.pair):
             return self.highlight
         return self.normal
 

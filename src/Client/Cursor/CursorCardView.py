@@ -9,7 +9,7 @@ class CursorCardView(CardView):
     perspective_scale = 1.1
 
     def __init__(self, card, app, pos):
-        super().__init__(card, app, pos)
+        super().__init__(card, app, pos, style=self.highlight)
 
     def draw_surface(self):
         x, y = self.shadow_offset

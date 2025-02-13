@@ -40,4 +40,4 @@ class TargetView(ViewObject):
                 start_y + line_d_y * min(max(1, time_modifier + self.length / line_size), num_lines),
             ))
         for start, end in zip(line_starts, line_ends):
-            pygame.draw.line(screen, (255, 0, 0), start, end, self.weight)
+            pygame.draw.line(screen, self.cursor.targetter.style, start, end, self.weight)

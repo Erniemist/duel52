@@ -23,7 +23,7 @@ class King(CardType):
 
         def repeat_battlecries(self):
             for card in self.card.host.cards:
-                if card.type.value != King.value:
+                if card.value != King.value:
                     self.game.trigger(FlipTrigger(card.card_id, self.player))
 
     def __init__(self, card):

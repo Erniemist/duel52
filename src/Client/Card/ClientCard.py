@@ -16,17 +16,18 @@ class ClientCard:
         self.game: ClientGameState = game
         self.minion = None
 
-    def can_select(self, my_turn, awaiting_choice):
-        if awaiting_choice:
-            return awaiting_choice.could_choose(self)
+    def can_select(self, my_turn):
         return (
             my_turn
             and self.game.active_player().team == self.host.player.team
             and self.game.active_player().actions > 0
         )
 
-    def on_select(self, cursor, awaiting_choice):
-        if awaiting_choice:
-            self.game.submit_choice(self.card_id)
-        else:
-            cursor.pick_up(self)
+    def can_choose(self, choice):
+        return choice.could_choose(self)
+
+    def on_select(self, cursor):
+        cursor.pick_up(self)
+
+    def on_choose(self):
+        return self.game.submit_choice(self.card_id)

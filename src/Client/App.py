@@ -4,8 +4,10 @@ import traceback
 
 import pygame
 
+from Client.Board.Lane.Side.Minion.MinionView import MinionView
 from Client.ClientGameState import ClientGameState
 from Client.Cursor.Cursor import Cursor
+from Client.Cursor.Target import Target
 from DataTransfer.GameData import GameData
 from Client.GameView import GameView
 from Server.Choices.CardChoice import CardChoice
@@ -30,12 +32,12 @@ class App:
         self.actions = []
         self.tick = 0
         self.fake_server: None | ServerApp = None
-        self.awaiting_choice = None
+        self.awaiting_choice: None | CardChoice = None
 
     async def update(self, action):
         action.sent = True
         try:
-            self.fake_server.resolve_action(action.json())
+            self.fake_server.resolve_action(action.json(), self.team)
         except Exception as e:
             print(e)
             print(traceback.format_exc())
@@ -46,24 +48,35 @@ class App:
             response = json.loads(message)
             if 'action_id' in response.keys():
                 self.mark_action_as_resolved(response['action_id'])
+            game_data = GameData.from_json(response['game'])
+            self.game_state = game_data.make_client()
             if 'awaiting_choice' in response.keys():
                 self.set_awaiting_choice(response)
                 self.fake_server.game.awaited_choices.append(self.awaiting_choice)
-            game_data = GameData.from_json(response['game'])
-            self.game_state = game_data.make_client()
             if not self.team:
                 self.team = response['team']
             self.fake_server = ServerApp(name='fake', game=game_data.make_server())
 
     def set_awaiting_choice(self, response):
         validators = []
-        for validator_name in response['awaiting_choice']:
+        for validator_name in response['awaiting_choice']['validators']:
             match validator_name:
                 case FromHand.name: validators.append(FromHand(self.my_player()))
                 case FromBoard.name: validators.append(FromBoard(self.game_state))
                 case FaceDown.name: validators.append(FaceDown())
                 case _: raise Exception(f'{validator_name} is not a valid choice')
-        self.awaiting_choice = CardChoice(validators, self.game_state, self.my_player())
+        self.awaiting_choice = CardChoice(
+            validators,
+            self.game_state,
+            self.my_player(),
+        )
+        match response['awaiting_choice']:
+            case {'target': None}:
+                return
+            case {'target': {'source': source_id, 'style': style}}:
+                self.cursor.set_target_source(Target(source_id, style))
+            case _:
+                raise Exception(f"Invalid target data {response['awaiting_choice']['target']}")
 
     def players(self):
         return self.game_state.players
@@ -105,10 +118,22 @@ class App:
         self.cursor.position = pygame.mouse.get_pos()
         self.game_view = GameView(self)
         self.handle_events()
+        self.set_target_style()
         self.game_view = GameView(self)
         self.game_view.draw_all(self.screen)
         pygame.display.flip()
         self.tick += 1
+
+    def set_target_style(self):
+        if not self.cursor.target_source() or self.awaiting_choice:
+            return
+        if not self.focused_object() or not isinstance(self.focused_object(), MinionView):
+            self.cursor.set_target_source(Target.harm(self.cursor.target_source()))
+            return
+        if self.focused_object().minion.side.side_id != self.cursor.target_source().side.side_id:
+            self.cursor.set_target_source(Target.harm(self.cursor.target_source()))
+            return
+        self.cursor.set_target_source(Target.affect(self.cursor.target_source()))
 
     def next_action(self):
         return next((action for action in self.actions if not action.resolved), None)

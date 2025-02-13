@@ -12,13 +12,16 @@ class CardView(ViewObject):
     back_colour_frozen = (200, 70, 125)
     front_colour = (230, 230, 230)
     front_colour_frozen = (200, 200, 255)
+    highlight = (255, 255, 0)
+    normal = (0, 0, 0)
 
-    def __init__(self, card, app, pos, rotation=0, face_down=False, w=None, h=None):
+    def __init__(self, card, app, pos, rotation=0, face_down=False, w=125, h=175, style=None):
         x, y = pos
-        super().__init__(card, app, x, y, 125 if w is None else w, 175 if h is None else h)
+        super().__init__(card, app, x, y, w, h)
         self.card = self.real
         self.rotation = rotation
         self.face_down = face_down
+        self.style = self.normal if style is None else style
 
     def draw(self, screen: pygame.Surface):
         card = self.draw_surface()
@@ -30,17 +33,16 @@ class CardView(ViewObject):
 
     def draw_surface(self):
         surface = pygame.Surface((self.w, self.h), pygame.SRCALPHA)
-        card = self.draw_card(surface, highlight=self.focused)
+        card = self.draw_card(surface)
         return pygame.transform.rotate(card, self.rotation)
 
     def draw_focused_card(self, screen):
-        return self.draw_card(screen, highlight=True)
+        return self.draw_card(screen)
 
-    def draw_card(self, screen: pygame.Surface, highlight=False):
-        border_colour = (255, 255, 0) if highlight else (0, 0, 0)
+    def draw_card(self, screen: pygame.Surface):
         pygame.draw.rect(
             screen,
-            border_colour,
+            self.style,
             (0, 0, self.w, self.h),
             border_radius=self.weight
         )

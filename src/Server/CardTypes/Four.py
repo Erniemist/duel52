@@ -1,3 +1,4 @@
+from Client.Cursor.Target import Target
 from Server.Ability import Ability
 from Server.CardTypes.CardType import CardType
 from Server.Choices.CardChoice import CardChoice
@@ -18,7 +19,12 @@ class Four(CardType):
 
         def __init__(self, card, game, player):
             self.player = player
-            self.peek_choice = CardChoice([FromBoard(game), FaceDown()], game, player)
+            self.peek_choice = CardChoice(
+                [FromBoard(game), FaceDown()],
+                game,
+                player,
+                Target.affect(card.minion),
+            )
             super().__init__(
                 [
                     self.peek_choice,

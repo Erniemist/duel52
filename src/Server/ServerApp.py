@@ -29,10 +29,17 @@ class ServerApp:
                 if action_id is not None:
                     data['action_id'] = action_id
                 if self.game.awaiting_choice():
-                    data['awaiting_choice'] = [
-                        validator.name
-                        for validator in self.game.awaited_choices[0].choice_validators
-                    ]
+                    choice = self.game.awaited_choices[0]
+                    data['awaiting_choice'] = {
+                        'validators': [
+                            validator.name
+                            for validator in choice.choice_validators
+                        ]
+                    }
+                    data['awaiting_choice']['target'] = {
+                        'source': choice.target.source_id,
+                        'style': choice.target.style,
+                    } if choice.target else None
             await connection.send(json.dumps(data))
 
     async def create(self, websocket: ServerConnection):

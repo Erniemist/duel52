@@ -1,4 +1,5 @@
 from Client.Board.Lane.Side.Minion.Minion import Minion
+from Client.Cursor.Target import Target
 
 
 class ClientMinion(Minion):
@@ -12,27 +13,29 @@ class ClientMinion(Minion):
         self.hp = minion_data.hp
         self.face_down = minion_data.face_down
         self.attacks_made = minion_data.attacks_made
+        self.max_attacks = minion_data.max_attacks
         self.frozen = minion_data.frozen
         self.pair = None
         self.view_object = None
 
-    def can_select(self, my_turn, awaiting_choice):
-        if awaiting_choice:
-            return awaiting_choice.could_choose(self.card)
+    def can_select(self, my_turn):
         if self.frozen:
             return False
         if not my_turn or self.team != self.game.active_player().team or self.player.actions < 1:
             return False
         return not self.pair or self.attacks_left() > 0
 
-    def on_select(self, cursor, awaiting_choice):
-        if awaiting_choice:
-            self.game.submit_choice(self.card.card_id)
-            return
+    def on_select(self, cursor):
         if self.face_down:
             self.game.flip_action(self)
         else:
-            cursor.set_target_source(self)
+            cursor.set_target_source(Target.harm(source=self))
+
+    def can_choose(self, choice):
+        return choice.could_choose(self.card)
+
+    def on_choose(self):
+        self.game.submit_choice(self.card.card_id)
 
     def can_target(self, target_source, my_turn):
         if self.game.active_player().team != self.team:

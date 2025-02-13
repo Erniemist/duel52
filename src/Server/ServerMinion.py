@@ -3,6 +3,8 @@ from Server.Triggers.FlipTrigger import FlipTrigger
 
 
 class ServerMinion(Minion):
+    base_max_attacks = 1
+
     def __init__(self, card, side, game, minion_data=None):
         self.card = card
         self.side = side
@@ -15,16 +17,18 @@ class ServerMinion(Minion):
             self.hp = self.max_hp
             self.face_down = True
             self.attacks_made = 0
+            self.max_attacks = self.base_max_attacks
             self.frozen = False
         else:
             self.hp = minion_data.hp
             self.face_down = minion_data.face_down
             self.attacks_made = minion_data.attacks_made
+            self.max_attacks = minion_data.max_attacks
             self.frozen = minion_data.frozen
 
     def end_turn(self):
         self.attacks_made = 0
-        self.max_attacks = Minion.max_attacks
+        self.max_attacks = self.base_max_attacks
         self.frozen = False
 
     def flip_up(self):

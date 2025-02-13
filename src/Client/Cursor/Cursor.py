@@ -1,4 +1,4 @@
-from Client.Board.Lane.Side.Minion.Minion import Minion
+from Client.Board.Lane.Side.Minion.ClientMinion import ClientMinion
 from Client.Card.ClientCard import ClientCard
 from Client.Cursor.CursorCardView import CursorCardView
 from Client.Cursor.TargetView import TargetView
@@ -11,17 +11,17 @@ class Cursor:
         self.position = (0, 0)
         self.offset = (0, 0)
         self.card_id = None
-        self.target_source_id = None
+        self.targetter = None
 
     def card(self) -> ClientCard | None:
         if self.card_id is None:
             return None
         return self.app.find_card_from_hand(self.card_id)
 
-    def target_source(self) -> Minion | None:
-        if self.target_source_id is None:
+    def target_source(self) -> ClientMinion | None:
+        if self.targetter is None:
             return None
-        return self.app.find_card_from_board(self.target_source_id).minion
+        return self.app.find_card_from_board(self.targetter.source_id).minion
 
     def view(self):
         if self.card():
@@ -45,22 +45,26 @@ class Cursor:
         x, y = self.position
         return x + o_x, y + o_y
 
-    def set_target_source(self, minion):
-        self.target_source_id = minion.card.card_id
+    def set_target_source(self, targetter):
+        self.targetter = targetter
 
     def cancel(self):
         match self.mode():
+            case 'choose':
+                pass
             case 'target':
-                self.target_source_id = None
+                self.cancel_target()
             case 'place':
                 self.card_id = None
 
     def cancel_target(self):
-        self.target_source_id = None
+        self.targetter = None
 
     def mode(self):
         if self.card():
             return 'place'
+        elif self.app.awaiting_choice:
+            return 'choose'
         elif self.target_source():
             return 'target'
         else:
@@ -76,10 +80,12 @@ class Cursor:
         mode = self.mode()
         if mode == 'place':
             return lambda x: self.place(x)
+        if mode == 'choose':
+            return lambda x: self.choose(x)
         if mode == 'target':
             return lambda x: self.target(x)
         else:
-            return lambda x: x.on_select(self, self.app.awaiting_choice)
+            return lambda x: x.on_select(self)
 
     def pick_up(self, card):
         self.card_id = card.card_id
@@ -89,6 +95,10 @@ class Cursor:
         game_object.on_place(self.card())
         self.card_id = None
 
+    def choose(self, game_object):
+        game_object.on_choose()
+        self.cancel_target()
+
     def target(self, game_object):
         game_object.on_target(self.target_source())
         self.cancel_target()
@@ -97,7 +107,9 @@ class Cursor:
         mode = self.mode()
         if mode == 'place':
             return lambda x: x.can_place(self.card(), self.app.is_my_turn())
+        if mode == 'choose':
+            return lambda x: x.can_choose(self.app.awaiting_choice)
         if mode == 'target':
             return lambda x: x.can_target(self.target_source(), self.app.is_my_turn())
         else:
-            return lambda x: x.can_select(self.app.is_my_turn(), self.app.awaiting_choice)
+            return lambda x: x.can_select(self.app.is_my_turn())
