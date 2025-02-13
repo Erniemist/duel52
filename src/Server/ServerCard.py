@@ -27,5 +27,5 @@ class ServerCard:
     def move_to(self, new_host):
         old_host = self.host
         self.host = new_host
-        self.host.add_card(self)
         old_host.remove_card(self)
+        self.host.add_card(self)
