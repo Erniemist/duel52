@@ -25,21 +25,20 @@ class ServerApp:
     async def send(self, sender: ServerConnection, action_id: None | str = None):
         for connection, team in self.teams.items():
             data = {'game': GameData.from_server(self.game, team).to_json(), 'team': team}
-            if connection == sender:
-                if action_id is not None:
-                    data['action_id'] = action_id
-                if self.game.awaiting_choice():
-                    choice = self.game.awaited_choices[0]
-                    data['awaiting_choice'] = {
-                        'validators': [
-                            validator.name
-                            for validator in choice.choice_validators
-                        ]
-                    }
-                    data['awaiting_choice']['target'] = {
-                        'source': choice.target.source_id,
-                        'style': choice.target.style,
-                    } if choice.target else None
+            if connection == sender and action_id is not None:
+                data['action_id'] = action_id
+            if self.game.awaiting_choice() and team == self.game.awaited_choices[0].chooser:
+                choice = self.game.awaited_choices[0]
+                data['awaiting_choice'] = {
+                    'validators': [
+                        validator.name
+                        for validator in choice.choice_validators
+                    ]
+                }
+                data['awaiting_choice']['target'] = {
+                    'source': choice.target.source_id,
+                    'style': choice.target.style,
+                } if choice.target else None
             await connection.send(json.dumps(data))
 
     async def create(self, websocket: ServerConnection):
