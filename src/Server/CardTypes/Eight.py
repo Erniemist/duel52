@@ -17,8 +17,15 @@ class Eight(CardType):
             self.player = trigger.player
             self.attacker = game.find_card_from_board(trigger.source_id).minion
             super().__init__(parts=[
-                Effect(lambda: self.attacker.take_damage(1))
+                Effect(lambda: self.reflect_damage())
             ])
+
+        def reflect_damage(self):
+            if self.attacker.pair:
+                self.attacker.take_damage(1)
+                self.attacker.pair.take_damage(1)
+            else:
+                self.attacker.take_damage(1)
 
     def __init__(self, card):
         super().__init__(card, abilities=[self.Ability1])
