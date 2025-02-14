@@ -18,9 +18,9 @@ def test_ace():
     game.new_turn()
     game.play('A', '222')
     game.flip('A')
-    game.attack('A', 'X_1')
+    game.attack('A', ['X_1'])
     assert game.active_player().team == 'B'
     assert game.active_player().actions == 1
-    game.attack('A', 'X_1')
+    game.attack('A', ['X_1'])
 
     assert len(game.graveyard.cards) == 1

@@ -29,3 +29,8 @@ class ServerCard:
         self.host = new_host
         old_host.remove_card(self)
         self.host.add_card(self)
+
+    def has_keyword(self, keyword):
+        if self.type is None:
+            return False
+        return any(ability == keyword for ability in self.type.abilities)

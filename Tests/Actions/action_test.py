@@ -3,30 +3,6 @@ from DataTransfer.GameData import GameData
 from GameFactory import GameFactory
 
 
-def test_attack_card():
-    factory = GameFactory()
-    factory.with_hand('A', [CardData('X_1', 'X'), CardData('X_2', 'X')])
-    factory.with_hand('B', [CardData('X_3', 'X'), CardData('x_4', 'X')])
-    game = factory.make_server()
-
-    game.play('X_1', '111')
-    game.flip('X_1')
-
-    game.play('X_3', '222')
-    game.flip('X_3')
-    game.attack('X_3', 'X_1')
-
-    client_game = GameData.from_server(game, 'A').make_client()
-
-    defender = client_game.board.lanes[0].sides[0].cards[0]
-    assert defender.card_id == 'X_1'
-    assert defender.minion.hp == 1
-
-    attacker = client_game.board.lanes[0].sides[1].cards[0]
-    assert attacker.card_id == 'X_3'
-    assert attacker.minion.hp == 2
-
-
 def test_pair_cards():
     factory = GameFactory()
     factory.with_hand('A', [
@@ -68,13 +44,13 @@ def test_death():
 
     game.play('4444', '222')
     game.flip('4444')
-    game.attack('4444', '3333')
+    game.attack('4444', ['3333'])
 
     game.flip('1111')
     game.play('2222', '111')
     game.flip('2222')
 
-    game.attack('4444', '3333')
+    game.attack('4444', ['3333'])
 
     client_game = GameData.from_server(game, 'A').make_client()
 

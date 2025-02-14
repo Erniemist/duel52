@@ -21,15 +21,15 @@ def test_seven():
 
     game.play('4444', '222')
     game.flip('4444')
-    game.attack('4444', '1111')
+    game.attack('4444', ['1111'])
 
     game.flip('1111')
-    game.attack('1111', '4444')
+    game.attack('1111', ['4444'])
     game.play('2222', '333')
 
     game.play('3333', '444')
     game.flip('3333')
-    game.attack('3333', '2222')
+    game.attack('3333', ['2222'])
 
     game.flip('7777')
 

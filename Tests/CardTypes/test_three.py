@@ -20,13 +20,13 @@ def test_three():
 
     game.play('4444', '222')
     game.flip('4444')
-    game.attack('4444', '3333')
+    game.attack('4444', ['3333'])
 
     game.flip('1111')
     game.play('2222', '111')
     game.flip('2222')
 
-    game.attack('4444', '3333')
+    game.attack('4444', ['3333'])
 
     assert game.find_card_from_board('3333') is not None
     assert not game.find_card_from_board('3333').minion.face_down

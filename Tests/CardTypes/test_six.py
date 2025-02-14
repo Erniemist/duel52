@@ -34,7 +34,7 @@ def test_six_freezes():
     with pytest.raises(Exception, match='Frozen minion 3333 cannot flip'):
         game.flip('3333')
     with pytest.raises(Exception, match='Frozen minion 4444 cannot attack'):
-        game.attack('4444', '6666')
+        game.attack('4444', ['6666'])
     with pytest.raises(Exception, match='Frozen minion 4444 cannot pair'):
         game.pair('4444', '5555')
     with pytest.raises(Exception, match='Frozen minion 4444 cannot pair'):

@@ -22,10 +22,10 @@ def test_eight():
     game.active_player().actions = 6
     game.play('X_3', '222')
     game.flip('X_3')
-    game.attack('X_3', '8')
+    game.attack('X_3', ['8'])
     game.play('X_4', '222')
     game.flip('X_4')
-    game.attack('X_4', '8')
+    game.attack('X_4', ['8'])
 
     assert game.find_card_from_board('X_3').minion.hp == 1
     assert game.find_card_from_board('X_4').minion.hp == 1
@@ -52,7 +52,7 @@ def test_eight_with_pair():
     game.play('X_4', '222')
     game.flip('X_4')
     game.pair('X_3', 'X_4')
-    game.attack('X_3', '8')
+    game.attack('X_3', ['8'])
 
     assert game.find_card_from_board('X_3').minion.hp == 1
     assert game.find_card_from_board('X_4').minion.hp == 1

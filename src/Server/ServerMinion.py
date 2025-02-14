@@ -39,15 +39,16 @@ class ServerMinion(Minion):
         self.game.trigger(FlipTrigger(self.card.card_id, self.player))
         self.player.other_player().learn(self.card)
 
-    def attack(self, enemy):
+    def attack(self, enemies):
         self.attacks_made += 1
         damage = 2 if self.pair else 1
-        self.game.trigger(AttackTrigger(
-            attacker_id=self.card.card_id,
-            defender_id=enemy.card.card_id,
-            player=self.player,
-        ))
-        enemy.take_damage(damage)
+        for enemy in enemies:
+            self.game.trigger(AttackTrigger(
+                attacker_id=self.card.card_id,
+                defender_id=enemy.card.card_id,
+                player=self.player,
+            ))
+            enemy.take_damage(damage)
 
     def take_damage(self, damage):
         self.hp -= damage

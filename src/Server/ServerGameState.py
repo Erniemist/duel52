@@ -6,6 +6,7 @@ from Server.Actions.FlipAction import FlipAction
 from Server.Actions.PairAction import PairAction
 from Server.Actions.PlayAction import PlayAction
 from DataTransfer.CardData import CardData
+from Server.CardTypes.card_types import types
 from Server.Choices.CardChoice import CardChoice
 from Server.Effects.Effect import Effect
 from Server.ServerBoard import ServerBoard
@@ -54,7 +55,7 @@ class ServerGameState:
 
     def make_deck(self) -> Deck:
         main_deck = Deck(self, None)
-        values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'] * 4
+        values = [types.keys()] * 4
         cards = [
             CardData(str(uuid.uuid4().int), value).make(self, main_deck, True)
             for card_id, value in enumerate(values)
@@ -117,8 +118,8 @@ class ServerGameState:
     def pair(self, card_1_id, card_2_id):
         self.resolve_action(PairAction(self, card_1_id, card_2_id))
 
-    def attack(self, card_1_id, card_2_id):
-        self.resolve_action(AttackAction(self, card_1_id, card_2_id))
+    def attack(self, attacker, targets):
+        self.resolve_action(AttackAction(self, attacker, targets))
 
     def resolve_action(self, action):
         self.active_player().start_action()
