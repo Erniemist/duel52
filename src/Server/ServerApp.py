@@ -27,13 +27,16 @@ class ServerApp:
             data = {'game': GameData.from_server(self.game, team).to_json(), 'team': team}
             if connection == sender and action_id is not None:
                 data['action_id'] = action_id
-            if self.game.awaiting_choice() and team == self.game.awaited_choices[0].chooser:
+            if self.game.awaiting_choice() and team == self.game.awaited_choices[0].chooser.team:
                 choice = self.game.awaited_choices[0]
                 data['awaiting_choice'] = {
                     'validators': [
-                        validator.name
+                        {
+                            'name': validator.name,
+                            'card': validator.card.card_id if validator.card else None,
+                        }
                         for validator in choice.choice_validators
-                    ]
+                    ],
                 }
                 data['awaiting_choice']['target'] = {
                     'source': choice.target.source_id,

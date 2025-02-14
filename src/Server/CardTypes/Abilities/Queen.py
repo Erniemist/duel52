@@ -13,7 +13,7 @@ class Queen(OnFlip):
     def __init__(self, card, game, trigger):
         self.card = card
         self.summons = CardChoice(
-            [FromBoard(game), OtherLane(card), Friendly(card.minion.team)],
+            [FromBoard(game), OtherLane(card), Friendly(card)],
             game,
             trigger.player,
             Target.affect(card.minion),

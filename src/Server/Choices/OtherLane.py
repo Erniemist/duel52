@@ -1,8 +1,8 @@
-class OtherLane:
-    name = 'OtherLane'
+from Server.Choices.Validator import Validator
 
-    def __init__(self, card):
-        self.card = card
+
+class OtherLane(Validator):
+    name = 'OtherLane'
 
     def could_choose(self, card):
         return card.minion and card.minion.side.lane is not self.card.minion.side.lane
