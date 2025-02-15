@@ -12,10 +12,7 @@
 - `python src/client.py`
 - 
 To run local server:
-- Create .env file containing:
-WEBSOCKET_URI=ws://localhost:8001
-PORT=8001
-then
+- `cp .env.example .env`
 - `python src/server.py`
 
 rules: http://juddmadden.com/duel52/
