@@ -5,12 +5,12 @@ class Deck:
         self.cards = []
 
     def draw_from_top(self, zone):
-        if len(self.cards) == 0:
+        if not self.cards:
             return
         self.cards[0].move_to(zone)
 
     def remove_card(self, card):
-        self.cards = [c for c in self.cards if c is not card]
+        self.cards.remove(card)
 
     def add_card(self, card):
         self.cards.append(card)
