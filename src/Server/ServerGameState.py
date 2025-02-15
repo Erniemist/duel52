@@ -55,7 +55,7 @@ class ServerGameState:
 
     def make_deck(self) -> Deck:
         main_deck = Deck(self, None)
-        values = [types.keys()] * 4
+        values = [*types.keys()] * 4
         cards = [
             CardData(str(uuid.uuid4().int), value).make(self, main_deck, True)
             for card_id, value in enumerate(values)
