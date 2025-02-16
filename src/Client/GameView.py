@@ -1,4 +1,6 @@
 from Client.Board.BoardView import BoardView
+from Client.Cursor.Target import Target
+from Client.Cursor.TargetView import TargetView
 from Client.Player.PlayerView import PlayerView
 from Client.Text import Text
 from Client.ViewObject import ViewObject
@@ -14,6 +16,9 @@ class GameView(ViewObject):
             BoardView(app.board(), app, w, h),
             app.cursor.view(),
         ]
+        if self.app.game_state.pending_attack:
+            attack = self.app.game_state.pending_attack
+            children.append(TargetView(attack.attacker, Target.RED, self.app, attack.targets[0].view_object.get_centre()))
         if self.app.game_state.winner is not None:
             if self.app.game_state.winner == self.app.team:
                 children.append(Text(self.app, 'You won!', w / 2, h / 2, 100))

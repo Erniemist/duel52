@@ -1,5 +1,7 @@
 from typing import TYPE_CHECKING
 
+from Server.CardTypes.card_types import types
+
 if TYPE_CHECKING:
     from Client.Board.Lane.Side.ClientSide import ClientSide
     from Client.ClientGameState import ClientGameState
@@ -11,6 +13,7 @@ if TYPE_CHECKING:
 class ClientCard:
     def __init__(self, game, host, card_data):
         self.value = card_data.value
+        self.type = types[self.value](self) if self.value in types.keys() else None
         self.host: Deck | ClientGraveyard | Hand | ClientSide = host
         self.card_id = card_data.card_id
         self.game: ClientGameState = game
@@ -31,3 +34,8 @@ class ClientCard:
 
     def on_choose(self):
         return self.game.submit_choice(self.card_id)
+
+    def has_keyword(self, keyword):
+        if self.type is None:
+            return False
+        return any(ability == keyword for ability in self.type.abilities)

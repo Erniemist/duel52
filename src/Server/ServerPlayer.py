@@ -32,6 +32,7 @@ class ServerPlayer:
             self.game.new_turn()
 
     def end_turn(self):
+        self.actions = 0
         for minion in self.minions():
             minion.end_turn()
 

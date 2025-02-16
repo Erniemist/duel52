@@ -8,8 +8,11 @@ class TargetView(ViewObject):
     length = 20
     gap = 10
 
-    def __init__(self, cursor, app, start, end):
-        super().__init__(cursor, app, *start)
+    def __init__(self, target_source, style, app, end):
+        self.target_source = target_source
+        self.style = style
+        start = self.targetter_centre()
+        super().__init__(target_source, app, *start)
         self.start = start
         self.end = end
 
@@ -40,4 +43,9 @@ class TargetView(ViewObject):
                 start_y + line_d_y * min(max(1, time_modifier + self.length / line_size), num_lines),
             ))
         for start, end in zip(line_starts, line_ends):
-            pygame.draw.line(screen, self.cursor.targetter.style, start, end, self.weight)
+            pygame.draw.line(screen, self.style, start, end, self.weight)
+
+    def targetter_centre(self):
+        if self.target_source.pair:
+            return self.target_source.view_object.parent.get_centre()
+        return self.target_source.view_object.get_centre()

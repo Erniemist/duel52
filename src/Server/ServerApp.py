@@ -81,7 +81,7 @@ class ServerApp:
                 self.game.pair(card_1_id, card_2_id)
 
             case {'action': AttackAction.name, 'data': {'attacker': attacker, 'targets': targets}}:
-                self.game.attack(attacker, [targets])
+                self.game.attack(attacker, targets)
 
             case _:
                 raise Exception(f"Didn't recognise action: {action_data}")

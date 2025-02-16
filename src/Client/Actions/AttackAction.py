@@ -10,4 +10,7 @@ class AttackAction(Action):
         super().__init__()
 
     def data(self):
-        return {'attacker': self.attacker, 'targets': self.targets}
+        return {
+            'attacker': self.attacker.card.card_id,
+            'targets': [target.card.card_id for target in self.targets],
+        }

@@ -176,7 +176,7 @@ class App:
             if event.button != LEFT:
                 return
             if not self.game_view.focused_object:
-                self.cursor.cancel_target()
+                self.cursor.cancel()
                 return
             self.cursor.click_method()(self.game_view.focused_object.real)
 

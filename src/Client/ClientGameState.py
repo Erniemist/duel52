@@ -7,6 +7,7 @@ from Client.Board.ClientBoard import ClientBoard
 from Client.Card.ClientCard import ClientCard
 from Client.Graveyard.ClientGraveyard import ClientGraveyard
 from Client.Player.ClientPlayer import ClientPlayer
+from Server.CardTypes.Abilities.Ten import Ten
 
 
 class ClientGameState:
@@ -18,6 +19,7 @@ class ClientGameState:
         self._active_player: ClientPlayer = self.players[game_data.active_player_index]
         self.board: ClientBoard = board
         self.actions = []
+        self.pending_attack = None
 
     def active_player(self):
         return self._active_player
@@ -33,16 +35,25 @@ class ClientGameState:
         return None
 
     def play_action(self, card, side):
-        self.actions.append(PlayAction(card.card_id, side.side_id))
+        self.actions.append(PlayAction(card, side))
 
     def flip_action(self, minion):
-        self.actions.append(FlipAction(minion.card.card_id))
+        self.actions.append(FlipAction(minion))
 
-    def attack_action(self, minion_1, minion_2):
-        self.actions.append(AttackAction(minion_1.card.card_id, minion_2.card.card_id))
+    def attack(self, attacker, target):
+        if not attacker.card.has_keyword(Ten):
+            self.actions.append(AttackAction(attacker, [target]))
+            return
+        if not self.pending_attack:
+            self.pending_attack = AttackAction(attacker, [target])
+            return
+        if target.card.card_id != self.pending_attack.targets[0].card.card_id:
+            self.pending_attack.targets.append(target)
+        self.actions.append(self.pending_attack)
+        self.pending_attack = None
 
     def pair_action(self, minion_1, minion_2):
-        self.actions.append(PairAction(minion_1.card.card_id, minion_2.card.card_id))
+        self.actions.append(PairAction(minion_1, minion_2))
 
     def submit_choice(self, card_id):
         self.actions.append(ChooseAction(card_id))

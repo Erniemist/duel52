@@ -27,13 +27,8 @@ class Cursor:
         if self.card():
             return CursorCardView(self.card(), self.app, self.card_position())
         if self.target_source():
-            return TargetView(self, self.app, self.start_pos(), self.position)
+            return TargetView(self.target_source(), self.targetter.style, self.app, self.position)
         return ViewObject(self, self.app, 0, 0)
-
-    def start_pos(self):
-        if self.target_source().pair:
-            return self.target_source().view_object.parent.get_centre()
-        return self.target_source().view_object.get_centre()
 
     def set_offset(self, card_view):
         x, y = self.position
@@ -58,7 +53,10 @@ class Cursor:
                 self.card_id = None
 
     def cancel_target(self):
-        self.targetter = None
+        if self.app.game_state.pending_attack:
+            self.app.game_state.pending_attack = None
+        else:
+            self.targetter = None
 
     def mode(self):
         if self.card():
@@ -101,7 +99,8 @@ class Cursor:
 
     def target(self, game_object):
         game_object.on_target(self.target_source())
-        self.cancel_target()
+        if not self.app.game_state.pending_attack:
+            self.cancel_target()
 
     def validation_method(self):
         mode = self.mode()

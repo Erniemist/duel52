@@ -4,10 +4,10 @@ from Client.Actions.Action import Action
 class PairAction(Action):
     name = 'pair'
 
-    def __init__(self, card_1_id, card_2_id):
-        self.card_1_id = card_1_id
-        self.card_2_id = card_2_id
+    def __init__(self, minion_1, minion_2):
+        self.minion_1 = minion_1
+        self.minion_2 = minion_2
         super().__init__()
 
     def data(self):
-        return {'card_1': self.card_1_id, 'card_2': self.card_2_id}
+        return {'card_1': self.minion_1.card.card_id, 'card_2': self.minion_2.card.card_id}

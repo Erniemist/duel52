@@ -56,6 +56,6 @@ class ClientMinion(Minion):
 
     def on_target(self, target_source):
         if self.game.active_player().team != self.team:
-            self.game.attack_action(target_source, self)
+            self.game.attack(target_source, self)
         else:
             self.game.pair_action(target_source, self)
