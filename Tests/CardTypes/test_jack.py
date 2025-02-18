@@ -44,5 +44,5 @@ def test_jack_taunt():
 
     game.play('A', '222')
     game.flip('A')
-    with pytest.raises(Exception, match='Minion X_1 is protected by a Jack'):
+    with pytest.raises(Exception, match='Tried to attack a non-Jack minion'):
         game.attack('A', ['X_1'])
