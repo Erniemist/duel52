@@ -94,6 +94,7 @@ def test_board():
                 'value': 'A',
                 'minion': {
                     'hp': 2,
+                    'max_hp': 2,
                     'face_down': True,
                     'attacks_made': 0,
                     'max_attacks': 1,
@@ -117,6 +118,7 @@ def test_board():
                 'value': 'A',
                 'minion': {
                     'hp': 2,
+                    'max_hp': 2,
                     'face_down': True,
                     'attacks_made': 0,
                     'max_attacks': 1,
@@ -137,6 +139,7 @@ def test_board():
                 'value': '',
                 'minion': {
                     'hp': 2,
+                    'max_hp': 2,
                     'face_down': True,
                     'attacks_made': 0,
                     'max_attacks': 1,

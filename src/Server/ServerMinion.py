@@ -15,12 +15,15 @@ class ServerMinion(Minion):
         self.team = self.player.team
         self.pair = None
         if minion_data is None:
+
+            self.max_hp = self.card.type.max_hp if self.card.type else 2
             self.hp = self.max_hp
             self.face_down = True
             self.attacks_made = 0
             self.max_attacks = self.base_max_attacks
             self.frozen = False
         else:
+            self.max_hp = minion_data.max_hp
             self.hp = minion_data.hp
             self.face_down = minion_data.face_down
             self.attacks_made = minion_data.attacks_made
