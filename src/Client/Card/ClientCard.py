@@ -1,7 +1,6 @@
 from typing import TYPE_CHECKING
 
-from Server.CardTypes.CardType import CardType
-from Server.CardTypes.card_types import types
+from Server.CardTypes.card_types import get_type
 
 if TYPE_CHECKING:
     from Client.Board.Lane.Side.ClientSide import ClientSide
@@ -14,7 +13,7 @@ if TYPE_CHECKING:
 class ClientCard:
     def __init__(self, game, host, card_data):
         self.value = card_data.value
-        self.type = types[self.value](self) if self.value in types.keys() else CardType(self)
+        self.type = get_type(card_data.value)(self)
         self.host: Deck | ClientGraveyard | Hand | ClientSide = host
         self.card_id = card_data.card_id
         self.game: ClientGameState = game

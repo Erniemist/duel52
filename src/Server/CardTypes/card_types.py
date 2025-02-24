@@ -24,3 +24,7 @@ types = {
     'K': lambda card: CardType(card, 'The King', abilities=[King]),
     'A': lambda card: CardType(card, 'The Assassin', abilities=[Ace]),
 }
+
+
+def get_type(value):
+    return types.get(value, lambda card: CardType(card))

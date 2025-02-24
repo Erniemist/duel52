@@ -1,5 +1,4 @@
-from Server.CardTypes.CardType import CardType
-from Server.CardTypes.card_types import types
+from Server.CardTypes.card_types import get_type
 from Server.ServerMinion import ServerMinion
 from typing import TYPE_CHECKING
 
@@ -15,12 +14,8 @@ if TYPE_CHECKING:
 class ServerCard:
     def __init__(self, game, host, card_data):
         self.type = None
-        value = card_data.value
-        if value in types:
-            self.type = types[value](self)
-        else:
-            self.type = CardType(self)
-        self.value = value
+        self.type = get_type(card_data.value)(self)
+        self.value = card_data.value
         self.host: Deck | Hand | ServerSide | ClientGraveyard = host
         self.card_id = card_data.card_id
         self.game: ServerGameState = game
