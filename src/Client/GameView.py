@@ -29,7 +29,7 @@ class GameView(ViewObject):
                 children.append(Text(self.app, 'You lost', w / 2, h / 2, 100))
         card = self.show_card_description()
         if card:
-            children.append(CardDescription(self, card))
+            children.append(CardDescription(self, card.type))
         self.set_children(children)
         self.focused_object = self.get_focused_object()
 
