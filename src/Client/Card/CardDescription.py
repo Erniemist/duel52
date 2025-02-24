@@ -20,17 +20,17 @@ class Paragraph(ViewObject):
 
     def __init__(self, app, paragraph, x, y, max_w):
         self.font = pygame.font.SysFont('Arial', 24)
-        self.lines = self.wrap_text(paragraph, x, y, max_w)
+        self.lines = self.wrap_text(paragraph, y, max_w)
         super().__init__(
             None,
             app,
             x,
             y,
-            w=max(text.get_width() for x, y, text in self.lines),
-            h=sum(text.get_height() for x, y, text in self.lines) + self.line_spacing * (len(self.lines) - 1),
+            w=max(text.get_width() for y, text in self.lines),
+            h=sum(text.get_height() for y, text in self.lines) + self.line_spacing * (len(self.lines) - 1),
         )
 
-    def wrap_text(self, paragraph, x, y, max_w):
+    def wrap_text(self, paragraph, y, max_w):
         lines = []
         words = paragraph.split(' ')
         line = []
@@ -39,30 +39,32 @@ class Paragraph(ViewObject):
             potential_text = self.render_line(potential_line)
             if potential_text.get_width() >= max_w:
                 text = self.render_line(line)
-                lines.append((x, y, text))
+                lines.append((y, text))
                 y += text.get_height() + self.line_spacing
                 line = [word]
             else:
                 line.append(word)
         if len(line) > 0:
-            lines.append((x, y, self.render_line(line)))
+            lines.append((y, self.render_line(line)))
         return lines
 
     def render_line(self, line):
         return self.font.render(' '.join(line), True, (0, 0, 0))
 
     def draw(self, screen):
-        for x, y, text in self.lines:
-            screen.blit(text, (x, y))
+        for y, text in self.lines:
+            screen.blit(text, (self.x, self.y + y))
 
 
 class CardDescription(ViewObject):
     margin = 6
 
-    def __init__(self, app, card_type):
-        self.card_type = card_type
-        super().__init__(None, app, 0, 0, CardView.w * 3, CardView.h * 3)
-        header = Header(app, self.card_type.name, self.x + self.w / 2, self.y + self.margin * 3)
+    def __init__(self, app, card, board_width):
+        w = CardView.w * 3
+        x = board_width - w if self.minion_in_left_lane(app, card) else 0
+        self.card_type = card.type
+        super().__init__(None, app, x, 0, w, CardView.h * 3)
+        header = Header(app, self.card_type.name, self.w / 2, self.margin * 3)
         children = [header]
         last_y = header.y + header.h + self.margin * 4
 
@@ -76,6 +78,9 @@ class CardDescription(ViewObject):
             ))
             last_y = children[-1].y + children[-1].h
         self.set_children(children)
+
+    def minion_in_left_lane(self, app, card):
+        return card.minion and card.minion.side.side_id in [side.side_id for side in app.board().lanes[0].sides]
 
     def draw(self, screen):
         pygame.draw.rect(screen, (0, 0, 0), (self.x, self.y, self.w, self.h), border_radius=self.margin)
