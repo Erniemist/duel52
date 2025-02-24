@@ -12,15 +12,15 @@ from Server.CardTypes.Abilities.King import King
 from Server.CardTypes.Abilities.Ace import Ace
 
 types = {
-    '2': lambda card: CardType(card, abilities=[Two]),
-    '3': lambda card: CardType(card, abilities=[Three]),
-    '4': lambda card: CardType(card, abilities=[Four]),
-    '5': lambda card: CardType(card, abilities=[Five]),
-    '6': lambda card: CardType(card, abilities=[Six]),
-    '7': lambda card: CardType(card, abilities=[Seven]),
-    '8': lambda card: CardType(card, abilities=[Eight]),
-    '10': lambda card: CardType(card, abilities=[Ten]),
-    'Q': lambda card: CardType(card, abilities=[Queen]),
-    'K': lambda card: CardType(card, abilities=[King]),
-    'A': lambda card: CardType(card, abilities=[Ace]),
+    '2': lambda card: CardType(card, 'The Archivist', abilities=[Two]),
+    '3': lambda card: CardType(card, 'Ambush!', abilities=[Three]),
+    '4': lambda card: CardType(card, 'The Spy', abilities=[Four]),
+    '5': lambda card: CardType(card, "The King's Banner", abilities=[Five]),
+    '6': lambda card: CardType(card, 'The Frost Mage', abilities=[Six]),
+    '7': lambda card: CardType(card, 'The Healer', abilities=[Seven]),
+    '8': lambda card: CardType(card, 'The Thornbearer', abilities=[Eight]),
+    '10': lambda card: CardType(card, 'The Berserker', abilities=[Ten]),
+    'Q': lambda card: CardType(card, 'The Queen', abilities=[Queen]),
+    'K': lambda card: CardType(card, 'The King', abilities=[King]),
+    'A': lambda card: CardType(card, 'The Assassin', abilities=[Ace]),
 }

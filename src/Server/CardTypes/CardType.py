@@ -2,9 +2,10 @@ from functions import can_call
 
 
 class CardType:
-    def __init__(self, card, abilities):
+    def __init__(self, card, name='', abilities=None):
         self.card = card
-        self.abilities = abilities
+        self.name = name
+        self.abilities = abilities if abilities else []
 
     def handle_triggers(self, trigger):
         for ability in self.abilities:
