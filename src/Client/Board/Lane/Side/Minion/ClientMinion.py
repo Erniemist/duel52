@@ -10,6 +10,7 @@ class ClientMinion(Minion):
         self.value = card.value
         self.player = side.player
         self.team = self.player.team
+        self.max_hp = minion_data.max_hp
         self.hp = minion_data.hp
         self.face_down = minion_data.face_down
         self.attacks_made = minion_data.attacks_made
