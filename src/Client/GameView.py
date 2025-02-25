@@ -1,4 +1,7 @@
 from Client.Board.BoardView import BoardView
+from Client.Board.Lane.Side.Minion.ClientMinion import ClientMinion
+from Client.Card.CardDescription import CardDescription
+from Client.Card.ClientCard import ClientCard
 from Client.Cursor.Target import Target
 from Client.Cursor.TargetView import TargetView
 from Client.Player.PlayerView import PlayerView
@@ -24,8 +27,29 @@ class GameView(ViewObject):
                 children.append(Text(self.app, 'You won!', w / 2, h / 2, 100))
             else:
                 children.append(Text(self.app, 'You lost', w / 2, h / 2, 100))
+        card = self.show_card_description()
+        if card:
+            children.append(CardDescription(self.app, card, w))
         self.set_children(children)
         self.focused_object = self.get_focused_object()
+
+    def show_card_description(self):
+        view_object = self.app.focused_object()
+        if not view_object:
+            return None
+        focused = view_object.real
+        if focused is None:
+            return None
+        card = None
+        if isinstance(focused, ClientCard):
+            card = focused
+        if isinstance(focused, ClientMinion):
+            card = focused.card
+        if not card:
+            return None
+        if card.card_id not in self.app.my_player().known_cards:
+            return None
+        return card
 
     def get_focused_object(self):
         if self.app.game_state.winner is not None:

@@ -10,6 +10,7 @@ class ViewObject:
         self.parent = None
         self._x = x
         self._y = y
+        self.x, self.y = x, y
         self.w = w
         self.h = h
         self.children = []
@@ -19,6 +20,7 @@ class ViewObject:
         self.children = children
         for child in self.children:
             child.parent = self
+            child.x, child.y = child.position()
 
     def check_focus(self):
         for child in self.children[::-1]:

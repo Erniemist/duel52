@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from Server.CardTypes.card_types import types
+from Server.CardTypes.card_types import get_type
 
 if TYPE_CHECKING:
     from Client.Board.Lane.Side.ClientSide import ClientSide
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 class ClientCard:
     def __init__(self, game, host, card_data):
         self.value = card_data.value
-        self.type = types[self.value](self) if self.value in types.keys() else None
+        self.type = get_type(card_data.value)(self)
         self.host: Deck | ClientGraveyard | Hand | ClientSide = host
         self.card_id = card_data.card_id
         self.game: ClientGameState = game
@@ -26,6 +26,12 @@ class ClientCard:
             and self.game.active_player().actions > 0
         )
 
+    def can_hover(self, player):
+        return self.card_id in player.known_cards
+
+    def on_hover(self):
+        pass
+
     def can_choose(self, choice):
         return choice.could_choose(self)
 
@@ -36,6 +42,4 @@ class ClientCard:
         return self.game.submit_choice(self.card_id)
 
     def has_keyword(self, keyword):
-        if self.type is None:
-            return False
         return any(ability == keyword for ability in self.type.abilities)

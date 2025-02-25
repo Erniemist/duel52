@@ -59,6 +59,8 @@ class Cursor:
             self.targetter = None
 
     def mode(self):
+        if not self.app.is_my_turn():
+            return 'hover'
         if self.card():
             return 'place'
         elif self.app.awaiting_choice:
@@ -76,6 +78,8 @@ class Cursor:
 
     def click_method(self):
         mode = self.mode()
+        if mode == 'hover':
+            return lambda x: self.hover(x)
         if mode == 'place':
             return lambda x: self.place(x)
         if mode == 'choose':
@@ -88,6 +92,9 @@ class Cursor:
     def pick_up(self, card):
         self.card_id = card.card_id
         self.set_offset(self.app.game_view.focused_object)
+
+    def hover(self, game_object):
+        game_object.on_hover()
 
     def place(self, game_object):
         game_object.on_place(self.card())
@@ -104,6 +111,8 @@ class Cursor:
 
     def validation_method(self):
         mode = self.mode()
+        if mode == 'hover':
+            return lambda x: x.can_hover(self.app.my_player())
         if mode == 'place':
             return lambda x: x.can_place(self.card(), self.app.is_my_turn())
         if mode == 'choose':
