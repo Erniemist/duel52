@@ -13,7 +13,6 @@ if TYPE_CHECKING:
 
 class ServerCard:
     def __init__(self, game, host, card_data):
-        self.type = None
         self.type = get_type(card_data.value)(self)
         self.value = card_data.value
         self.host: Deck | Hand | ServerSide | ClientGraveyard = host
@@ -29,6 +28,4 @@ class ServerCard:
         self.host.add_card(self)
 
     def has_keyword(self, keyword):
-        if self.type is None:
-            return False
         return any(ability == keyword for ability in self.type.abilities)

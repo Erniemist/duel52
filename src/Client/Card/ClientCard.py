@@ -42,6 +42,4 @@ class ClientCard:
         return self.game.submit_choice(self.card_id)
 
     def has_keyword(self, keyword):
-        if self.type is None:
-            return False
         return any(ability == keyword for ability in self.type.abilities)
