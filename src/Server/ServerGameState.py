@@ -158,10 +158,9 @@ class ServerGameState:
         while len(self.triggers) > 0:
             trigger = self.triggers.pop()
             for card in self.get_cards():
-                if card.type:
-                    abilities = card.type.handle_triggers(trigger)
-                    if abilities is not None:
-                        self.abilities += [*abilities]
+                abilities = card.type.handle_triggers(trigger)
+                if abilities is not None:
+                    self.abilities += [*abilities]
 
     def resolve_abilities(self):
         while len(self.abilities) > 0:

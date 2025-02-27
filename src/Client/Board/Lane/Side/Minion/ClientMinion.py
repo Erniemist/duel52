@@ -32,6 +32,12 @@ class ClientMinion(Minion):
         else:
             cursor.set_target_source(Target.harm(source=self))
 
+    def can_hover(self, player):
+        return self.card.card_id in player.known_cards
+
+    def on_hover(self):
+        pass
+
     def can_choose(self, choice):
         return choice.could_choose(self.card)
 
