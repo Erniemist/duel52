@@ -18,12 +18,12 @@ def test_jack_hp():
     game.play('J', '111')
     game.flip('J')
 
-    game.new_turn()
     game.play('A', '222')
     game.flip('A')
     game.attack('A', ['J'])
     game.attack('A', ['J'])
     assert len(game.find_side('111').cards) == 1
+    assert game.find_card('J').minion.hp == 1
 
 
 def test_jack_taunt():
