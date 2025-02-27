@@ -2,7 +2,7 @@ from typing import Self
 
 
 class Minion:
-    max_hp = 2
+    max_hp: int
     max_attacks: int
     attacks_made: int
     pair: None | Self

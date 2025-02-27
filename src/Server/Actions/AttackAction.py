@@ -1,4 +1,5 @@
 from Server.CardTypes.Abilities.Ten import Ten
+from Server.CardTypes.Abilities.Jack import Jack
 
 
 class AttackAction:
@@ -28,3 +29,6 @@ class AttackAction:
             raise Exception("Tried to attack with an exhausted minion")
         if self.friendly_minion.face_down:
             raise Exception("Tried to attack with a facedown minion")
+        if any(enemy_minion.has_keyword(Jack) for enemy_minion in self.enemy_minions[0].side.cards):
+            if any(enemy_minion.card.has_keyword(Jack) == False for enemy_minion in self.enemy_minions):
+                raise Exception("Tried to attack a non-Jack minion")

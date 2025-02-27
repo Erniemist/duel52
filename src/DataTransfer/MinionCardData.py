@@ -4,8 +4,9 @@ from Server.ServerMinion import ServerMinion
 
 
 class MinionCardData:
-    def __init__(self, card, hp, face_down, attacks_made, max_attacks, frozen, pair=None):
+    def __init__(self, card, max_hp, hp, face_down, attacks_made, max_attacks, frozen, pair=None):
         self.card = card
+        self.max_hp = max_hp
         self.hp = hp
         self.face_down = face_down
         self.attacks_made = attacks_made
@@ -21,6 +22,7 @@ class MinionCardData:
         return MinionCardData(
             card=CardData.from_json(data),
             hp=data['minion']['hp'],
+            max_hp=data['minion']['max_hp'],
             face_down=data['minion']['face_down'],
             attacks_made=data['minion']['attacks_made'],
             max_attacks=data['minion']['max_attacks'],
@@ -45,6 +47,7 @@ class MinionCardData:
         return MinionCardData(
             card=CardData.from_server(minion.card, for_player),
             hp=minion.hp,
+            max_hp=minion.max_hp,
             face_down=minion.face_down,
             attacks_made=minion.attacks_made,
             max_attacks=minion.max_attacks,
@@ -57,6 +60,7 @@ class MinionCardData:
             **self.card.to_json(),
             'minion': {
                 'hp': self.hp,
+                'max_hp': self.max_hp,
                 'face_down': self.face_down,
                 'attacks_made': self.attacks_made,
                 'max_attacks': self.max_attacks,
