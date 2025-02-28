@@ -17,6 +17,7 @@ class Queen(OnFlip):
             game,
             trigger.player,
             Target.affect(card.minion),
+            optional=True,
         )
         super().__init__(
             [

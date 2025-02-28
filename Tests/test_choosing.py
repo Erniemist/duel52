@@ -48,3 +48,18 @@ def test_choosing_with_no_legal_target():
     server.resolve_action({'action': 'flip', 'data': {'card': '4'}}, 'B')
     assert not game.awaiting_choice()
 
+
+def test_optional_choice():
+    factory = GameFactory()
+    factory.with_hand('A', [
+        CardData('Q', 'Q'),
+        CardData('X_1', 'X'),
+    ])
+    game = factory.make_server()
+    server = ServerApp('name', game)
+
+    game.play('X_1', '111')
+    game.play('Q', '333')
+    game.flip('Q')
+    server.resolve_action({'action': 'choose', 'data': {'card': None}}, 'A')
+    assert game.find_card('X_1').minion.side.side_id == '111'
