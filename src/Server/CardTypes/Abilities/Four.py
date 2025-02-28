@@ -20,6 +20,10 @@ class Four(OnFlip):
         super().__init__(
             [
                 self.peek_choice,
-                Effect(lambda: self.player.learn(self.peek_choice.card)),
+                Effect(self.peek),
             ],
         )
+
+    def peek(self):
+        if self.peek_choice.card is not None:
+            self.player.learn(self.peek_choice.card)

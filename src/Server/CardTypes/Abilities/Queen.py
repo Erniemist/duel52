@@ -21,6 +21,10 @@ class Queen(OnFlip):
         super().__init__(
             [
                 self.summons,
-                Effect(lambda: self.summons.card.move_to(self.card.minion.side)),
+                Effect(self.summon),
             ],
         )
+
+    def summon(self):
+        if self.summons.card is not None:
+            self.summons.card.move_to(self.card.minion.side)
