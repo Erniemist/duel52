@@ -170,6 +170,9 @@ class ServerGameState:
                     next_step.resolve()
                     continue
                 if isinstance(next_step, CardChoice):
+                    if all(not next_step.could_choose(card) for card in self.get_cards()):
+                        next_step.resolved = True
+                        return
                     self.awaited_choices.append(next_step)
                     return
                 raise Exception("Unrecognised step", next_step)

@@ -74,7 +74,7 @@ class ServerMinion(Minion):
         return self.attacks_left() > 0 and len([
             enemy
             for enemy in self.player.other_player().minions()
-            if enemy.side == self.side
+            if enemy.side.lane is self.side.lane
         ]) > 0
 
     def could_act(self):
