@@ -8,6 +8,7 @@ from Client.Board.Lane.Side.Minion.MinionView import MinionView
 from Client.ClientGameState import ClientGameState
 from Client.Cursor.Cursor import Cursor
 from Client.Cursor.Target import Target
+from DataTransfer.ChoiceData import ChoiceData
 from DataTransfer.GameData import GameData
 from Client.GameView import GameView
 from Server.Choices.CardChoice import CardChoice
@@ -60,30 +61,11 @@ class App:
                 self.team = response['team']
 
     def set_awaiting_choice(self, response):
-        validators = []
-        for validator in response['awaiting_choice']['validators']:
-            card = None
-            if validator['card'] is not None:
-                card = self.game_state.find_card_from_board(validator['card'])
-            match validator['name']:
-                case FromHand.name: validators.append(FromHand(self.my_player()))
-                case FromBoard.name: validators.append(FromBoard(self.game_state))
-                case FaceDown.name: validators.append(FaceDown())
-                case OtherLane.name: validators.append(OtherLane(card))
-                case Friendly.name: validators.append(Friendly(card))
-                case _: raise Exception(f'{validator} is not a valid choice')
-        self.awaiting_choice = CardChoice(
-            validators,
-            self.game_state,
+        self.awaiting_choice = ChoiceData.from_json(response['awaiting_choice']).make_client(
             self.my_player(),
+            self.game_state,
         )
-        match response['awaiting_choice']:
-            case {'target': None}:
-                return
-            case {'target': {'source': source_id, 'style': style}}:
-                self.cursor.set_target_source(Target(source_id, style))
-            case _:
-                raise Exception(f"Invalid target data {response['awaiting_choice']['target']}")
+        self.cursor.set_target_source(self.awaiting_choice.target)
 
     def players(self):
         return self.game_state.players
