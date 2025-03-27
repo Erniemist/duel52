@@ -3,12 +3,11 @@ from Client.Cursor.Target import Target
 
 
 class ClientMinion(Minion):
-    def __init__(self, card, side, game, minion_data):
+    def __init__(self, card, game, minion_data):
         self.card = card
-        self.side = side
         self.game = game
         self.value = card.value
-        self.player = side.player
+        self.player = self.side.player
         self.team = self.player.team
         self.max_hp = minion_data.max_hp
         self.hp = minion_data.hp
@@ -18,6 +17,10 @@ class ClientMinion(Minion):
         self.frozen = minion_data.frozen
         self.pair = None
         self.view_object = None
+
+    @property
+    def side(self):
+        return self.card.host
 
     def can_select(self, my_turn):
         if self.frozen:

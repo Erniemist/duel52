@@ -31,6 +31,7 @@ def test_queen():
         game.choose('X_3')
     game.choose('X_2')
     assert len(game.find_side('111').cards) == 3
+    assert game.find_card_from_board('X_2').minion.side.side_id == '111'
 
 
 def test_pull_pair():

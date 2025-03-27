@@ -1,4 +1,5 @@
 from Client.Board.Lane.Side.Minion.Minion import Minion
+from Server.CardTypes.Abilities.Stealth import Stealth
 from Server.Triggers.AttackTrigger import AttackTrigger
 from Server.Triggers.FlipTrigger import FlipTrigger
 
@@ -6,12 +7,11 @@ from Server.Triggers.FlipTrigger import FlipTrigger
 class ServerMinion(Minion):
     base_max_attacks = 1
 
-    def __init__(self, card, side, game, minion_data=None):
+    def __init__(self, card, game, minion_data=None):
         self.card = card
-        self.side = side
         self.game = game
         self.value = card.value
-        self.player = side.player
+        self.player = self.side.player
         self.team = self.player.team
         self.pair = None
         if minion_data is None:
@@ -29,6 +29,10 @@ class ServerMinion(Minion):
             self.attacks_made = minion_data.attacks_made
             self.max_attacks = minion_data.max_attacks
             self.frozen = minion_data.frozen
+
+    @property
+    def side(self):
+        return self.card.host
 
     def end_turn(self):
         self.attacks_made = 0
@@ -79,3 +83,9 @@ class ServerMinion(Minion):
 
     def could_act(self):
         return self.could_attack() or self.face_down or self.could_pair()
+
+    def has_active_keyword(self, keyword):
+        return not self.face_down and self.card.has_keyword(keyword)
+
+    def can_see(self, other):
+        return self.team == other.team or not other.has_active_keyword(Stealth)

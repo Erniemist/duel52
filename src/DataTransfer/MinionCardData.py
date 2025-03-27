@@ -35,7 +35,7 @@ class MinionCardData:
         self.side = side
         self.is_server = is_server
         card = self.card.make(game, side, is_server)
-        card.minion = ServerMinion(card, side, game, self) if is_server else ClientMinion(card, side, game, self)
+        card.minion = ServerMinion(card, game, self) if is_server else ClientMinion(card, game, self)
         if self.pair:
             other = next((card for card in side.cards if card.card_id == self.pair), None)
             if other is not None:

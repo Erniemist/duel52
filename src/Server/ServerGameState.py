@@ -21,15 +21,12 @@ class All:
     def __init__(self, game):
         self.game = game
 
-    def other_side(self, card):
+    def other_side(self, minion):
         return [
-            other_card
-            for other_card in card.host.other_side().cards
-            if self.can_see(other_card)
+            other
+            for other in minion.side.other_side().minions()
+            if minion.can_see(other)
         ]
-
-    def can_see(self, other_card):
-        return other_card.minion.face_down or not other_card.has_keyword(Stealth)
 
 
 class ServerGameState:
@@ -108,7 +105,7 @@ class ServerGameState:
         return None
 
     def find_card_from_board(self, card_id) -> ServerCard:
-        return next((card for card in self.board.get_cards() if card.card_id == card_id))
+        return next((card for card in self.board.get_cards() if card.card_id == card_id), None)
 
     def find_card_from_hand(self, card_id) -> None | ServerCard:
         return next((card for card in self.get_hand_cards() if card.card_id == card_id), None)
