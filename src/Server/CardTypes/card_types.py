@@ -1,3 +1,4 @@
+from Server.CardTypes.Abilities.Stealth import Stealth
 from Server.CardTypes.CardType import CardType
 from Server.CardTypes.Abilities.Two import Two
 from Server.CardTypes.Abilities.Three import Three

@@ -6,6 +6,7 @@ from Server.Actions.FlipAction import FlipAction
 from Server.Actions.PairAction import PairAction
 from Server.Actions.PlayAction import PlayAction
 from DataTransfer.CardData import CardData
+from Server.CardTypes.Abilities.Stealth import Stealth
 from Server.CardTypes.card_types import types
 from Server.Choices.CardChoice import CardChoice
 from Server.Effects.Effect import Effect
@@ -14,6 +15,21 @@ from Server.ServerCard import ServerCard
 from Client.Deck.Deck import Deck
 from Server.ServerGraveyard import ServerGraveyard
 from Server.ServerPlayer import ServerPlayer
+
+
+class All:
+    def __init__(self, game):
+        self.game = game
+
+    def other_side(self, card):
+        return [
+            other_card
+            for other_card in card.host.other_side().cards
+            if self.can_see(other_card)
+        ]
+
+    def can_see(self, other_card):
+        return other_card.minion.face_down or not other_card.has_keyword(Stealth)
 
 
 class ServerGameState:
@@ -35,6 +51,7 @@ class ServerGameState:
             self.graveyard: ServerGraveyard = graveyard
             self.players: list[ServerPlayer] = players
             self.board: ServerBoard = board
+        self.all = All(self)
 
     def active_player(self) -> ServerPlayer:
         return self.players[self.active_player_index]

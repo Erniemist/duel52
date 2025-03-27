@@ -22,4 +22,4 @@ def test_nine():
     game.flip('6')
 
     assert not game.find_card_from_board('9_1').minion.frozen
-    assert game.find_card_from_board('9_1').minion.frozen
+    assert game.find_card_from_board('9_2').minion.frozen
