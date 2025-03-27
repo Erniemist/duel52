@@ -21,11 +21,12 @@ class All:
     def __init__(self, game):
         self.game = game
 
-    def other_side(self, minion):
+    def other_side(self, card):
+        side = card.minion.side if card.minion else card.minion_last_info.side
         return [
             other
-            for other in minion.side.other_side().minions()
-            if minion.can_see(other)
+            for other in side.other_side().minions()
+            if card.can_see(other)
         ]
 
 

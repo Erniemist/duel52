@@ -13,5 +13,5 @@ class Six(OnFlip):
         ])
 
     def freeze_all_enemy_in_lane(self):
-        for minion in self.game.all.other_side(self.card.minion):
+        for minion in self.game.all.other_side(self.card):
             minion.frozen = True

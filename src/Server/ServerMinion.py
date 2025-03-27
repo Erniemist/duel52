@@ -1,5 +1,4 @@
 from Client.Board.Lane.Side.Minion.Minion import Minion
-from Server.CardTypes.Abilities.Stealth import Stealth
 from Server.Triggers.AttackTrigger import AttackTrigger
 from Server.Triggers.FlipTrigger import FlipTrigger
 
@@ -86,6 +85,3 @@ class ServerMinion(Minion):
 
     def has_active_keyword(self, keyword):
         return not self.face_down and self.card.has_keyword(keyword)
-
-    def can_see(self, other):
-        return self.team == other.team or not other.has_active_keyword(Stealth)

@@ -1,3 +1,4 @@
+from Server.CardTypes.Abilities.Stealth import Stealth
 from Server.CardTypes.card_types import get_type
 from Server.MinionLastInfo import MinionLastInfo
 from Server.ServerMinion import ServerMinion
@@ -32,3 +33,7 @@ class ServerCard:
 
     def has_keyword(self, keyword):
         return any(ability == keyword for ability in self.type.abilities)
+
+    def can_see(self, other):
+        team = self.minion.team if self.minion else self.minion_last_info.team
+        return team == other.team or not other.has_active_keyword(Stealth)

@@ -12,12 +12,15 @@ class Eight(Ability):
 
     def __init__(self, card, game, trigger):
         self.player = trigger.player
-        self.attacker = game.find_card_from_board(trigger.source_id).minion
+        attacker = game.find_card_from_board(trigger.source_id).minion
+        self.attacker = attacker if card.can_see(attacker) else None
         super().__init__(parts=[
             Effect(self.reflect_damage)
         ])
 
     def reflect_damage(self):
+        if self.attacker is None:
+            return
         if self.attacker.pair:
             self.attacker.take_damage(1)
             self.attacker.pair.take_damage(1)

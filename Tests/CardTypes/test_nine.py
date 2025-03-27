@@ -60,3 +60,25 @@ def test_nine_with_queen():
 
     assert len(game.find_side('333').minions()) == 2
     assert game.find_card_from_board('9').minion.side.side_id == '333'
+
+
+def test_nine_with_eight():
+    factory = GameFactory()
+    factory.with_hand('A', [
+        CardData('9', '9'),
+    ])
+    factory.with_hand('B', [
+        CardData('8', '8'),
+    ])
+    game = factory.make_server()
+
+    game.play('9', '111')
+    game.flip('9')
+
+    game.active_player().actions = 2
+    game.play('8', '222')
+    game.flip('8')
+
+    game.attack('9', ['8'])
+
+    assert game.find_card_from_board('9').minion.hp == 2
