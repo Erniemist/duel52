@@ -1,3 +1,5 @@
+import pytest
+
 from DataTransfer.CardData import CardData
 from GameFactory import GameFactory
 
@@ -27,3 +29,28 @@ def test_ten():
 
     assert game.find_card_from_board('X_3').minion.hp == 1
     assert game.find_card_from_board('X_4').minion.hp == 1
+
+def test_ten_with_nine():
+    factory = GameFactory()
+    factory.with_hand('A', [
+        CardData('9', '9'),
+        CardData('X', 'X'),
+    ])
+    factory.with_hand('B', [
+        CardData('10', '10'),
+    ])
+    game = factory.make_server()
+
+    game.active_player().actions = 3
+    game.play('9', '111')
+    game.flip('9')
+    game.play('X', '111')
+
+    game.play('10', '222')
+    game.flip('10')
+    with pytest.raises(Exception, match="Tried to cleave a Stealth card"):
+        game.attack('10', ['X', '9'])
+
+    game.attack('10', ['9'])
+
+    assert game.find_card_from_board('9').minion.hp == 1

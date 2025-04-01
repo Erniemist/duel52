@@ -1,5 +1,6 @@
-from Server.CardTypes.Abilities.Ten import Ten
+from Server.CardTypes.Abilities.Cleave import Cleave
 from Server.CardTypes.Abilities.Jack import Jack
+from Server.CardTypes.Abilities.Stealth import Stealth
 
 
 class AttackAction:
@@ -15,8 +16,11 @@ class AttackAction:
         self.friendly_minion.attack(self.enemy_minions)
 
     def validate(self):
-        if len(self.enemy_minions) > 1 and not self.friendly_minion.card.has_keyword(Ten):
-            raise Exception(f"Tried to attack multiple minions")
+        if len(self.enemy_minions) > 1:
+            if not self.friendly_minion.has_active_keyword(Cleave):
+                raise Exception("Tried to attack multiple minions")
+            if any(minion.has_active_keyword(Stealth) for minion in self.enemy_minions):
+                raise Exception("Tried to cleave a Stealth card")
         if self.friendly_minion.frozen:
             raise Exception(f"Frozen minion {self.friendly_minion.card.card_id} cannot attack")
         if self.friendly_minion.team != self.player.team:
