@@ -6,7 +6,6 @@ from Server.Actions.FlipAction import FlipAction
 from Server.Actions.PairAction import PairAction
 from Server.Actions.PlayAction import PlayAction
 from DataTransfer.CardData import CardData
-from Server.CardTypes.Abilities.Stealth import Stealth
 from Server.CardTypes.card_types import types
 from Server.Choices.CardChoice import CardChoice
 from Server.Effects.Effect import Effect

@@ -53,7 +53,7 @@ class Paragraph(ViewObject):
 
     def draw(self, screen):
         for y, text in self.lines:
-            screen.blit(text, (self.x, self.y + y))
+            screen.blit(text, (self.x, y))
 
 
 class CardDescription(ViewObject):
@@ -73,7 +73,7 @@ class CardDescription(ViewObject):
                 app,
                 paragraph=ability.description,
                 x=self.margin * 3,
-                y=last_y + self.margin,
+                y=last_y + self.margin * 6,
                 max_w=self.w - self.margin * 6,
             ))
             last_y = children[-1].y + children[-1].h

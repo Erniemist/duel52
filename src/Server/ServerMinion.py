@@ -1,4 +1,6 @@
 from Client.Board.Lane.Side.Minion.Minion import Minion
+from Server.CardTypes.Abilities.Backstab import Backstab
+from Server.CardTypes.Abilities.Jack import Jack
 from Server.Triggers.AttackTrigger import AttackTrigger
 from Server.Triggers.FlipTrigger import FlipTrigger
 
@@ -14,7 +16,6 @@ class ServerMinion(Minion):
         self.team = self.player.team
         self.pair = None
         if minion_data is None:
-
             self.max_hp = self.card.type.max_hp if self.card.type else 2
             self.hp = self.max_hp
             self.face_down = True
@@ -47,14 +48,21 @@ class ServerMinion(Minion):
 
     def attack(self, enemies):
         self.attacks_made += 1
-        damage = 2 if self.pair else 1
         for enemy in enemies:
             self.game.trigger(AttackTrigger(
                 attacker_id=self.card.card_id,
                 defender_id=enemy.card.card_id,
                 player=self.player,
             ))
-            enemy.take_damage(damage)
+            enemy.take_damage(self.calculate_damage(enemy))
+
+    def calculate_damage(self, enemy):
+        damage = 1
+        if self.pair:
+            damage += 1
+        if self.has_active_keyword(Backstab) and enemy.has_active_keyword(Jack):
+            damage += 1
+        return damage
 
     def take_damage(self, damage):
         self.hp -= damage

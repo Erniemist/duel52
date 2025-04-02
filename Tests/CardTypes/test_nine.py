@@ -82,3 +82,25 @@ def test_nine_with_eight():
     game.attack('9', ['8'])
 
     assert game.find_card_from_board('9').minion.hp == 2
+
+
+def test_nine_with_jack():
+    factory = GameFactory()
+    factory.with_hand('A', [
+        CardData('9', '9'),
+    ])
+    factory.with_hand('B', [
+        CardData('J', 'J'),
+    ])
+    game = factory.make_server()
+
+    game.play('9', '111')
+    game.flip('9')
+
+    game.active_player().actions = 2
+    game.play('J', '222')
+    game.flip('J')
+
+    game.attack('9', ['J'])
+
+    assert game.find_card_from_board('J').minion.hp == 1

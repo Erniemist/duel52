@@ -1,3 +1,4 @@
+from Server.CardTypes.Abilities.Backstab import Backstab
 from Server.CardTypes.Abilities.Stealth import Stealth
 from Server.CardTypes.CardType import CardType
 from Server.CardTypes.Abilities.Two import Two
@@ -21,7 +22,7 @@ types = {
     '6': lambda card: CardType(card, 'The Frost Mage', abilities=[Six]),
     '7': lambda card: CardType(card, 'The Healer', abilities=[Seven]),
     '8': lambda card: CardType(card, 'The Thornbearer', abilities=[Eight]),
-    '9': lambda card: CardType(card, 'The Ninja', abilities=[Stealth]),
+    '9': lambda card: CardType(card, 'The Ninja', abilities=[Stealth, Backstab]),
     '10': lambda card: CardType(card, 'The Berserker', abilities=[Cleave]),
     'J': lambda card: CardType(card, 'The Knight', abilities=[Jack], max_hp=3),
     'Q': lambda card: CardType(card, 'The Queen', abilities=[Queen]),
