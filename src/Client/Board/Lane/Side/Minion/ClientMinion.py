@@ -1,5 +1,6 @@
 from Client.Board.Lane.Side.Minion.Minion import Minion
 from Client.Cursor.Target import Target
+from Server.CardTypes.Abilities.Stealth import Stealth
 
 
 class ClientMinion(Minion):
@@ -53,9 +54,13 @@ class ClientMinion(Minion):
         return my_turn and self.can_pair(target_source)
 
     def can_be_attacked(self, target_source):
+        if target_source.side.lane != self.side.lane:
+            return False
         if target_source.attacks_left() < 1:
             return False
-        return target_source.side.lane == self.side.lane
+        if self.has_active_keyword(Stealth) and self.game.pending_attack:
+            return False
+        return True
 
     def can_pair(self, target_source):
         if self.face_down:
@@ -69,3 +74,6 @@ class ClientMinion(Minion):
             self.game.attack(target_source, self)
         else:
             self.game.pair_action(target_source, self)
+
+    def has_active_keyword(self, keyword):
+        return not self.face_down and self.card.has_keyword(keyword)

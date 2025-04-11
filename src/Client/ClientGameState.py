@@ -8,6 +8,7 @@ from Client.Card.ClientCard import ClientCard
 from Client.Graveyard.ClientGraveyard import ClientGraveyard
 from Client.Player.ClientPlayer import ClientPlayer
 from Server.CardTypes.Abilities.Cleave import Cleave
+from Server.CardTypes.Abilities.Stealth import Stealth
 
 
 class ClientGameState:
@@ -41,7 +42,7 @@ class ClientGameState:
         self.actions.append(FlipAction(minion))
 
     def attack(self, attacker, target):
-        if not attacker.card.has_keyword(Cleave):
+        if not attacker.has_active_keyword(Cleave) or target.has_active_keyword(Stealth):
             self.actions.append(AttackAction(attacker, [target]))
             return
         if not self.pending_attack:
