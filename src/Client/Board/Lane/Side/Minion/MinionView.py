@@ -3,9 +3,10 @@ import pygame
 
 from typing import TYPE_CHECKING
 
+from Client.Card.CardImage import CardImage
+
 if TYPE_CHECKING:
     from Client.Board.Lane.Side.Pair.PairView import PairView
-from Client.Card.CardView import CardView
 from Client.ViewObject import ViewObject
 
 
@@ -73,12 +74,12 @@ class MinionView(ViewObject):
     def main_colour(self):
         if self.minion.face_down:
             if self.minion.frozen:
-                return CardView.back_colour_frozen
-            return CardView.back_colour
+                return CardImage.back_colour_frozen
+            return CardImage.back_colour
         if self.minion.frozen:
-            return CardView.front_colour_frozen
+            return CardImage.front_colour_frozen
         if self.minion.attacks_left() > 0:
-            return CardView.front_colour
+            return CardImage.front_colour
         return self.exahusted_colour
 
     def get_border(self):

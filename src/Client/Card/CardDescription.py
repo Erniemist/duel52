@@ -1,5 +1,6 @@
 import pygame
 
+from Client.Card.CardImage import CardImage
 from Client.Card.CardView import CardView
 from Client.ViewObject import ViewObject
 
@@ -60,10 +61,10 @@ class CardDescription(ViewObject):
     margin = 6
 
     def __init__(self, app, card, board_width):
-        w = CardView.w * 3
+        w = CardImage.w * 3
         x = board_width - w if self.minion_in_left_lane(app, card) else 0
         self.card_type = card.type
-        super().__init__(None, app, x, 0, w, CardView.h * 3)
+        super().__init__(None, app, x, 0, w, CardImage.h * 3)
         header = Header(app, self.card_type.name, self.w / 2, self.margin * 3)
         children = [header]
         last_y = header.y + header.h + self.margin * 4
@@ -84,7 +85,7 @@ class CardDescription(ViewObject):
 
     def draw(self, screen):
         pygame.draw.rect(screen, (0, 0, 0), (self.x, self.y, self.w, self.h), border_radius=self.margin)
-        pygame.draw.rect(screen, CardView.front_colour, (
+        pygame.draw.rect(screen, CardImage.front_colour, (
             self.x + self.margin,
             self.y + self.margin,
             self.w - self.margin * 2,

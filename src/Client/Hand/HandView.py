@@ -1,5 +1,6 @@
 import math
 
+from Client.Card.CardImage import CardImage
 from Client.Card.CardView import CardView
 from Client.Hand.FocusedHandCardView import FocusedHandCardView
 from Client.Hand.HandCardView import HandCardView
@@ -8,7 +9,7 @@ from Client.ViewObject import ViewObject
 
 class HandView(ViewObject):
     squish = 0.75
-    card_w = CardView.w * squish
+    card_w = CardImage.w * squish
 
     def __init__(self, hand, app, x, y, flipped):
         self.cards_to_show = [card for card in hand.cards if card is not app.cursor.card()]
@@ -17,9 +18,9 @@ class HandView(ViewObject):
             hand,
             app,
             x - w / 2,
-            y - CardView.h / 2,
+            y - CardImage.h / 2,
             w,
-            CardView.h,
+            CardImage.h,
         )
         self.flipped = flipped
         self.hand = self.real
@@ -38,7 +39,7 @@ class HandView(ViewObject):
                 cards.append(FocusedHandCardView(
                     card,
                     self.app,
-                    (self.card_x(i) - CardView.w * (1 - self.squish) / 4, -CardView.h * 0.5 * (-1 if self.flipped else 1)),
+                    (self.card_x(i) - CardImage.w * (1 - self.squish) / 4, -CardImage.h * 0.5 * (-1 if self.flipped else 1)),
                     face_down=self.flipped,
                 ))
             else:
@@ -58,7 +59,7 @@ class HandView(ViewObject):
         return focused and isinstance(focused, CardView) and focused.real.card_id == card.card_id
 
     def card_x(self, i):
-        return i * self.card_w - CardView.w * (1 - self.squish) / 2
+        return i * self.card_w - CardImage.w * (1 - self.squish) / 2
 
     def card_y(self, rotation):
         if len(self.cards_to_show) == 1:

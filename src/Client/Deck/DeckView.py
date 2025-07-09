@@ -1,6 +1,6 @@
 import pygame
 
-from Client.Card.CardView import CardView
+from Client.Card.CardImage import CardImage
 from Client.ViewObject import ViewObject
 
 
@@ -20,7 +20,7 @@ class DeckView(ViewObject):
         pygame.draw.rect(screen, border_colour, (x, y, self.w, self.h), border_radius=margin)
         pygame.draw.rect(
             screen,
-            CardView.back_colour,
+            CardImage.back_colour,
             (x + margin, y + margin, self.w - margin * 2, self.h - margin * 2),
             border_radius=margin
         )

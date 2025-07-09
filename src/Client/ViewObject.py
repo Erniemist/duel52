@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 from Client import rectangle
 from functions import can_call
 
