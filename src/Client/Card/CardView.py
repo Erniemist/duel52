@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 import pygame
 
 from Client.ViewObject import ViewObject
@@ -24,48 +26,46 @@ class CardView(ViewObject):
         self.style = self.normal if style is None else style
 
     def draw(self, screen: pygame.Surface):
-        card = self.draw_surface()
+        card = make_image(self.style, self.face_down, self.card.value, self.w, self.h, self.rotation)
         x, y = self.position()
         x += self.w / 2
         y += self.h / 2
         card_rect = card.get_rect(center=(x, y))
         screen.blit(card, card_rect)
 
-    def draw_surface(self):
-        surface = pygame.Surface((self.w, self.h), pygame.SRCALPHA)
-        card = self.draw_card(surface)
-        return pygame.transform.rotate(card, self.rotation)
+@lru_cache()
+def make_image(style, face_down, value, w, h, rotation):
+    surface = pygame.Surface((w, h), pygame.SRCALPHA)
+    card = draw_card(style, face_down, value, w, h, surface)
+    return pygame.transform.rotate(card, rotation)
 
-    def draw_focused_card(self, screen):
-        return self.draw_card(screen)
+def draw_card(style, face_down, value, w, h, screen: pygame.Surface):
+    pygame.draw.rect(
+        screen,
+        style,
+        (0, 0, w, h),
+        border_radius=CardView.weight
+    )
 
-    def draw_card(self, screen: pygame.Surface):
+    if face_down:
         pygame.draw.rect(
             screen,
-            self.style,
-            (0, 0, self.w, self.h),
-            border_radius=self.weight
+            CardView.back_colour,
+            (CardView.weight, CardView.weight, w - CardView.weight * 2, h - CardView.weight * 2),
+            border_radius=CardView.weight
         )
-
-        if self.face_down:
-            pygame.draw.rect(
-                screen,
-                self.back_colour,
-                (self.weight, self.weight, self.w - self.weight * 2, self.h - self.weight * 2),
-                border_radius=self.weight
-            )
-            return screen
-        pygame.draw.rect(
-            screen,
-            self.front_colour,
-            (self.weight, self.weight, self.w - self.weight * 2, self.h - self.weight * 2),
-            border_radius=self.weight
-        )
-        font = pygame.font.SysFont('arial', self.font_size)
-        numeral = font.render(self.card.value, True, (0, 0, 0))
-
-        screen.blit(numeral, (
-            self.w / 2 - numeral.get_width() / 2,
-            self.h / 2 - numeral.get_height() / 2,
-        ))
         return screen
+    pygame.draw.rect(
+        screen,
+        CardView.front_colour,
+        (CardView.weight, CardView.weight, w - CardView.weight * 2, h - CardView.weight * 2),
+        border_radius=CardView.weight
+    )
+    font = pygame.font.SysFont('arial', CardView.font_size)
+    numeral = font.render(value, True, (0, 0, 0))
+
+    screen.blit(numeral, (
+        w / 2 - numeral.get_width() / 2,
+        h / 2 - numeral.get_height() / 2,
+    ))
+    return screen

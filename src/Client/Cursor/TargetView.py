@@ -33,7 +33,7 @@ class TargetView(ViewObject):
         line_starts = []
         line_ends = []
         for i in range(num_lines):
-            time_modifier = i + self.app.tick % 100 / 100 + (1 - self.length / line_size)
+            time_modifier = i + self.app.tick % 10 / 10 + (1 - self.length / line_size)
             line_starts.append((
                 start_x + line_d_x * min(max(1, time_modifier), num_lines),
                 start_y + line_d_y * min(max(1, time_modifier), num_lines),

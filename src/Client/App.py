@@ -33,6 +33,7 @@ class App:
         self.running = True
         self.actions = []
         self.tick = 0
+        self.clock = pygame.time.Clock()
         self.fake_server: None | ServerApp = None
         self.awaiting_choice: None | CardChoice = None
 
@@ -124,11 +125,11 @@ class App:
             self.game_state = GameData.from_server(self.fake_server.game, self.team).make_client()
         self.cursor.position = pygame.mouse.get_pos()
         self.game_view = GameView(self)
-        self.handle_events()
         self.set_target_style()
         self.game_view = GameView(self)
         self.game_view.draw_all(self.screen)
         pygame.display.flip()
+        self.clock.tick(60)
         self.tick += 1
 
     def set_target_style(self):
@@ -155,6 +156,12 @@ class App:
         if self.game_view is None:
             return None
         return self.game_view.focused_object
+
+    async def user_input(self):
+        while self.running:
+            if self.game_view:
+                self.handle_events()
+            await asyncio.sleep(0)
 
     def handle_events(self):
         for event in pygame.event.get():

@@ -22,7 +22,8 @@ async def main():
             app = App(screen, websocket)
         await asyncio.gather(
             app.run(),
-            app.handle_incoming()
+            app.handle_incoming(),
+            app.user_input(),
         )
 
 

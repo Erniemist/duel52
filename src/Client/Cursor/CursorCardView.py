@@ -1,6 +1,6 @@
 import pygame
 
-from Client.Card.CardView import CardView
+from Client.Card.CardView import CardView, draw_card
 
 
 class CursorCardView(CardView):
@@ -11,14 +11,22 @@ class CursorCardView(CardView):
     def __init__(self, card, app, pos):
         super().__init__(card, app, pos, style=self.highlight)
 
-    def draw_surface(self):
+    def draw(self, screen: pygame.Surface):
+        card = self.make_image()
+        x, y = self.position()
+        x += self.w / 2
+        y += self.h / 2
+        card_rect = card.get_rect(center=(x, y))
+        screen.blit(card, card_rect)
+
+    def make_image(self):
         x, y = self.shadow_offset
         w = self.w * self.shadow_scale + x
         h = self.h * self.shadow_scale + y
         card = pygame.Surface((w, h), pygame.SRCALPHA)
         shadow = self.draw_shadow()
         card.blit(shadow, self.shadow_offset)
-        card = self.draw_focused_card(card)
+        card = draw_card(self.style, self.face_down, self.card.value, self.w, self.h, card)
         return pygame.transform.scale(card, (w * self.perspective_scale, h * self.perspective_scale))
 
     def draw_shadow(self):
