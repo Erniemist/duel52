@@ -43,14 +43,14 @@ class TargetView(ViewObject):
                 start_y + line_d_y * min(max(1, time_modifier + self.length / line_size), num_lines),
             )
             diff = (end[0] - start[0] + line_size, end[1] - start[1] + line_size)
-            surface = self.get_line_segment_image(diff, screen, self.style, self.weight, line_size)
+            surface = self.get_line_segment_image(diff, self.style, self.weight, line_size)
             draw_at = (start[0] - line_size, start[1] - line_size)
             screen.blit(surface, draw_at)
 
     @staticmethod
     @lru_cache(maxsize=20)
-    def get_line_segment_image(diff, screen, style, weight, line_size):
-        surface = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+    def get_line_segment_image(diff, style, weight, line_size):
+        surface = pygame.Surface((line_size * 2, line_size * 2), pygame.SRCALPHA)
         pygame.draw.line(surface, style, (line_size, line_size), diff, weight)
         return surface
 
