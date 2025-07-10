@@ -82,7 +82,7 @@ class App:
             case {'target': None}:
                 return
             case {'target': {'source': source_id, 'style': style}}:
-                self.cursor.set_target_source(Target(source_id, style))
+                self.cursor.set_target_source(Target(source_id, tuple(style)))
             case _:
                 raise Exception(f"Invalid target data {response['awaiting_choice']['target']}")
 

@@ -33,7 +33,7 @@ class TargetView(ViewObject):
         line_d_x = d_x / num_lines
         line_d_y = d_y / num_lines
         for i in range(num_lines):
-            time_modifier = i + self.app.tick % 10 / 10 + (1 - self.length / line_size)
+            time_modifier = i + self.app.tick % 20 / 20 + (1 - self.length / line_size)
             start = (
                 start_x + line_d_x * min(max(1, time_modifier), num_lines),
                 start_y + line_d_y * min(max(1, time_modifier), num_lines),
@@ -43,6 +43,7 @@ class TargetView(ViewObject):
                 start_y + line_d_y * min(max(1, time_modifier + self.length / line_size), num_lines),
             )
             diff = (end[0] - start[0] + line_size, end[1] - start[1] + line_size)
+            print(diff, self.style, self.weight, line_size)
             surface = self.get_line_segment_image(diff, self.style, self.weight, line_size)
             draw_at = (start[0] - line_size, start[1] - line_size)
             screen.blit(surface, draw_at)
