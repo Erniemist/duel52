@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 import pygame
 
 from Client.ViewObject import ViewObject
@@ -30,20 +32,27 @@ class TargetView(ViewObject):
 
         line_d_x = d_x / num_lines
         line_d_y = d_y / num_lines
-        line_starts = []
-        line_ends = []
         for i in range(num_lines):
             time_modifier = i + self.app.tick % 10 / 10 + (1 - self.length / line_size)
-            line_starts.append((
+            start = (
                 start_x + line_d_x * min(max(1, time_modifier), num_lines),
                 start_y + line_d_y * min(max(1, time_modifier), num_lines),
-            ))
-            line_ends.append((
+            )
+            end = (
                 start_x + line_d_x * min(max(1, time_modifier + self.length / line_size), num_lines),
                 start_y + line_d_y * min(max(1, time_modifier + self.length / line_size), num_lines),
-            ))
-        for start, end in zip(line_starts, line_ends):
-            pygame.draw.line(screen, self.style, start, end, self.weight)
+            )
+            diff = (end[0] - start[0] + line_size, end[1] - start[1] + line_size)
+            surface = self.get_line_segment_image(diff, screen, self.style, self.weight, line_size)
+            draw_at = (start[0] - line_size, start[1] - line_size)
+            screen.blit(surface, draw_at)
+
+    @staticmethod
+    @lru_cache(maxsize=20)
+    def get_line_segment_image(diff, screen, style, weight, line_size):
+        surface = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+        pygame.draw.line(surface, style, (line_size, line_size), diff, weight)
+        return surface
 
     def targetter_centre(self):
         if self.target_source.pair:
