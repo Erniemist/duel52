@@ -1,3 +1,4 @@
+from Client.Actions.PlayAction import PlayAction
 from Client.Card.ClientCard import ClientCard
 
 
@@ -10,8 +11,13 @@ class ClientSide:
         self.team = player.team
         self.cards: list[ClientCard] = []
 
-    def can_place(self, card, my_turn):
-        return my_turn and self.team == self.game.active_player().team and self.player.actions > 0
+    def can_place(self, card):
+        return any(
+            proposal['action'] == PlayAction.name
+            and proposal['data']['card'] == card.card_id
+            and proposal['data']['side'] == self.side_id
+            for proposal in self.game.proposals
+        )
 
     def on_place(self, card):
         self.game.play_action(card, self)

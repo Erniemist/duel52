@@ -25,6 +25,7 @@ class ServerApp:
     async def send(self, sender: ServerConnection, action_id: None | str = None):
         for connection, team in self.teams.items():
             data = {'game': GameData.from_server(self.game, team).to_json(), 'team': team}
+            print(data['game']['proposals'])
             if connection == sender and action_id is not None:
                 data['action_id'] = action_id
             if self.game.awaiting_choice() and team == self.game.awaited_choices[0].chooser.team:

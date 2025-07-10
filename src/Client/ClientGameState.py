@@ -21,6 +21,7 @@ class ClientGameState:
         self.board: ClientBoard = board
         self.actions = []
         self.pending_attack = None
+        self.proposals = game_data.proposals
 
     def active_player(self):
         return self._active_player

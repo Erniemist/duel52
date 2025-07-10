@@ -81,15 +81,8 @@ class ServerMinion(Minion):
             if other.minion is not self and other.minion.pair is None
         ]
 
-    def could_attack(self):
-        return self.attacks_left() > 0 and len([
-            enemy
-            for enemy in self.player.other_player().minions()
-            if enemy.side.lane is self.side.lane
-        ]) > 0
-
-    def could_act(self):
-        return self.could_attack() or self.face_down or self.could_pair()
+    def can_attack(self):
+        return self.attacks_left() > 0 and not self.frozen and not self.face_down
 
     def has_active_keyword(self, keyword):
         return not self.face_down and self.card.has_keyword(keyword)

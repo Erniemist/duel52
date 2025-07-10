@@ -6,6 +6,7 @@ from Server.Actions.FlipAction import FlipAction
 from Server.Actions.PairAction import PairAction
 from Server.Actions.PlayAction import PlayAction
 from DataTransfer.CardData import CardData
+from Server.Actions.Proposals import proposals
 from Server.CardTypes.card_types import types
 from Server.Choices.CardChoice import CardChoice
 from Server.Effects.Effect import Effect
@@ -123,6 +124,11 @@ class ServerGameState:
             *self.get_hand_cards(),
         ]
 
+    def get_proposals(self, for_player):
+        if for_player.team != self.active_player().team:
+            return []
+        return [action.json() for action in proposals(self.active_player())]
+
     def play(self, card_id, side_id):
         self.resolve_action(PlayAction(self, card_id, side_id))
 
@@ -161,9 +167,11 @@ class ServerGameState:
             return
 
         self.check_victory()
-        if self.active_player().actions == 0 or self.active_player().no_possible_actions():
+        if self.active_player().actions == 0 or len(self.get_proposals(self.active_player())) == 0:
             self.active_player().actions = 0
             self.new_turn()
+            if len(self.get_proposals(self.active_player())) == 0:
+                self.new_turn()
 
     def trigger(self, trigger):
         self.triggers.append(trigger)
