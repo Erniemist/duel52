@@ -1,4 +1,5 @@
 from DataTransfer.CardData import CardData
+from DataTransfer.GameData import GameData
 from GameFactory import GameFactory
 from Server.ServerApp import ServerApp
 

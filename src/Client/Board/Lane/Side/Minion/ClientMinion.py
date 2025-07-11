@@ -47,8 +47,8 @@ class ClientMinion(Minion):
     def on_hover(self):
         pass
 
-    def can_choose(self, choice):
-        return choice.could_choose(self.card)
+    def can_choose(self, valid_choices):
+        return self.card in valid_choices
 
     def on_choose(self):
         self.game.submit_choice(self.card.card_id)

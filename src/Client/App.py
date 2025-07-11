@@ -11,11 +11,6 @@ from Client.Cursor.Target import Target
 from DataTransfer.GameData import GameData
 from Client.GameView import GameView
 from Server.Choices.CardChoice import CardChoice
-from Server.Choices.FaceDown import FaceDown
-from Server.Choices.Friendly import Friendly
-from Server.Choices.FromBoard import FromBoard
-from Server.Choices.FromHand import FromHand
-from Server.Choices.OtherLane import OtherLane
 from Server.ServerApp import ServerApp
 
 LEFT = 1
@@ -56,28 +51,17 @@ class App:
             self.fake_server = ServerApp(name='fake', game=game_data.make_server())
             if 'awaiting_choice' in response.keys():
                 self.set_awaiting_choice(response)
-                self.fake_server.game.awaited_choices.append(self.awaiting_choice)
+                self.fake_server.game.awaited_choices.append(
+                    CardChoice([], self.game_state, self.my_player())
+                )
             if not self.team:
                 self.team = response['team']
 
     def set_awaiting_choice(self, response):
-        validators = []
-        for validator in response['awaiting_choice']['validators']:
-            card = None
-            if validator['card'] is not None:
-                card = self.game_state.find_card_from_board(validator['card'])
-            match validator['name']:
-                case FromHand.name: validators.append(FromHand(self.my_player()))
-                case FromBoard.name: validators.append(FromBoard(self.game_state))
-                case FaceDown.name: validators.append(FaceDown())
-                case OtherLane.name: validators.append(OtherLane(card))
-                case Friendly.name: validators.append(Friendly(card))
-                case _: raise Exception(f'{validator} is not a valid choice')
-        self.awaiting_choice = CardChoice(
-            validators,
-            self.game_state,
-            self.my_player(),
-        )
+        self.awaiting_choice = [
+            self.game_state.find_card(card_id)
+            for card_id in response['awaiting_choice']['valid_choices']
+        ]
         match response['awaiting_choice']:
             case {'target': None}:
                 return
