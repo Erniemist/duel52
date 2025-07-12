@@ -1,6 +1,8 @@
+from functools import lru_cache
+
 import pygame
 
-from Client.Card.CardView import CardView
+from Client.Card.CardImage import CardImage
 from Client.ViewObject import ViewObject
 
 
@@ -14,22 +16,30 @@ class DeckView(ViewObject):
         self.deck = self.real
 
     def draw(self, screen: pygame.Surface):
-        x, y = self.position()
-        border_colour = (255, 255, 0) if self.focused else (0, 0, 0)
+        screen.blit(
+            self.make_image(self.w, self.h, self.focused, self.touching_mouse(), self.font_size, len(self.deck.cards)),
+            self.position(),
+        )
+
+    @staticmethod
+    @lru_cache()
+    def make_image(w, h, focused, touching_mouse, font_size, num_cards):
+        surface = pygame.Surface((w, h), pygame.SRCALPHA)
+        border_colour = (255, 255, 0) if focused else (0, 0, 0)
         margin = 5
-        pygame.draw.rect(screen, border_colour, (x, y, self.w, self.h), border_radius=margin)
+        pygame.draw.rect(surface, border_colour, (0, 0, w, h), border_radius=margin)
         pygame.draw.rect(
-            screen,
-            CardView.back_colour,
-            (x + margin, y + margin, self.w - margin * 2, self.h - margin * 2),
+            surface,
+            CardImage.back_colour,
+            (margin, margin, w - margin * 2, h - margin * 2),
             border_radius=margin
         )
-        if self.touching_mouse():
-            font = pygame.font.SysFont('arial', self.font_size)
-            numeral = font.render(str(len(self.deck.cards)), True, (255, 255, 255))
+        if touching_mouse:
+            font = pygame.font.SysFont('arial', font_size)
+            numeral = font.render(str(num_cards), True, (255, 255, 255))
 
-            screen.blit(numeral, (
-                x + self.w / 2 - numeral.get_width() / 2,
-                y + self.h / 2 - numeral.get_height() / 2,
+            surface.blit(numeral, (
+                w / 2 - numeral.get_width() / 2,
+                h / 2 - numeral.get_height() / 2,
             ))
-
+        return surface

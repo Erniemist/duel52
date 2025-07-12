@@ -1,4 +1,6 @@
+from Server.CardTypes.Abilities.Stealth import Stealth
 from Server.CardTypes.card_types import get_type
+from Server.MinionLastInfo import MinionLastInfo
 from Server.ServerMinion import ServerMinion
 from typing import TYPE_CHECKING
 
@@ -19,13 +21,19 @@ class ServerCard:
         self.card_id = card_data.card_id
         self.game: ServerGameState = game
         self.minion: None | ServerMinion = None
-        self.minion_last_info: None | dict = None
+        self.minion_last_info = None
 
     def move_to(self, new_host):
         old_host = self.host
+        if self.minion is not None:
+            self.minion_last_info = MinionLastInfo(self.minion)
         self.host = new_host
         old_host.remove_card(self)
         self.host.add_card(self)
 
     def has_keyword(self, keyword):
         return any(ability == keyword for ability in self.type.abilities)
+
+    def can_see(self, other):
+        team = self.minion.team if self.minion else self.minion_last_info.team
+        return team == other.team or not other.has_active_keyword(Stealth)

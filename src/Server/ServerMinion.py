@@ -1,4 +1,6 @@
 from Client.Board.Lane.Side.Minion.Minion import Minion
+from Server.CardTypes.Abilities.Backstab import Backstab
+from Server.CardTypes.Abilities.Jack import Jack
 from Server.Triggers.AttackTrigger import AttackTrigger
 from Server.Triggers.FlipTrigger import FlipTrigger
 
@@ -6,16 +8,14 @@ from Server.Triggers.FlipTrigger import FlipTrigger
 class ServerMinion(Minion):
     base_max_attacks = 1
 
-    def __init__(self, card, side, game, minion_data=None):
+    def __init__(self, card, game, minion_data=None):
         self.card = card
-        self.side = side
         self.game = game
         self.value = card.value
-        self.player = side.player
+        self.player = self.side.player
         self.team = self.player.team
         self.pair = None
         if minion_data is None:
-
             self.max_hp = self.card.type.max_hp if self.card.type else 2
             self.hp = self.max_hp
             self.face_down = True
@@ -29,6 +29,10 @@ class ServerMinion(Minion):
             self.attacks_made = minion_data.attacks_made
             self.max_attacks = minion_data.max_attacks
             self.frozen = minion_data.frozen
+
+    @property
+    def side(self):
+        return self.card.host
 
     def end_turn(self):
         self.attacks_made = 0
@@ -44,14 +48,21 @@ class ServerMinion(Minion):
 
     def attack(self, enemies):
         self.attacks_made += 1
-        damage = 2 if self.pair else 1
         for enemy in enemies:
             self.game.trigger(AttackTrigger(
                 attacker_id=self.card.card_id,
                 defender_id=enemy.card.card_id,
                 player=self.player,
             ))
-            enemy.take_damage(damage)
+            enemy.take_damage(self.calculate_damage(enemy))
+
+    def calculate_damage(self, enemy):
+        damage = 1
+        if self.pair:
+            damage += 1
+        if self.has_active_keyword(Backstab) and enemy.has_active_keyword(Jack):
+            damage += 1
+        return damage
 
     def take_damage(self, damage):
         self.hp -= damage
@@ -70,12 +81,8 @@ class ServerMinion(Minion):
             if other.minion is not self and other.minion.pair is None
         ]
 
-    def could_attack(self):
-        return self.attacks_left() > 0 and len([
-            enemy
-            for enemy in self.player.other_player().minions()
-            if enemy.side.lane is self.side.lane
-        ]) > 0
+    def can_attack(self):
+        return self.attacks_left() > 0 and not self.frozen and not self.face_down
 
-    def could_act(self):
-        return self.could_attack() or self.face_down or self.could_pair()
+    def has_active_keyword(self, keyword):
+        return not self.face_down and self.card.has_keyword(keyword)

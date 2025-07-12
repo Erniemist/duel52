@@ -116,10 +116,10 @@ class Cursor:
         if mode == 'hover':
             return lambda x: x.can_hover(self.app.my_player())
         if mode == 'place':
-            return lambda x: x.can_place(self.card(), self.app.is_my_turn())
+            return lambda x: x.can_place(self.card())
         if mode == 'choose':
             return lambda x: x.can_choose(self.app.awaiting_choice)
         if mode == 'target':
-            return lambda x: x.can_target(self.target_source(), self.app.is_my_turn())
+            return lambda x: x.can_target()
         else:
-            return lambda x: x.can_select(self.app.is_my_turn())
+            return lambda x: x.can_select()

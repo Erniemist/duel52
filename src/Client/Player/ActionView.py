@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 import pygame.draw
 
 from Client.ViewObject import ViewObject
@@ -13,18 +15,26 @@ class ActionView(ViewObject):
         self.player = self.real
 
     def draw(self, screen):
-        x, y = self.position()
-        pygame.draw.ellipse(screen, (0, 0, 0), (x, y, self.w, self.w))
-        pygame.draw.ellipse(
-            screen,
-            (255, 255, 0),
-            (x + self.weight, y + self.weight, self.w - self.weight * 2, self.w - self.weight * 2)
+        screen.blit(
+            self.get_image(self.player.actions, self.font_size, self.w, self.weight),
+            self.position(),
         )
-        font = pygame.font.SysFont('arial', self.font_size)
-        text = font.render(str(self.player.actions), True, (0, 0, 0))
 
-        screen.blit(text, (
-            x + self.w / 2 - text.get_width() / 2,
-            y + self.w / 2 - text.get_height() / 2,
+    @staticmethod
+    @lru_cache()
+    def get_image(actions, font_size, w, weight):
+        surface = pygame.Surface((w, w), pygame.SRCALPHA)
+        pygame.draw.ellipse(surface, (0, 0, 0), (0, 0, w, w))
+        pygame.draw.ellipse(
+            surface,
+            (255, 255, 0),
+            (weight, weight, w - weight * 2, w - weight * 2)
+        )
+        font = pygame.font.SysFont('arial', font_size)
+        text = font.render(str(actions), True, (0, 0, 0))
+        surface.blit(text, (
+            w / 2 - text.get_width() / 2,
+            w / 2 - text.get_height() / 2,
         ))
+        return surface
 

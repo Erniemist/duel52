@@ -7,7 +7,8 @@ from Client.Board.ClientBoard import ClientBoard
 from Client.Card.ClientCard import ClientCard
 from Client.Graveyard.ClientGraveyard import ClientGraveyard
 from Client.Player.ClientPlayer import ClientPlayer
-from Server.CardTypes.Abilities.Ten import Ten
+from Server.CardTypes.Abilities.Cleave import Cleave
+from Server.CardTypes.Abilities.Stealth import Stealth
 
 
 class ClientGameState:
@@ -20,9 +21,13 @@ class ClientGameState:
         self.board: ClientBoard = board
         self.actions = []
         self.pending_attack = None
+        self.proposals = game_data.proposals
 
     def active_player(self):
         return self._active_player
+
+    def find_card(self, card_id) -> None | ClientCard:
+        return self.find_card_from_hand(card_id) or self.find_card_from_board(card_id)
 
     def find_card_from_board(self, card_id) -> None | ClientCard:
         return next((card for card in self.board.get_cards() if card.card_id == card_id), None)
@@ -41,7 +46,7 @@ class ClientGameState:
         self.actions.append(FlipAction(minion))
 
     def attack(self, attacker, target):
-        if not attacker.card.has_keyword(Ten):
+        if not attacker.has_active_keyword(Cleave) or target.has_active_keyword(Stealth):
             self.actions.append(AttackAction(attacker, [target]))
             return
         if not self.pending_attack:

@@ -6,6 +6,7 @@ from Server.Actions.FlipAction import FlipAction
 from Server.Actions.PairAction import PairAction
 from Server.Actions.PlayAction import PlayAction
 from DataTransfer.CardData import CardData
+from Server.Actions.Proposals import proposals
 from Server.CardTypes.card_types import types
 from Server.Choices.CardChoice import CardChoice
 from Server.Effects.Effect import Effect
@@ -14,6 +15,19 @@ from Server.ServerCard import ServerCard
 from Client.Deck.Deck import Deck
 from Server.ServerGraveyard import ServerGraveyard
 from Server.ServerPlayer import ServerPlayer
+
+
+class All:
+    def __init__(self, game):
+        self.game = game
+
+    def other_side(self, card):
+        side = card.minion.side if card.minion else card.minion_last_info.side
+        return [
+            other
+            for other in side.other_side().minions()
+            if card.can_see(other)
+        ]
 
 
 class ServerGameState:
@@ -35,6 +49,7 @@ class ServerGameState:
             self.graveyard: ServerGraveyard = graveyard
             self.players: list[ServerPlayer] = players
             self.board: ServerBoard = board
+        self.all = All(self)
 
     def active_player(self) -> ServerPlayer:
         return self.players[self.active_player_index]
@@ -91,7 +106,7 @@ class ServerGameState:
         return None
 
     def find_card_from_board(self, card_id) -> ServerCard:
-        return next((card for card in self.board.get_cards() if card.card_id == card_id))
+        return next((card for card in self.board.get_cards() if card.card_id == card_id), None)
 
     def find_card_from_hand(self, card_id) -> None | ServerCard:
         return next((card for card in self.get_hand_cards() if card.card_id == card_id), None)
@@ -108,6 +123,11 @@ class ServerGameState:
             *self.graveyard.cards.values(),
             *self.get_hand_cards(),
         ]
+
+    def get_proposals(self, for_player):
+        if for_player.team != self.active_player().team:
+            return []
+        return [action.json() for action in proposals(self.active_player())]
 
     def play(self, card_id, side_id):
         self.resolve_action(PlayAction(self, card_id, side_id))
@@ -147,9 +167,11 @@ class ServerGameState:
             return
 
         self.check_victory()
-        if self.active_player().actions == 0 or self.active_player().no_possible_actions():
+        if self.active_player().actions == 0 or len(self.get_proposals(self.active_player())) == 0:
             self.active_player().actions = 0
             self.new_turn()
+            if len(self.get_proposals(self.active_player())) == 0:
+                self.new_turn()
 
     def trigger(self, trigger):
         self.triggers.append(trigger)

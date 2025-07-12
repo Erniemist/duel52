@@ -20,7 +20,6 @@ def test_queen():
 
     game.play('X_3', '444')
     game.flip('X_3')
-    game.new_turn()
 
     game.play('X_2', '333')
     assert len(game.find_side('111').cards) == 2
@@ -31,6 +30,7 @@ def test_queen():
         game.choose('X_3')
     game.choose('X_2')
     assert len(game.find_side('111').cards) == 3
+    assert game.find_card_from_board('X_2').minion.side.side_id == '111'
 
 
 def test_pull_pair():

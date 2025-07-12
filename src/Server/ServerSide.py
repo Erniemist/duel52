@@ -27,13 +27,12 @@ class ServerSide:
                 return
             pair.card.move_to(self)
             return
-        card.minion = ServerMinion(card, self, self.game)
+        card.minion = ServerMinion(card, self.game)
 
     def remove_card(self, card):
         self.cards.remove(card)
         if self.still_on_board(card):
             return
-        card.minion_last_info = card.minion
         card.minion = None
         if card.host is self.game.graveyard:
             self.game.trigger(DeathTrigger(card.card_id, self.player))
@@ -43,3 +42,6 @@ class ServerSide:
 
     def other_side(self):
         return next(side for side in self.lane.sides if side.side_id != self.side_id)
+
+    def minions(self):
+        return [card.minion for card in self.cards]

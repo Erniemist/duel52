@@ -28,8 +28,6 @@ class ServerPlayer:
     def start_turn(self, actions: int = 3):
         self.actions = actions
         self.deck.draw_from_top(self.hand)
-        if self.no_possible_actions():
-            self.game.new_turn()
 
     def end_turn(self):
         self.actions = 0
@@ -48,9 +46,6 @@ class ServerPlayer:
 
     def finish_action(self):
         self.actions -= 1
-
-    def no_possible_actions(self):
-        return len(self.hand.cards) == 0 and len([minion for minion in self.minions() if minion.could_act()]) == 0
 
     def other_team(self):
         return next(team for team in self.TEAMS if team is not self.team)
