@@ -6,7 +6,13 @@
   - bash: `source .venv/bin/activate`
   - fish: `source .venv/bin/activate.fish`
 - Windows: `.venv\Scripts\activate.bat`
+- VS Code: Settings > Workspace > Activate Env in Current Terminal (restart Terminal)
 - `pip install -r requirements.txt`
-- `python client.py`
+- `pytest`
+- `python src/client.py`
+- 
+To run local server:
+- `cp .env.example .env`
+- `python src/server.py`
 
 rules: http://juddmadden.com/duel52/
