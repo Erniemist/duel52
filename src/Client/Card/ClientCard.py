@@ -33,8 +33,8 @@ class ClientCard:
     def on_hover(self):
         pass
 
-    def can_choose(self, valid_choices):
-        return self in valid_choices
+    def can_choose(self, choice):
+        return self in choice.cards
 
     def on_select(self, cursor):
         cursor.pick_up(self)
