@@ -46,7 +46,9 @@ class Cursor:
     def cancel(self):
         match self.mode():
             case 'choose':
-                pass
+                if self.app.awaiting_choice and self.app.awaiting_choice.optional:
+                    self.app.game_state.submit_choice(None)
+                    self.cancel_target()
             case 'target':
                 self.cancel_target()
             case 'place':

@@ -3,6 +3,7 @@ import uuid
 
 from websockets import ServerConnection
 
+from DataTransfer.ChoiceData import ChoiceData
 from DataTransfer.GameData import GameData
 from Server.Actions.FlipAction import FlipAction
 from Server.Actions.PlayAction import PlayAction
@@ -29,21 +30,8 @@ class ServerApp:
                 data['action_id'] = action_id
             if self.game.awaiting_choice() and team == self.game.awaited_choices[0].chooser.team:
                 choice = self.game.awaited_choices[0]
-                data['awaiting_choice'] = self.get_valid_choices(choice)
+                data['awaiting_choice'] = ChoiceData.from_server(self.game, choice).to_json()
             await connection.send(json.dumps(data))
-
-    def get_valid_choices(self, choice):
-        return {
-            'valid_choices': [
-                card.card_id
-                for card in self.game.get_cards()
-                if choice.could_choose(card)
-            ],
-            'target': {
-                'source': choice.target.source_id,
-                'style': choice.target.style,
-            } if choice.target else None
-        }
 
     async def create(self, websocket: ServerConnection):
         team = ServerPlayer.TEAMS[0]
@@ -57,6 +45,7 @@ class ServerApp:
 
     async def handle_action(self, websocket: ServerConnection, data: dict):
         print('team', self.teams[websocket])
+        print(data)
         self.resolve_action(data, self.teams[websocket])
         await self.send(websocket, data['action_id'])
 
