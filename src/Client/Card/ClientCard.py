@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 
+from Client.Actions.PlayAction import PlayAction
 from Server.CardTypes.card_types import get_type
 
 if TYPE_CHECKING:
@@ -19,11 +20,11 @@ class ClientCard:
         self.game: ClientGameState = game
         self.minion = None
 
-    def can_select(self, my_turn):
-        return (
-            my_turn
-            and self.game.active_player().team == self.host.player.team
-            and self.game.active_player().actions > 0
+    def can_select(self):
+        return any(
+            proposal['action'] == PlayAction.name
+            and proposal['data']['card'] == self.card_id
+            for proposal in self.game.proposals
         )
 
     def can_hover(self, player):
@@ -32,8 +33,8 @@ class ClientCard:
     def on_hover(self):
         pass
 
-    def can_choose(self, choice):
-        return choice.could_choose(self)
+    def can_choose(self, valid_choices):
+        return self in valid_choices
 
     def on_select(self, cursor):
         cursor.pick_up(self)

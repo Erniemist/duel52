@@ -6,13 +6,14 @@ from Server.ServerGameState import ServerGameState
 
 
 class GameData:
-    def __init__(self, winner, active_player_index, graveyard, players, board):
+    def __init__(self, winner, active_player_index, graveyard, players, board, proposals):
         self.winner = winner
         self.active_player_index = active_player_index
         self.graveyard: GraveyardData = graveyard
         self.players: list[PlayerData] = players
         self.board: BoardData = board
         self.is_server = None
+        self.proposals = proposals
 
     @staticmethod
     def from_json(data):
@@ -22,6 +23,7 @@ class GameData:
             players=[PlayerData.from_json(player) for player in data['players']],
             board=BoardData.from_json(data['board']),
             winner=data['winner'],
+            proposals=data['proposals'],
         )
 
     def make_server(self):
@@ -36,7 +38,8 @@ class GameData:
             graveyard=GraveyardData.from_server(server.graveyard, for_player),
             players=[PlayerData.from_server(player, for_player) for player in server.players],
             board=BoardData.from_server(server.board, for_player),
-            winner=server.winner.team if server.winner else None
+            winner=server.winner.team if server.winner else None,
+            proposals=server.get_proposals(for_player),
         )
 
     def make_client(self):
@@ -59,5 +62,6 @@ class GameData:
             'graveyard': self.graveyard.to_json(),
             'players': [player.to_json() for player in self.players],
             'board': self.board.to_json(),
-            'winner': self.winner
+            'winner': self.winner,
+            'proposals': self.proposals,
         }

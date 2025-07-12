@@ -21,9 +21,13 @@ class ClientGameState:
         self.board: ClientBoard = board
         self.actions = []
         self.pending_attack = None
+        self.proposals = game_data.proposals
 
     def active_player(self):
         return self._active_player
+
+    def find_card(self, card_id) -> None | ClientCard:
+        return self.find_card_from_hand(card_id) or self.find_card_from_board(card_id)
 
     def find_card_from_board(self, card_id) -> None | ClientCard:
         return next((card for card in self.board.get_cards() if card.card_id == card_id), None)

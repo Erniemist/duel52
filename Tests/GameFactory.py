@@ -38,6 +38,7 @@ class GameFactory:
             ]},
         ]},
         'winner': None,
+        'proposals': [],
     }
 
     def __init__(self):

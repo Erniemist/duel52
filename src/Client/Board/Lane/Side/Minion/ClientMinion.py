@@ -1,3 +1,6 @@
+from Client.Actions.AttackAction import AttackAction
+from Client.Actions.FlipAction import FlipAction
+from Client.Actions.PairAction import PairAction
 from Client.Board.Lane.Side.Minion.Minion import Minion
 from Client.Cursor.Target import Target
 from Server.CardTypes.Abilities.Stealth import Stealth
@@ -23,12 +26,14 @@ class ClientMinion(Minion):
     def side(self):
         return self.card.host
 
-    def can_select(self, my_turn):
-        if self.frozen:
-            return False
-        if not my_turn or self.team != self.game.active_player().team or self.player.actions < 1:
-            return False
-        return not self.pair or self.attacks_left() > 0
+    def can_select(self):
+        for proposal in self.game.proposals:
+            match proposal:
+                case {'action': FlipAction.name, 'data': {'card': self.card.card_id}}: return True
+                case {'action': PairAction.name, 'data': {'card_1': self.card.card_id}}: return True
+                case {'action': AttackAction.name, 'data': {'attacker': self.card.card_id}}: return True
+                case _: continue
+        return False
 
     def on_select(self, cursor):
         if self.face_down:
@@ -42,32 +47,19 @@ class ClientMinion(Minion):
     def on_hover(self):
         pass
 
-    def can_choose(self, choice):
-        return choice.could_choose(self.card)
+    def can_choose(self, valid_choices):
+        return self.card in valid_choices
 
     def on_choose(self):
         self.game.submit_choice(self.card.card_id)
 
-    def can_target(self, target_source, my_turn):
-        if self.game.active_player().team != self.team:
-            return self.can_be_attacked(target_source)
-        return my_turn and self.can_pair(target_source)
-
-    def can_be_attacked(self, target_source):
-        if target_source.side.lane != self.side.lane:
-            return False
-        if target_source.attacks_left() < 1:
-            return False
-        if self.has_active_keyword(Stealth) and self.game.pending_attack:
-            return False
-        return True
-
-    def can_pair(self, target_source):
-        if self.face_down:
-            return False
-        if self.pair or target_source.pair:
-            return False
-        return self.value == target_source.value
+    def can_target(self):
+        for proposal in self.game.proposals:
+            if proposal['action'] == PairAction.name and proposal['data']['card_2'] == self.card.card_id:
+                return True
+            if proposal['action'] == AttackAction.name and self.card.card_id in proposal['data']['targets']:
+                return True
+        return False
 
     def on_target(self, target_source):
         if self.game.active_player().team != self.team:

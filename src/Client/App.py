@@ -11,11 +11,6 @@ from Client.Cursor.Target import Target
 from DataTransfer.GameData import GameData
 from Client.GameView import GameView
 from Server.Choices.CardChoice import CardChoice
-from Server.Choices.FaceDown import FaceDown
-from Server.Choices.Friendly import Friendly
-from Server.Choices.FromBoard import FromBoard
-from Server.Choices.FromHand import FromHand
-from Server.Choices.OtherLane import OtherLane
 from Server.ServerApp import ServerApp
 
 LEFT = 1
@@ -33,6 +28,7 @@ class App:
         self.running = True
         self.actions = []
         self.tick = 0
+        self.clock = pygame.time.Clock()
         self.fake_server: None | ServerApp = None
         self.awaiting_choice: None | CardChoice = None
 
@@ -55,33 +51,22 @@ class App:
             self.fake_server = ServerApp(name='fake', game=game_data.make_server())
             if 'awaiting_choice' in response.keys():
                 self.set_awaiting_choice(response)
-                self.fake_server.game.awaited_choices.append(self.awaiting_choice)
+                self.fake_server.game.awaited_choices.append(
+                    CardChoice([], self.game_state, self.my_player())
+                )
             if not self.team:
                 self.team = response['team']
 
     def set_awaiting_choice(self, response):
-        validators = []
-        for validator in response['awaiting_choice']['validators']:
-            card = None
-            if validator['card'] is not None:
-                card = self.game_state.find_card_from_board(validator['card'])
-            match validator['name']:
-                case FromHand.name: validators.append(FromHand(self.my_player()))
-                case FromBoard.name: validators.append(FromBoard(self.game_state))
-                case FaceDown.name: validators.append(FaceDown())
-                case OtherLane.name: validators.append(OtherLane(card))
-                case Friendly.name: validators.append(Friendly(card))
-                case _: raise Exception(f'{validator} is not a valid choice')
-        self.awaiting_choice = CardChoice(
-            validators,
-            self.game_state,
-            self.my_player(),
-        )
+        self.awaiting_choice = [
+            self.game_state.find_card(card_id)
+            for card_id in response['awaiting_choice']['valid_choices']
+        ]
         match response['awaiting_choice']:
             case {'target': None}:
                 return
             case {'target': {'source': source_id, 'style': style}}:
-                self.cursor.set_target_source(Target(source_id, style))
+                self.cursor.set_target_source(Target(source_id, tuple(style)))
             case _:
                 raise Exception(f"Invalid target data {response['awaiting_choice']['target']}")
 
@@ -124,11 +109,11 @@ class App:
             self.game_state = GameData.from_server(self.fake_server.game, self.team).make_client()
         self.cursor.position = pygame.mouse.get_pos()
         self.game_view = GameView(self)
-        self.handle_events()
         self.set_target_style()
         self.game_view = GameView(self)
         self.game_view.draw_all(self.screen)
         pygame.display.flip()
+        self.clock.tick(60)
         self.tick += 1
 
     def set_target_style(self):
@@ -155,6 +140,12 @@ class App:
         if self.game_view is None:
             return None
         return self.game_view.focused_object
+
+    async def user_input(self):
+        while self.running:
+            if self.game_view:
+                self.handle_events()
+            await asyncio.sleep(0)
 
     def handle_events(self):
         for event in pygame.event.get():
