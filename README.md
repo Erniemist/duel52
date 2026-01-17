@@ -10,7 +10,7 @@
 - `pip install -r requirements.txt`
 - `pytest`
 - `python src/client.py`
-- 
+
 To run local server:
 - `cp .env.example .env`
 - `python src/server.py`
