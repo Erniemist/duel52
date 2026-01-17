@@ -18,7 +18,7 @@ class MinionView(ViewObject):
     highlight = (255, 255, 0)
     targeted = (255, 0, 0)
     normal = (0, 0, 0)
-    exahusted_colour = (200, 200, 200)
+    exhausted_colour = (200, 200, 200)
 
     def __init__(self, minion, app, position):
         x, y = position
@@ -66,7 +66,7 @@ class MinionView(ViewObject):
             return CardImage.front_colour_frozen
         if self.minion.attacks_left() > 0:
             return CardImage.front_colour
-        return self.exahusted_colour
+        return self.exhausted_colour
 
     def get_border(self):
         source = self.app.cursor.target_source()
@@ -85,6 +85,7 @@ class MinionView(ViewObject):
         if other_pair.minion is self.minion:
             return False
         return other_pair.minion.team == self.minion.team
+
 
 class MinionImage:
     weight = 5

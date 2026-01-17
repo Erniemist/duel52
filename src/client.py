@@ -49,8 +49,9 @@ async def choose_game(websocket, games):
         if name in [game.name for game in games]:
             return await choose_game(websocket, games)
         await websocket.send(json.dumps({'action': 'create', 'name': name}))
-        return
+        return None
     await websocket.send(json.dumps({'action': 'join', 'game_id': games[choice - 1]['game_id']}))
+    return None
 
 
 if __name__ == '__main__':
